@@ -11,7 +11,9 @@ const STORAGE_KEYS = {
   LAYER_VISIBILITY: 'dielineforge_layer_visibility',
   CUSTOM_MATERIALS: 'dielineforge_custom_materials',
   CUSTOM_SHEETS: 'dielineforge_custom_sheets',
-  LAST_ACTIVE_TAB: 'dielineforge_active_tab'
+  LAST_ACTIVE_TAB: 'dielineforge_active_tab',
+  CUSTOM_LOGO: 'dielineforge_custom_logo',
+  BRAND_NAME: 'dielineforge_brand_name'
 };
 
 @Injectable({
@@ -197,7 +199,51 @@ export class StorageService {
     }
   }
 
-  // 7. Reset and Storage Info
+  // 7. Custom Logo & Brand Settings
+  saveCustomLogo(logoDataUrl: string | null): boolean {
+    if (!this.isAvailable()) return false;
+    try {
+      if (logoDataUrl) {
+        localStorage.setItem(STORAGE_KEYS.CUSTOM_LOGO, logoDataUrl);
+      } else {
+        localStorage.removeItem(STORAGE_KEYS.CUSTOM_LOGO);
+      }
+      return true;
+    } catch (e) {
+      console.warn('StorageService: Failed to save custom logo', e);
+      return false;
+    }
+  }
+
+  loadCustomLogo(): string | null {
+    if (!this.isAvailable()) return null;
+    try {
+      return localStorage.getItem(STORAGE_KEYS.CUSTOM_LOGO);
+    } catch {
+      return null;
+    }
+  }
+
+  saveBrandName(name: string): boolean {
+    if (!this.isAvailable()) return false;
+    try {
+      localStorage.setItem(STORAGE_KEYS.BRAND_NAME, name);
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
+  loadBrandName(): string | null {
+    if (!this.isAvailable()) return null;
+    try {
+      return localStorage.getItem(STORAGE_KEYS.BRAND_NAME);
+    } catch {
+      return null;
+    }
+  }
+
+  // 8. Reset and Storage Info
   clearAllStorage(): boolean {
     if (!this.isAvailable()) return false;
     try {

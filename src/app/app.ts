@@ -28,8 +28,11 @@ export class App {
   showProjectModal = signal<boolean>(false);
   showExportModal = signal<boolean>(false);
   showProjectsModal = signal<boolean>(false);
+  showSettingsModal = signal<boolean>(false);
   saveSnapshotName = signal<string>('');
   notificationMessage = signal<string | null>(null);
+  logoUploadError = signal<string | null>(null);
+  isDraggingLogo = signal<boolean>(false);
 
   setTab(tab: WorkspaceTab): void {
     this.state.activeTab.set(tab);
@@ -111,5 +114,62 @@ export class App {
   updateNotes(notes: string): void {
     this.state.project.update(p => ({ ...p, notes }));
     this.state.updateProjectName(this.state.project().name);
+  }
+
+  handleLogoFile(file: File): void {
+    this.logoUploadError.set(null);
+    if (!file.type.startsWith('image/')) {
+      this.logoUploadError.set('Please select an image file (PNG, SVG, JPG, WebP, GIF)');
+      return;
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      this.logoUploadError.set('Logo file size must be under 5MB');
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const dataUrl = e.target?.result as string;
+      if (dataUrl) {
+        this.state.setCustomLogo(dataUrl);
+        this.triggerToast('Custom logo updated successfully!');
+      }
+    };
+    reader.onerror = () => {
+      this.logoUploadError.set('Failed to read image file');
+    };
+    reader.readAsDataURL(file);
+  }
+
+  onLogoInputSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    if (input.files && input.files[0]) {
+      this.handleLogoFile(input.files[0]);
+    }
+  }
+
+  onLogoDrop(event: DragEvent): void {
+    event.preventDefault();
+    this.isDraggingLogo.set(false);
+    if (event.dataTransfer?.files && event.dataTransfer.files[0]) {
+      this.handleLogoFile(event.dataTransfer.files[0]);
+    }
+  }
+
+  onLogoDragOver(event: DragEvent): void {
+    event.preventDefault();
+    this.isDraggingLogo.set(true);
+  }
+
+  onLogoDragLeave(): void {
+    this.isDraggingLogo.set(false);
+  }
+
+  removeLogo(): void {
+    this.state.setCustomLogo(null);
+    this.triggerToast('Logo reset to default');
+  }
+
+  updateBrandTitle(name: string): void {
+    this.state.setBrandName(name);
   }
 }

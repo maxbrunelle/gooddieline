@@ -18,22 +18,32 @@
   >
     <!-- Brand & Navigation -->
     <div class="flex items-center gap-4">
-      <div class="flex items-center gap-2.5 pr-4 border-r" [class.border-neutral-800]="state.isDarkMode()" [class.border-slate-200]="!state.isDarkMode()">
-        <div class="w-8 h-8 rounded-lg bg-[#3850a2] flex items-center justify-center shadow-sm shadow-[#3850a2]/30">
-          <mat-icon class="text-white text-lg">architecture</mat-icon>
-        </div>
-        <div>
-          <div class="text-xs font-black tracking-wider flex items-center gap-1.5" [class.text-neutral-100]="state.isDarkMode()" [class.text-slate-900]="!state.isDarkMode()">
-            <span>DIELINEFORGE</span>
-            <span class="text-[9px] font-mono font-bold px-1.5 py-0.5 rounded bg-[#3850a2]/15 text-[#7995f5] border border-[#3850a2]/30">CAD</span>
+      <button 
+        type="button"
+        class="flex items-center justify-center pr-4 border-r cursor-pointer group bg-transparent transition-opacity hover:opacity-85" 
+        [class.border-neutral-800]="state.isDarkMode()" 
+        [class.border-slate-200]="!state.isDarkMode()"
+        (click)="showSettingsModal.set(true)"
+        title="Click to customize brand & logo in Settings"
+      >
+        @if (state.customLogo()) {
+          <div class="h-9 max-w-48 px-2 flex items-center justify-center rounded-lg overflow-hidden">
+            <img 
+              [src]="state.customLogo()" 
+              alt="Brand Logo" 
+              class="h-8 w-auto object-contain max-h-8" 
+              referrerpolicy="no-referrer"
+            />
           </div>
-          <div class="text-[10px] font-mono flex items-center gap-1.5" [class.text-neutral-400]="state.isDarkMode()" [class.text-slate-500]="!state.isDarkMode()">
-            <span class="font-semibold text-neutral-300" [class.text-slate-700]="!state.isDarkMode()">{{ state.activeTemplate().code }}</span>
-            <span [class.text-neutral-600]="state.isDarkMode()" [class.text-slate-300]="!state.isDarkMode()">•</span>
-            <span class="truncate max-w-44">{{ state.activeTemplate().name }}</span>
+        } @else {
+          <div class="flex items-center justify-center gap-2 px-2.5 py-1.5 rounded-xl bg-[#3850a2]/15 border border-[#3850a2]/30 shadow-xs">
+            <mat-icon class="text-lg text-[#3850a2]" [class.text-[#7995f5]]="state.isDarkMode()">architecture</mat-icon>
+            <span class="text-xs font-black tracking-wider" [class.text-neutral-100]="state.isDarkMode()" [class.text-slate-900]="!state.isDarkMode()">
+              {{ state.brandName() }}
+            </span>
           </div>
-        </div>
-      </div>
+        }
+      </button>
 
       <!-- Main Studio Navigation Tabs -->
       <nav class="flex items-center gap-1 p-0.5 rounded-lg border" [class.bg-neutral-950/60]="state.isDarkMode()" [class.border-neutral-800]="state.isDarkMode()" [class.bg-slate-50]="!state.isDarkMode()" [class.border-slate-200]="!state.isDarkMode()">
@@ -133,6 +143,25 @@
           {{ state.isDarkMode() ? 'light_mode' : 'dark_mode' }}
         </mat-icon>
         <span class="hidden sm:inline">{{ state.isDarkMode() ? 'Light' : 'Dark' }}</span>
+      </button>
+
+      <!-- Settings & Logo Customization Button -->
+      <button
+        id="btn_settings"
+        (click)="showSettingsModal.set(true)"
+        class="flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-medium rounded-lg border transition-colors cursor-pointer"
+        [class.bg-neutral-900]="state.isDarkMode()"
+        [class.hover:bg-neutral-800]="state.isDarkMode()"
+        [class.text-neutral-300]="state.isDarkMode()"
+        [class.border-neutral-800]="state.isDarkMode()"
+        [class.bg-white]="!state.isDarkMode()"
+        [class.hover:bg-slate-100]="!state.isDarkMode()"
+        [class.text-slate-700]="!state.isDarkMode()"
+        [class.border-slate-200]="!state.isDarkMode()"
+        title="Settings & Logo Configuration"
+      >
+        <mat-icon class="text-sm scale-90 text-[#7995f5]" [class.text-[#3850a2]]="!state.isDarkMode()">settings</mat-icon>
+        <span class="hidden sm:inline">Settings</span>
       </button>
 
       <!-- Export Production Suite Trigger -->
@@ -857,6 +886,242 @@
               Done
             </button>
           </div>
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- Settings & Custom Logo Modal -->
+  @if (showSettingsModal()) {
+    <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-sm">
+      <div 
+        class="w-full max-w-lg rounded-2xl shadow-2xl border p-6 space-y-6 animate-in fade-in zoom-in duration-150 transition-colors"
+        [class.bg-neutral-900]="state.isDarkMode()"
+        [class.border-neutral-800]="state.isDarkMode()"
+        [class.text-neutral-100]="state.isDarkMode()"
+        [class.bg-white]="!state.isDarkMode()"
+        [class.border-slate-200]="!state.isDarkMode()"
+        [class.text-slate-900]="!state.isDarkMode()"
+      >
+        <!-- Modal Header -->
+        <div class="flex items-center justify-between border-b pb-4" [class.border-neutral-800]="state.isDarkMode()" [class.border-slate-200]="!state.isDarkMode()">
+          <div class="flex items-center gap-2.5">
+            <div class="w-9 h-9 rounded-xl bg-[#3850a2]/15 text-[#7995f5] flex items-center justify-center border border-[#3850a2]/30">
+              <mat-icon class="text-xl text-[#3850a2]">settings</mat-icon>
+            </div>
+            <div>
+              <h2 class="text-base font-bold">Studio Settings & Branding</h2>
+              <p class="text-xs" [class.text-neutral-400]="state.isDarkMode()" [class.text-slate-500]="!state.isDarkMode()">
+                Customize your studio logo, brand title, and workspace defaults
+              </p>
+            </div>
+          </div>
+          <button
+            (click)="showSettingsModal.set(false)"
+            class="p-1.5 rounded-lg transition-colors cursor-pointer"
+            [class.text-neutral-400]="state.isDarkMode()"
+            [class.hover:text-white]="state.isDarkMode()"
+            [class.hover:bg-neutral-800]="state.isDarkMode()"
+            [class.text-slate-500]="!state.isDarkMode()"
+            [class.hover:text-slate-900]="!state.isDarkMode()"
+            [class.hover:bg-slate-100]="!state.isDarkMode()"
+          >
+            <mat-icon class="text-base">close</mat-icon>
+          </button>
+        </div>
+
+        <!-- Custom Brand Logo Section -->
+        <div class="space-y-3">
+          <div class="flex items-center justify-between">
+            <div class="text-xs font-bold uppercase tracking-wider flex items-center gap-1.5" [class.text-neutral-300]="state.isDarkMode()" [class.text-slate-700]="!state.isDarkMode()">
+              <mat-icon class="text-sm text-[#7995f5]">image</mat-icon>
+              <span>Custom Brand Logo</span>
+            </div>
+            @if (state.customLogo()) {
+              <span class="text-[10px] font-mono px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">
+                Custom Logo Active
+              </span>
+            }
+          </div>
+
+          <!-- Logo Uploader Area -->
+          <div 
+            class="relative border-2 border-dashed rounded-xl p-5 transition-all text-center flex flex-col items-center justify-center gap-3"
+            [class.border-neutral-700]="state.isDarkMode() && !isDraggingLogo()"
+            [class.bg-neutral-950/60]="state.isDarkMode()"
+            [class.border-slate-300]="!state.isDarkMode() && !isDraggingLogo()"
+            [class.bg-slate-50]="!state.isDarkMode()"
+            [class.border-[#3850a2]]="isDraggingLogo()"
+            [class.bg-[#3850a2]/10]="isDraggingLogo()"
+            (drop)="onLogoDrop($event)"
+            (dragover)="onLogoDragOver($event)"
+            (dragleave)="onLogoDragLeave()"
+          >
+            <input 
+              #logoInput 
+              type="file" 
+              accept="image/png,image/jpeg,image/svg+xml,image/webp,image/gif" 
+              (change)="onLogoInputSelected($event)" 
+              class="hidden" 
+            />
+
+            @if (state.customLogo()) {
+              <!-- Current Logo Preview -->
+              <div class="flex flex-col items-center gap-3 w-full">
+                <div 
+                  class="h-16 w-full max-w-xs p-2 rounded-xl flex items-center justify-center border transition-colors shadow-inner"
+                  [class.bg-neutral-900]="state.isDarkMode()"
+                  [class.border-neutral-800]="state.isDarkMode()"
+                  [class.bg-white]="!state.isDarkMode()"
+                  [class.border-slate-200]="!state.isDarkMode()"
+                >
+                  <img 
+                    [src]="state.customLogo()" 
+                    alt="Custom Studio Logo" 
+                    class="max-h-full max-w-full object-contain" 
+                    referrerpolicy="no-referrer"
+                  />
+                </div>
+
+                <div class="flex items-center gap-2">
+                  <button
+                    type="button"
+                    (click)="logoInput.click()"
+                    class="px-3 py-1.5 text-xs font-semibold rounded-lg bg-[#3850a2] hover:bg-[#4865c2] text-white transition-all active:scale-95 cursor-pointer flex items-center gap-1.5 shadow-sm shadow-[#3850a2]/30"
+                  >
+                    <mat-icon class="text-sm">file_upload</mat-icon>
+                    <span>Change Logo</span>
+                  </button>
+                  <button
+                    type="button"
+                    (click)="removeLogo()"
+                    class="px-3 py-1.5 text-xs font-semibold rounded-lg transition-colors cursor-pointer flex items-center gap-1.5"
+                    [class.bg-neutral-800]="state.isDarkMode()"
+                    [class.hover:bg-rose-500/20]="state.isDarkMode()"
+                    [class.text-neutral-300]="state.isDarkMode()"
+                    [class.hover:text-rose-400]="state.isDarkMode()"
+                    [class.bg-slate-200]="!state.isDarkMode()"
+                    [class.hover:bg-rose-100]="!state.isDarkMode()"
+                    [class.text-slate-700]="!state.isDarkMode()"
+                    [class.hover:text-rose-600]="!state.isDarkMode()"
+                  >
+                    <mat-icon class="text-sm">delete_outline</mat-icon>
+                    <span>Reset Default</span>
+                  </button>
+                </div>
+              </div>
+            } @else {
+              <!-- Empty State Upload Trigger -->
+              <div class="w-12 h-12 rounded-2xl bg-[#3850a2]/15 text-[#7995f5] flex items-center justify-center border border-[#3850a2]/30">
+                <mat-icon class="text-2xl text-[#3850a2]">add_photo_alternate</mat-icon>
+              </div>
+
+              <div>
+                <p class="text-xs font-semibold" [class.text-neutral-200]="state.isDarkMode()" [class.text-slate-800]="!state.isDarkMode()">
+                  Drag & drop your logo here, or 
+                  <button 
+                    type="button" 
+                    (click)="logoInput.click()" 
+                    class="text-[#7995f5] hover:underline font-bold cursor-pointer"
+                  >
+                    browse files
+                  </button>
+                </p>
+                <p class="text-[11px] mt-1" [class.text-neutral-500]="state.isDarkMode()" [class.text-slate-500]="!state.isDarkMode()">
+                  Supports PNG, SVG, JPG, WebP (Transparent PNG / SVG recommended)
+                </p>
+              </div>
+            }
+          </div>
+
+          @if (logoUploadError()) {
+            <p class="text-xs text-rose-400 flex items-center gap-1">
+              <mat-icon class="text-sm">error</mat-icon>
+              <span>{{ logoUploadError() }}</span>
+            </p>
+          }
+        </div>
+
+        <!-- Studio / Brand Name Section -->
+        <div class="space-y-2">
+          <div class="text-xs font-bold uppercase tracking-wider flex items-center gap-1.5" [class.text-neutral-300]="state.isDarkMode()" [class.text-slate-700]="!state.isDarkMode()">
+            <mat-icon class="text-sm text-[#7995f5]">badge</mat-icon>
+            <span>Brand / Studio Name</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <input
+              type="text"
+              [value]="state.brandName()"
+              (input)="updateBrandTitle($any($event.target).value)"
+              placeholder="e.g. DIELINEFORGE or Apex Packaging"
+              class="flex-1 px-3 py-2 text-xs rounded-lg border focus:outline-none focus:border-[#3850a2] transition-colors"
+              [class.bg-neutral-950]="state.isDarkMode()"
+              [class.border-neutral-700]="state.isDarkMode()"
+              [class.text-white]="state.isDarkMode()"
+              [class.bg-slate-50]="!state.isDarkMode()"
+              [class.border-slate-300]="!state.isDarkMode()"
+              [class.text-slate-900]="!state.isDarkMode()"
+            />
+            <button
+              type="button"
+              (click)="updateBrandTitle('DIELINEFORGE')"
+              class="px-3 py-2 text-xs font-medium rounded-lg border transition-colors cursor-pointer"
+              [class.bg-neutral-800]="state.isDarkMode()"
+              [class.border-neutral-700]="state.isDarkMode()"
+              [class.text-neutral-300]="state.isDarkMode()"
+              [class.bg-slate-100]="!state.isDarkMode()"
+              [class.border-slate-300]="!state.isDarkMode()"
+              [class.text-slate-700]="!state.isDarkMode()"
+              title="Reset name to DIELINEFORGE"
+            >
+              Reset
+            </button>
+          </div>
+        </div>
+
+        <!-- Workspace Units & Preferences -->
+        <div class="space-y-2 pt-2 border-t" [class.border-neutral-800]="state.isDarkMode()" [class.border-slate-200]="!state.isDarkMode()">
+          <div class="text-xs font-bold uppercase tracking-wider flex items-center gap-1.5" [class.text-neutral-300]="state.isDarkMode()" [class.text-slate-700]="!state.isDarkMode()">
+            <mat-icon class="text-sm text-[#7995f5]">tune</mat-icon>
+            <span>CAD Default Measurement Unit</span>
+          </div>
+          <div class="grid grid-cols-3 gap-2">
+            @for (u of ['mm', 'in', 'cm']; track u) {
+              <button
+                type="button"
+                (click)="state.setUnit($any(u))"
+                [class.bg-[#3850a2]]="state.unit() === u"
+                [class.text-white]="state.unit() === u"
+                [class.font-bold]="state.unit() === u"
+                [class.border-[#3850a2]]="state.unit() === u"
+                [class.bg-neutral-950]="state.unit() !== u && state.isDarkMode()"
+                [class.border-neutral-800]="state.unit() !== u && state.isDarkMode()"
+                [class.text-neutral-400]="state.unit() !== u && state.isDarkMode()"
+                [class.bg-slate-50]="state.unit() !== u && !state.isDarkMode()"
+                [class.border-slate-200]="state.unit() !== u && !state.isDarkMode()"
+                [class.text-slate-600]="state.unit() !== u && !state.isDarkMode()"
+                class="py-2 px-3 text-xs rounded-lg border text-center transition-all cursor-pointer capitalize"
+              >
+                {{ u === 'mm' ? 'Millimeters (mm)' : (u === 'in' ? 'Inches (in)' : 'Centimeters (cm)') }}
+              </button>
+            }
+          </div>
+        </div>
+
+        <!-- Modal Footer -->
+        <div class="pt-4 border-t flex items-center justify-between" [class.border-neutral-800]="state.isDarkMode()" [class.border-slate-200]="!state.isDarkMode()">
+          <div class="flex items-center gap-1.5 text-[11px] font-mono" [class.text-neutral-400]="state.isDarkMode()" [class.text-slate-500]="!state.isDarkMode()">
+            <mat-icon class="text-xs text-emerald-400">check_circle</mat-icon>
+            <span>Saved to LocalStorage</span>
+          </div>
+
+          <button
+            type="button"
+            (click)="showSettingsModal.set(false)"
+            class="px-5 py-2 bg-[#3850a2] hover:bg-[#4865c2] text-white font-bold text-xs rounded-lg shadow-md shadow-[#3850a2]/30 transition-all active:scale-95 cursor-pointer"
+          >
+            Save & Close
+          </button>
         </div>
       </div>
     </div>

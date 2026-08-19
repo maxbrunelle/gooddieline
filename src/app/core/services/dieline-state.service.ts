@@ -59,6 +59,8 @@ export class DielineStateService {
   activeTab = signal<WorkspaceTab>('editor_2d');
   unit = signal<'mm' | 'in' | 'cm'>('mm');
   isDarkMode = signal<boolean>(true);
+  customLogo = signal<string | null>(null);
+  brandName = signal<string>('DIELINEFORGE');
   isOptimizingNesting = signal<boolean>(false);
   nestingProgress = signal<number>(100);
   
@@ -172,6 +174,27 @@ export class DielineStateService {
       if (savedProj.sheetId) this.activeSheetId.set(savedProj.sheetId);
       this.lastSavedTimestamp.set('Loaded from Browser Storage');
     }
+
+    // 7. Hydrate Custom Brand Logo & App Name
+    const savedLogo = this.storage.loadCustomLogo();
+    if (savedLogo) {
+      this.customLogo.set(savedLogo);
+    }
+    const savedBrand = this.storage.loadBrandName();
+    if (savedBrand) {
+      this.brandName.set(savedBrand);
+    }
+  }
+
+  setCustomLogo(logoDataUrl: string | null): void {
+    this.customLogo.set(logoDataUrl);
+    this.storage.saveCustomLogo(logoDataUrl);
+  }
+
+  setBrandName(name: string): void {
+    const trimmed = name.trim() || 'DIELINEFORGE';
+    this.brandName.set(trimmed);
+    this.storage.saveBrandName(trimmed);
   }
 
   private autoSave(): void {
