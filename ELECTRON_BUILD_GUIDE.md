@@ -34,6 +34,33 @@ npm run electron:dev
 
 ---
 
+### Fixing `Cannot create symbolic link : A required privilege is not held by the client`
+
+This error occurs when Windows non-admin terminals extract macOS/Linux symlinks inside the default code-signing tool cache (`winCodeSign`). 
+
+Here are the **2 quick ways to fix it**:
+
+#### Option A: Run PowerShell / Terminal as Administrator (Fastest)
+1. Close your current PowerShell/Command Prompt.
+2. Search for **PowerShell** in the Windows Start menu, right-click, and choose **Run as administrator**.
+3. Navigate back to your project directory:
+   ```bash
+   cd "C:\Users\brune\Documents\gooddieline-main"
+   ```
+4. Run:
+   ```bash
+   npm run electron:build:win
+   ```
+
+#### Option B: Enable Windows Developer Mode
+1. Open Windows **Settings** (`Win + I`).
+2. Go to **System** > **For developers** (or search **Developer settings**).
+3. Toggle **Developer Mode** to **ON**.
+4. This grants non-admin users permission to create symlinks without needing elevated administrator prompts.
+5. Re-run `npm run electron:build:win`.
+
+---
+
 ### Step 4: Output Location
 Once the build completes, find your executables in the **`dist-electron/`** folder:
 - **`DielineForge Setup 1.0.0.exe`** (Installer)
