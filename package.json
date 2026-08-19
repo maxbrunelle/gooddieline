@@ -13,7 +13,7 @@
     "test": "ng test",
     "lint": "ng lint",
     "serve:ssr:app": "node dist/app/server/server.mjs",
-    "build:electron": "ng build --base-href ./",
+    "build:electron": "ng build --base-href ./ && node -e \"const fs=require('fs');const c='dist/app/browser/index.csr.html';const t='dist/app/browser/index.html';if(fs.existsSync(c))fs.copyFileSync(c,t);\"",
     "electron:dev": "npm run build:electron && electron .",
     "electron:build": "npm run build:electron && electron-builder",
     "electron:build:win": "npm run build:electron && electron-builder --win --x64",
