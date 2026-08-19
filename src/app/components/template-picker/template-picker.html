@@ -1,0 +1,104 @@
+<div class="w-full h-full bg-neutral-950 p-6 overflow-y-auto">
+  <div class="max-w-6xl mx-auto space-y-6">
+    <!-- Header Title and Search -->
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-neutral-800">
+      <div>
+        <h1 class="text-xl font-bold text-neutral-100 flex items-center gap-2">
+          <mat-icon class="text-amber-400">category</mat-icon>
+          <span>Parametric Packaging Template Library</span>
+        </h1>
+        <p class="text-xs text-neutral-400 mt-0.5">
+          Standardized industrial packaging templates conforming to FEFCO and ECMA manufacturing standards.
+        </p>
+      </div>
+
+      <!-- Search Input -->
+      <div class="relative w-full md:w-80">
+        <mat-icon class="absolute left-3 top-2.5 text-neutral-500 text-sm">search</mat-icon>
+        <input
+          #search
+          type="text"
+          placeholder="Search by name, code (FEFCO 0201)..."
+          [value]="searchQuery()"
+          (input)="searchQuery.set(search.value)"
+          class="w-full pl-9 pr-4 py-2 bg-neutral-900 border border-neutral-700 rounded-xl text-xs text-neutral-100 placeholder-neutral-500 focus:outline-hidden focus:border-amber-400"
+        />
+        @if (searchQuery()) {
+          <button (click)="searchQuery.set('')" class="absolute right-3 top-2.5 text-neutral-500 hover:text-white">
+            <mat-icon class="text-sm">close</mat-icon>
+          </button>
+        }
+      </div>
+    </div>
+
+    <!-- Category Filter Chips -->
+    <div class="flex items-center gap-2 overflow-x-auto pb-1">
+      @for (cat of categories; track cat.id) {
+        <button
+          (click)="selectedCategory.set(cat.id)"
+          [class.bg-amber-400]="selectedCategory() === cat.id"
+          [class.text-neutral-950]="selectedCategory() === cat.id"
+          [class.font-bold]="selectedCategory() === cat.id"
+          [class.bg-neutral-900]="selectedCategory() !== cat.id"
+          [class.text-neutral-300]="selectedCategory() !== cat.id"
+          class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-neutral-800 hover:border-neutral-700 text-xs font-medium whitespace-nowrap transition-colors"
+        >
+          <mat-icon class="text-sm">{{ cat.icon }}</mat-icon>
+          <span>{{ cat.label }}</span>
+        </button>
+      }
+    </div>
+
+    <!-- Template Grid Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      @for (tmpl of filteredTemplates(); track tmpl.id) {
+        <div 
+          role="button"
+          tabindex="0"
+          (click)="selectTemplate(tmpl.id)"
+          (keydown.enter)="selectTemplate(tmpl.id)"
+          (keydown.space)="selectTemplate(tmpl.id)"
+          [class.border-amber-400]="state.activeTemplateId() === tmpl.id"
+          [class.bg-amber-950/10]="state.activeTemplateId() === tmpl.id"
+          [class.border-neutral-800]="state.activeTemplateId() !== tmpl.id"
+          class="group bg-neutral-900 border rounded-2xl p-5 hover:border-neutral-600 hover:bg-neutral-850 cursor-pointer transition-all flex flex-col justify-between focus:outline-hidden focus:border-amber-400"
+        >
+          <div>
+            <div class="flex items-start justify-between gap-2 mb-2">
+              <div>
+                <span class="text-[10px] font-mono font-semibold px-2 py-0.5 rounded bg-neutral-800 text-neutral-400 border border-neutral-700">
+                  {{ tmpl.code }}
+                </span>
+                <h3 class="text-sm font-bold text-neutral-100 mt-1.5 group-hover:text-amber-300 transition-colors">
+                  {{ tmpl.name }}
+                </h3>
+              </div>
+
+              <span class="text-[10px] font-mono text-neutral-400 px-2 py-0.5 rounded-full bg-neutral-800">
+                {{ tmpl.panelCount }} Panels
+              </span>
+            </div>
+
+            <p class="text-xs text-neutral-400 line-clamp-3 leading-relaxed mb-4">
+              {{ tmpl.description }}
+            </p>
+          </div>
+
+          <div class="pt-3 border-t border-neutral-800 flex items-center justify-between">
+            <span class="text-[11px] text-neutral-400 flex items-center gap-1">
+              <mat-icon class="text-xs scale-75 text-neutral-500">settings</mat-icon>
+              <span>Parametric: {{ tmpl.paramsList.length }} variables</span>
+            </span>
+
+            <button
+              class="px-3 py-1.5 text-xs font-semibold rounded-lg bg-neutral-800 group-hover:bg-amber-400 group-hover:text-neutral-950 text-neutral-200 transition-colors flex items-center gap-1"
+            >
+              <span>Load Template</span>
+              <mat-icon class="text-xs">arrow_forward</mat-icon>
+            </button>
+          </div>
+        </div>
+      }
+    </div>
+  </div>
+</div>

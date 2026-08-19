@@ -1,0 +1,206 @@
+<div class="w-full h-full bg-neutral-950 p-6 overflow-y-auto">
+  <div class="max-w-6xl mx-auto space-y-6">
+    <!-- Header -->
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-neutral-800">
+      <div>
+        <h1 class="text-xl font-bold text-neutral-100 flex items-center gap-2">
+          <mat-icon class="text-amber-400">layers</mat-icon>
+          <span>Packaging Material Library & Tooling Profiles</span>
+        </h1>
+        <p class="text-xs text-neutral-400 mt-0.5">
+          Calibrated material profiles with thickness offsets, fold bend deductions, and Zünd Cut Center tool recommendations.
+        </p>
+      </div>
+
+      <button
+        (click)="showNewMaterialModal.set(true)"
+        class="flex items-center gap-1.5 px-3.5 py-2 bg-amber-400 hover:bg-amber-300 text-neutral-950 font-semibold text-xs rounded-xl shadow-lg transition-colors"
+      >
+        <mat-icon class="text-sm">add</mat-icon>
+        <span>Add Custom Material</span>
+      </button>
+    </div>
+
+    <!-- Materials Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      @for (mat of state.materials(); track mat.id) {
+        <div
+          role="button"
+          tabindex="0"
+          (click)="selectMaterial(mat.id)"
+          (keydown.enter)="selectMaterial(mat.id)"
+          (keydown.space)="selectMaterial(mat.id)"
+          [class.border-amber-400]="state.activeMaterialId() === mat.id"
+          [class.bg-amber-950/15]="state.activeMaterialId() === mat.id"
+          [class.border-neutral-800]="state.activeMaterialId() !== mat.id"
+          class="group bg-neutral-900 border rounded-2xl p-5 hover:border-neutral-600 cursor-pointer transition-all flex flex-col justify-between focus:outline-hidden focus:border-amber-400"
+        >
+          <div>
+            <div class="flex items-start justify-between gap-2 mb-3">
+              <div class="flex items-center gap-2.5">
+                <div 
+                  class="w-5 h-5 rounded-md border border-neutral-700 shadow-sm"
+                  [style.background-color]="mat.color"
+                ></div>
+                <div>
+                  <h3 class="text-sm font-bold text-neutral-100 group-hover:text-amber-300 transition-colors">
+                    {{ mat.name }}
+                  </h3>
+                  <div class="text-[10px] text-neutral-500">{{ mat.manufacturer }}</div>
+                </div>
+              </div>
+
+              @if (state.activeMaterialId() === mat.id) {
+                <span class="px-2 py-0.5 text-[10px] font-bold bg-amber-400 text-neutral-950 rounded-full">
+                  ACTIVE
+                </span>
+              }
+            </div>
+
+            <!-- Material Spec Details -->
+            <div class="space-y-2 text-xs font-mono text-neutral-300 bg-neutral-950/60 p-3 rounded-xl border border-neutral-800/80 mb-4">
+              <div class="flex justify-between">
+                <span class="text-neutral-500">Board Caliper / Thickness:</span>
+                <span class="font-bold text-neutral-100">{{ mat.thickness }} mm</span>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-neutral-500">Density / Basis:</span>
+                <span>{{ mat.densityGsm }} gsm</span>
+              </div>
+              @if (mat.flute !== 'None') {
+                <div class="flex justify-between">
+                  <span class="text-neutral-500">Flute Profile:</span>
+                  <span class="text-amber-400 font-bold">{{ mat.flute }}-Flute</span>
+                </div>
+              }
+              <div class="flex justify-between">
+                <span class="text-neutral-500">Zünd Cutting Knife:</span>
+                <span class="text-rose-400">{{ mat.recommendedKnife }}</span>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-neutral-500">Zünd Crease Wheel:</span>
+                <span class="text-blue-400">{{ mat.recommendedCreaseWheel }}</span>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-neutral-500">Est. Material Cost:</span>
+                <span class="text-emerald-400 font-bold">${{ mat.costPerSquareMeter }} / m²</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="flex justify-end">
+            <button
+              class="px-3 py-1.5 text-xs font-semibold rounded-lg bg-neutral-800 group-hover:bg-amber-400 group-hover:text-neutral-950 text-neutral-200 transition-colors"
+            >
+              Select Material
+            </button>
+          </div>
+        </div>
+      }
+    </div>
+  </div>
+
+  <!-- Add Custom Material Modal -->
+  @if (showNewMaterialModal()) {
+    <div class="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-6">
+      <div class="bg-neutral-900 border border-neutral-700 rounded-2xl p-6 shadow-2xl max-w-md w-full">
+        <div class="flex items-center justify-between mb-4">
+          <h2 class="text-base font-bold text-neutral-100 flex items-center gap-2">
+            <mat-icon class="text-amber-400">post_add</mat-icon>
+            <span>Create Custom Material Profile</span>
+          </h2>
+          <button (click)="showNewMaterialModal.set(false)" class="text-neutral-400 hover:text-white">
+            <mat-icon>close</mat-icon>
+          </button>
+        </div>
+
+        <div class="space-y-3 mb-6 text-xs">
+          <div>
+            <label for="mat-name-input" class="block text-neutral-400 mb-1">Material Name</label>
+            <input
+              #nameInput
+              id="mat-name-input"
+              type="text"
+              [value]="newMatName()"
+              (input)="newMatName.set(nameInput.value)"
+              class="w-full px-3 py-2 bg-neutral-950 border border-neutral-700 rounded-lg text-neutral-100 focus:outline-hidden focus:border-amber-400"
+            />
+          </div>
+
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label for="mat-thick-input" class="block text-neutral-400 mb-1">Caliper / Thickness (mm)</label>
+              <input
+                #thickInput
+                id="mat-thick-input"
+                type="number"
+                step="0.1"
+                [value]="newMatThickness()"
+                (input)="newMatThickness.set(+thickInput.value)"
+                class="w-full px-3 py-2 bg-neutral-950 border border-neutral-700 rounded-lg text-neutral-100 font-mono focus:outline-hidden focus:border-amber-400"
+              />
+            </div>
+            <div>
+              <label for="mat-gsm-input" class="block text-neutral-400 mb-1">Grammage (gsm)</label>
+              <input
+                #gsmInput
+                id="mat-gsm-input"
+                type="number"
+                [value]="newMatGrammage()"
+                (input)="newMatGrammage.set(+gsmInput.value)"
+                class="w-full px-3 py-2 bg-neutral-950 border border-neutral-700 rounded-lg text-neutral-100 font-mono focus:outline-hidden focus:border-amber-400"
+              />
+            </div>
+          </div>
+
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label for="mat-flute-select" class="block text-neutral-400 mb-1">Flute Type</label>
+              <select
+                #fluteSelect
+                id="mat-flute-select"
+                [value]="newMatFlute()"
+                (change)="setNewMatFlute(fluteSelect.value)"
+                class="w-full px-3 py-2 bg-neutral-950 border border-neutral-700 rounded-lg text-neutral-100 focus:outline-hidden focus:border-amber-400"
+              >
+                <option value="E">E-Flute (1.5mm)</option>
+                <option value="B">B-Flute (3.0mm)</option>
+                <option value="C">C-Flute (4.0mm)</option>
+                <option value="F">F-Flute (0.8mm)</option>
+                <option value="None">Solid Bleached Sulfate (SBS)</option>
+                <option value="Plastic">Corrugated Plastic (Coroplast)</option>
+              </select>
+            </div>
+            <div>
+              <label for="mat-cost-input" class="block text-neutral-400 mb-1">Cost per m² ($)</label>
+              <input
+                #costInput
+                id="mat-cost-input"
+                type="number"
+                step="0.1"
+                [value]="newMatCost()"
+                (input)="newMatCost.set(+costInput.value)"
+                class="w-full px-3 py-2 bg-neutral-950 border border-neutral-700 rounded-lg text-neutral-100 font-mono focus:outline-hidden focus:border-amber-400"
+              />
+            </div>
+          </div>
+        </div>
+
+        <div class="flex items-center justify-end gap-2">
+          <button
+            (click)="showNewMaterialModal.set(false)"
+            class="px-4 py-2 text-xs font-medium text-neutral-300 bg-neutral-800 hover:bg-neutral-700 rounded-lg"
+          >
+            Cancel
+          </button>
+          <button
+            (click)="saveCustomMaterial()"
+            class="px-4 py-2 text-xs font-semibold text-neutral-950 bg-amber-400 hover:bg-amber-300 rounded-lg transition-colors"
+          >
+            Save Profile
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+</div>

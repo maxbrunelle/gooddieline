@@ -1,0 +1,173 @@
+<div class="w-full h-full bg-neutral-950 p-6 overflow-y-auto">
+  <div class="max-w-6xl mx-auto space-y-6">
+    <!-- Header -->
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-neutral-800">
+      <div>
+        <h1 class="text-xl font-bold text-neutral-100 flex items-center gap-2">
+          <mat-icon class="text-amber-400">crop_free</mat-icon>
+          <span>Stock Sheet Presets & Flatbed Tables</span>
+        </h1>
+        <p class="text-xs text-neutral-400 mt-0.5">
+          Configure raw corrugated board stock dimensions, master rolls, and CNC cutting table working areas.
+        </p>
+      </div>
+
+      <button
+        (click)="showNewSheetModal.set(true)"
+        class="flex items-center gap-1.5 px-3.5 py-2 bg-amber-400 hover:bg-amber-300 text-neutral-950 font-semibold text-xs rounded-xl shadow-lg transition-colors"
+      >
+        <mat-icon class="text-sm">add</mat-icon>
+        <span>Add Custom Sheet</span>
+      </button>
+    </div>
+
+    <!-- Sheet Presets Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      @for (sheet of state.sheets(); track sheet.id) {
+        <div
+          role="button"
+          tabindex="0"
+          (click)="selectSheet(sheet.id)"
+          (keydown.enter)="selectSheet(sheet.id)"
+          (keydown.space)="selectSheet(sheet.id)"
+          [class.border-amber-400]="state.activeSheetId() === sheet.id"
+          [class.bg-amber-950/15]="state.activeSheetId() === sheet.id"
+          [class.border-neutral-800]="state.activeSheetId() !== sheet.id"
+          class="group bg-neutral-900 border rounded-2xl p-5 hover:border-neutral-600 cursor-pointer transition-all flex flex-col justify-between focus:outline-hidden focus:border-amber-400"
+        >
+          <div>
+            <div class="flex items-start justify-between gap-2 mb-2">
+              <h3 class="text-sm font-bold text-neutral-100 group-hover:text-amber-300 transition-colors">
+                {{ sheet.name }}
+              </h3>
+
+              @if (state.activeSheetId() === sheet.id) {
+                <span class="px-2 py-0.5 text-[10px] font-bold bg-amber-400 text-neutral-950 rounded-full">
+                  ACTIVE
+                </span>
+              }
+            </div>
+
+            <p class="text-xs text-neutral-400 mb-4 font-mono">
+              {{ sheet.displayDimensions }}
+            </p>
+
+            <!-- Sheet Dimensions Display -->
+            <div class="space-y-2 text-xs font-mono text-neutral-300 bg-neutral-950/60 p-3 rounded-xl border border-neutral-800/80 mb-4">
+              <div class="flex justify-between">
+                <span class="text-neutral-500">Dimensions (mm):</span>
+                <span class="font-bold text-neutral-100">{{ sheet.width.toFixed(0) }} × {{ sheet.height.toFixed(0) }} mm</span>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-neutral-500">Dimensions (inches):</span>
+                <span class="text-amber-400">{{ (sheet.width / 25.4).toFixed(1) }} × {{ (sheet.height / 25.4).toFixed(1) }} in</span>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-neutral-500">Total Sheet Area:</span>
+                <span>{{ ((sheet.width * sheet.height) / 1_000_000).toFixed(2) }} m²</span>
+              </div>
+              @if (sheet.costPerSheet) {
+                <div class="flex justify-between">
+                  <span class="text-neutral-500">Est. Sheet Cost:</span>
+                  <span class="text-emerald-400 font-bold">${{ sheet.costPerSheet.toFixed(2) }}</span>
+                </div>
+              }
+            </div>
+          </div>
+
+          <div class="flex justify-end">
+            <button
+              class="px-3 py-1.5 text-xs font-semibold rounded-lg bg-neutral-800 group-hover:bg-amber-400 group-hover:text-neutral-950 text-neutral-200 transition-colors"
+            >
+              Use For Nesting
+            </button>
+          </div>
+        </div>
+      }
+    </div>
+  </div>
+
+  <!-- Add Custom Sheet Modal -->
+  @if (showNewSheetModal()) {
+    <div class="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-6">
+      <div class="bg-neutral-900 border border-neutral-700 rounded-2xl p-6 shadow-2xl max-w-md w-full">
+        <div class="flex items-center justify-between mb-4">
+          <h2 class="text-base font-bold text-neutral-100 flex items-center gap-2">
+            <mat-icon class="text-amber-400">add_box</mat-icon>
+            <span>Create Custom Sheet Stock</span>
+          </h2>
+          <button (click)="showNewSheetModal.set(false)" class="text-neutral-400 hover:text-white">
+            <mat-icon>close</mat-icon>
+          </button>
+        </div>
+
+        <div class="space-y-3 mb-6 text-xs">
+          <div>
+            <label for="sheet-name-input" class="block text-neutral-400 mb-1">Sheet Description Name</label>
+            <input
+              #sheetName
+              id="sheet-name-input"
+              type="text"
+              [value]="newSheetName()"
+              (input)="newSheetName.set(sheetName.value)"
+              class="w-full px-3 py-2 bg-neutral-950 border border-neutral-700 rounded-lg text-neutral-100 focus:outline-hidden focus:border-amber-400"
+            />
+          </div>
+
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label for="sheet-width-input" class="block text-neutral-400 mb-1">Width X (mm)</label>
+              <input
+                #widthInput
+                id="sheet-width-input"
+                type="number"
+                [value]="newSheetWidth()"
+                (input)="newSheetWidth.set(+widthInput.value)"
+                class="w-full px-3 py-2 bg-neutral-950 border border-neutral-700 rounded-lg text-neutral-100 font-mono focus:outline-hidden focus:border-amber-400"
+              />
+            </div>
+            <div>
+              <label for="sheet-height-input" class="block text-neutral-400 mb-1">Height Y (mm)</label>
+              <input
+                #heightInput
+                id="sheet-height-input"
+                type="number"
+                [value]="newSheetHeight()"
+                (input)="newSheetHeight.set(+heightInput.value)"
+                class="w-full px-3 py-2 bg-neutral-950 border border-neutral-700 rounded-lg text-neutral-100 font-mono focus:outline-hidden focus:border-amber-400"
+              />
+            </div>
+          </div>
+
+          <div>
+            <label for="sheet-cost-input" class="block text-neutral-400 mb-1">Estimated Cost per Sheet ($)</label>
+            <input
+              #costInput
+              id="sheet-cost-input"
+              type="number"
+              step="0.5"
+              [value]="newSheetCost()"
+              (input)="newSheetCost.set(+costInput.value)"
+              class="w-full px-3 py-2 bg-neutral-950 border border-neutral-700 rounded-lg text-neutral-100 font-mono focus:outline-hidden focus:border-amber-400"
+            />
+          </div>
+        </div>
+
+        <div class="flex items-center justify-end gap-2">
+          <button
+            (click)="showNewSheetModal.set(false)"
+            class="px-4 py-2 text-xs font-medium text-neutral-300 bg-neutral-800 hover:bg-neutral-700 rounded-lg"
+          >
+            Cancel
+          </button>
+          <button
+            (click)="saveCustomSheet()"
+            class="px-4 py-2 text-xs font-semibold text-neutral-950 bg-amber-400 hover:bg-amber-300 rounded-lg transition-colors"
+          >
+            Save Sheet
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+</div>

@@ -1,0 +1,341 @@
+<div class="relative w-full h-full flex flex-col bg-neutral-950 overflow-hidden select-none">
+  <!-- Nesting Studio Top Controls & Stats Bar -->
+  <div class="h-14 bg-neutral-900 border-b border-neutral-800 px-4 flex items-center justify-between z-20">
+    <div class="flex items-center gap-3">
+      <!-- Re-Nest / Optimize Button -->
+      <button
+        id="btn_auto_nest"
+        (click)="state.recalculateNesting()"
+        [disabled]="state.isOptimizingNesting()"
+        class="flex items-center gap-1.5 px-3.5 py-1.5 bg-amber-500 hover:bg-amber-400 text-neutral-950 font-semibold text-xs rounded-lg shadow-md transition-all active:scale-95 disabled:opacity-50"
+      >
+        <mat-icon class="text-sm">auto_fix_high</mat-icon>
+        <span>{{ state.isOptimizingNesting() ? 'Optimizing...' : 'Optimize Nest' }}</span>
+      </button>
+
+      <!-- Compare Solutions Button -->
+      <button
+        id="btn_compare_solutions"
+        (click)="showCompareModal.set(true)"
+        class="flex items-center gap-1.5 px-3 py-1.5 bg-neutral-800 hover:bg-neutral-700 text-neutral-200 text-xs font-medium rounded-lg border border-neutral-700 transition-colors"
+      >
+        <mat-icon class="text-sm text-amber-400">compare_arrows</mat-icon>
+        <span>Compare Solutions ({{ state.nestingSolutions().length }})</span>
+      </button>
+
+      <div class="h-5 w-px bg-neutral-800 mx-1"></div>
+
+      <!-- Sheet Switcher Carousel -->
+      @if (state.activeNestingSolution(); as sol) {
+        <div class="flex items-center gap-1.5 bg-neutral-950 border border-neutral-800 px-2 py-1 rounded-lg">
+          <button
+            (click)="prevSheet()"
+            [disabled]="state.selectedSheetIndex() === 0"
+            class="p-0.5 text-neutral-400 hover:text-white disabled:opacity-30"
+          >
+            <mat-icon class="text-base">chevron_left</mat-icon>
+          </button>
+
+          <span class="text-xs font-mono text-neutral-300 min-w-20 text-center">
+            Sheet {{ state.selectedSheetIndex() + 1 }} / {{ sol.sheetsRequired }}
+          </span>
+
+          <button
+            (click)="nextSheet(sol.sheetsRequired)"
+            [disabled]="state.selectedSheetIndex() >= sol.sheetsRequired - 1"
+            class="p-0.5 text-neutral-400 hover:text-white disabled:opacity-30"
+          >
+            <mat-icon class="text-base">chevron_right</mat-icon>
+          </button>
+        </div>
+      }
+    </div>
+
+    <!-- Quick Stat KPI Pills -->
+    @if (state.activeNestingSolution(); as sol) {
+      @let currentSheet = sol.sheets[state.selectedSheetIndex()] || sol.sheets[0];
+      <div class="flex items-center gap-3 text-xs">
+        <div class="px-3 py-1 bg-neutral-800/80 border border-neutral-700/60 rounded-lg flex items-center gap-1.5">
+          <span class="text-neutral-400">Utilization:</span>
+          <strong class="font-mono text-emerald-400 font-bold text-sm">{{ currentSheet.utilizationPercent }}%</strong>
+        </div>
+
+        <div class="px-3 py-1 bg-neutral-800/80 border border-neutral-700/60 rounded-lg flex items-center gap-1.5">
+          <span class="text-neutral-400">Waste:</span>
+          <strong class="font-mono text-rose-400 font-bold text-sm">{{ currentSheet.wastePercent }}%</strong>
+        </div>
+
+        <div class="px-3 py-1 bg-neutral-800/80 border border-neutral-700/60 rounded-lg flex items-center gap-1.5">
+          <span class="text-neutral-400">Yield:</span>
+          <strong class="font-mono text-amber-400 font-bold text-sm">{{ currentSheet.itemCount }} pcs / sheet</strong>
+        </div>
+
+        <div class="px-3 py-1 bg-neutral-800/80 border border-neutral-700/60 rounded-lg flex items-center gap-1.5">
+          <span class="text-neutral-400">Total Sheets:</span>
+          <strong class="font-mono text-neutral-100 font-bold text-sm">{{ sol.sheetsRequired }}</strong>
+        </div>
+
+        <button
+          id="btn_nest_export_ai"
+          (click)="state.downloadAI(state.selectedSheetIndex())"
+          class="flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold text-neutral-950 bg-amber-400 hover:bg-amber-300 rounded-lg shadow-md transition-all active:scale-95 cursor-pointer ml-2"
+          title="Export Active Sheet to Zünd Cut Center (.ai) with 3 layers: crease, cut, reg"
+        >
+          <mat-icon class="text-sm font-bold">content_cut</mat-icon>
+          <span>Zünd Sheet (.AI)</span>
+        </button>
+      </div>
+    }
+  </div>
+
+  <!-- Main Sheet Layout Stage -->
+  <div 
+    #sheetContainer
+    role="region"
+    aria-label="Nesting Sheet Viewport"
+    tabindex="0"
+    (click)="deselectAll()"
+    (keydown.escape)="deselectAll()"
+    class="flex-1 w-full h-full cad-grid-dark relative overflow-auto p-8 flex items-center justify-center focus:outline-hidden"
+  >
+    @if (state.activeNestingSolution(); as sol) {
+      @let currentSheet = sol.sheets[state.selectedSheetIndex()] || sol.sheets[0];
+      @let cfg = state.project().nestingConfig;
+      @let sheetPreset = state.activeSheetPreset();
+      @let geom = state.geometry();
+
+      <!-- Cardboard Sheet Bed (Interactive Viewport) -->
+      <div 
+        class="relative bg-neutral-900 border-2 border-neutral-600 shadow-2xl transition-all"
+        [style.width.px]="cfg.sheetWidth * 0.42"
+        [style.height.px]="cfg.sheetHeight * 0.42"
+      >
+        <!-- Sheet Header Tag -->
+        <div class="absolute -top-6 left-0 flex items-center gap-2 text-[11px] font-mono text-neutral-400">
+          <span class="font-semibold text-neutral-200">{{ sheetPreset.name }}</span>
+          <span>({{ cfg.sheetWidth.toFixed(0) }} × {{ cfg.sheetHeight.toFixed(0) }} mm)</span>
+          <span class="text-neutral-600">•</span>
+          <span class="text-amber-400">{{ state.activeMaterial().name }}</span>
+        </div>
+
+        <!-- Margin Boundary Guide -->
+        <div 
+          class="absolute border border-dashed border-neutral-700 pointer-events-none"
+          [style.left.px]="cfg.marginEdge * 0.42"
+          [style.top.px]="cfg.marginEdge * 0.42"
+          [style.right.px]="cfg.marginEdge * 0.42"
+          [style.bottom.px]="cfg.marginEdge * 0.42"
+        ></div>
+
+        <!-- Zünd Optical Registration Marks (ICC Camera Crosshairs) -->
+        @if (cfg.includeRegistrationMarks) {
+          @for (mark of currentSheet.registrationMarks; track $index) {
+            <div 
+              class="absolute -translate-x-1/2 -translate-y-1/2 flex items-center justify-center pointer-events-none z-10"
+              [style.left.px]="mark.x * 0.42"
+              [style.top.px]="mark.y * 0.42"
+            >
+              <div class="w-3 h-3 rounded-full bg-black border border-white flex items-center justify-center">
+                <div class="w-1 h-1 bg-white rounded-full"></div>
+              </div>
+            </div>
+          }
+        }
+
+        <!-- Reusable Offcut Areas (Salvageable Board Remnants) -->
+        @for (offcut of currentSheet.offcuts; track offcut.id) {
+          <div 
+            class="absolute bg-emerald-500/10 border border-emerald-500/40 rounded-sm flex items-center justify-center text-[10px] font-mono text-emerald-400 pointer-events-none z-5"
+            [style.left.px]="offcut.x * 0.42"
+            [style.top.px]="offcut.y * 0.42"
+            [style.width.px]="offcut.width * 0.42"
+            [style.height.px]="offcut.height * 0.42"
+          >
+            <div class="bg-neutral-950/80 px-1.5 py-0.5 rounded border border-emerald-500/30 text-center">
+              <div>♻ Offcut Remnant</div>
+              <div>{{ offcut.width.toFixed(0) }} × {{ offcut.height.toFixed(0) }} mm</div>
+            </div>
+          </div>
+        }
+
+        <!-- Nested Packaging Dieline Pieces -->
+        @for (piece of currentSheet.items; track piece.id) {
+          <div
+            (mousedown)="selectPiece(piece, $event)"
+            [class.ring-2]="selectedPiece()?.id === piece.id"
+            [class.ring-amber-400]="selectedPiece()?.id === piece.id && !piece.colliding"
+            [class.ring-rose-500]="piece.colliding"
+            [class.bg-rose-950/30]="piece.colliding"
+            [class.bg-neutral-800/80]="!piece.colliding && selectedPiece()?.id !== piece.id"
+            [class.bg-amber-950/20]="selectedPiece()?.id === piece.id && !piece.colliding"
+            class="absolute border border-neutral-600 rounded-sm cursor-move shadow-md transition-shadow hover:shadow-xl hover:border-amber-400/80 flex flex-col items-center justify-center overflow-hidden z-10"
+            [style.left.px]="piece.x * 0.42"
+            [style.top.px]="piece.y * 0.42"
+            [style.width.px]="piece.width * 0.42"
+            [style.height.px]="piece.height * 0.42"
+          >
+            <!-- SVG Dieline Miniature Render Inside Piece -->
+            <svg 
+              class="w-full h-full opacity-60 pointer-events-none"
+              [attr.viewBox]="geom.bounds.minX + ' ' + geom.bounds.minY + ' ' + geom.bounds.width + ' ' + geom.bounds.height"
+              [style.transform]="'rotate(' + piece.rotation + 'deg)'"
+            >
+              @for (line of geom.lines; track line.id) {
+                @if (line.type === 'CUT') {
+                  <line [attr.x1]="line.p1.x" [attr.y1]="line.p1.y" [attr.x2]="line.p2.x" [attr.y2]="line.p2.y" stroke="#ef4444" stroke-width="2"/>
+                } @else if (line.type === 'CREASE') {
+                  <line [attr.x1]="line.p1.x" [attr.y1]="line.p1.y" [attr.x2]="line.p2.x" [attr.y2]="line.p2.y" stroke="#3b82f6" stroke-width="1.5" stroke-dasharray="4,4"/>
+                }
+              }
+            </svg>
+
+            <!-- Piece Index & Rotation Badge -->
+            <div class="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+              <span class="text-[11px] font-mono font-bold px-1.5 py-0.5 rounded bg-black/70 text-neutral-100 border border-neutral-700">
+                #{{ piece.pieceIndex }} ({{ piece.rotation }}°)
+              </span>
+              @if (piece.colliding) {
+                <span class="text-[9px] font-bold text-rose-400 bg-rose-950/90 px-1 rounded mt-1 border border-rose-600 animate-pulse">
+                  COLLISION
+                </span>
+              }
+            </div>
+
+            @if (piece.isLocked) {
+              <mat-icon class="absolute top-1 right-1 text-xs text-amber-400 scale-75">lock</mat-icon>
+            }
+          </div>
+        }
+      </div>
+    }
+  </div>
+
+  <!-- Selected Piece Floating Inspector Toolbar -->
+  @if (selectedPiece(); as piece) {
+    <div class="absolute bottom-6 left-1/2 -translate-x-1/2 z-30 flex items-center gap-3 p-2 bg-neutral-900/95 backdrop-blur-md border border-neutral-700 rounded-xl shadow-2xl text-xs">
+      <div class="flex items-center gap-1.5 px-2 font-mono text-neutral-300">
+        <span class="text-amber-400 font-bold">Piece #{{ piece.pieceIndex }}</span>
+        <span class="text-neutral-500">|</span>
+        <span>X: {{ piece.x }}mm</span>
+        <span>Y: {{ piece.y }}mm</span>
+      </div>
+
+      <div class="h-4 w-px bg-neutral-800"></div>
+
+      <!-- Rotate 90 deg -->
+      <button
+        (click)="rotateSelectedPiece(90)"
+        class="flex items-center gap-1 px-2.5 py-1 bg-neutral-800 hover:bg-neutral-700 text-neutral-200 rounded-md transition-colors"
+      >
+        <mat-icon class="text-sm">rotate_right</mat-icon>
+        <span>Rotate 90°</span>
+      </button>
+
+      <!-- Rotate 180 deg -->
+      <button
+        (click)="rotateSelectedPiece(180)"
+        class="flex items-center gap-1 px-2.5 py-1 bg-neutral-800 hover:bg-neutral-700 text-neutral-200 rounded-md transition-colors"
+      >
+        <mat-icon class="text-sm">sync</mat-icon>
+        <span>180°</span>
+      </button>
+
+      <!-- Lock Toggle -->
+      <button
+        (click)="toggleLockSelectedPiece()"
+        [class.text-amber-400]="piece.isLocked"
+        class="flex items-center gap-1 px-2.5 py-1 bg-neutral-800 hover:bg-neutral-700 text-neutral-200 rounded-md transition-colors"
+      >
+        <mat-icon class="text-sm">{{ piece.isLocked ? 'lock' : 'lock_open' }}</mat-icon>
+        <span>{{ piece.isLocked ? 'Locked' : 'Lock' }}</span>
+      </button>
+
+      <button
+        (click)="deselectAll()"
+        class="p-1 text-neutral-400 hover:text-white rounded hover:bg-neutral-800"
+      >
+        <mat-icon class="text-sm">close</mat-icon>
+      </button>
+    </div>
+  }
+
+  <!-- Multi-Solution Comparison Modal -->
+  @if (showCompareModal()) {
+    <div class="absolute inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-6">
+      <div class="bg-neutral-900 border border-neutral-700 rounded-2xl p-6 shadow-2xl max-w-2xl w-full">
+        <div class="flex items-center justify-between mb-4">
+          <div>
+            <h2 class="text-base font-bold text-neutral-100 flex items-center gap-2">
+              <mat-icon class="text-amber-400">compare_arrows</mat-icon>
+              <span>Nesting Optimization Solutions</span>
+            </h2>
+            <p class="text-xs text-neutral-400">Compare nesting algorithm strategies for maximum yield and minimum waste.</p>
+          </div>
+          <button (click)="showCompareModal.set(false)" class="text-neutral-400 hover:text-white">
+            <mat-icon>close</mat-icon>
+          </button>
+        </div>
+
+        <div class="space-y-3 mb-6">
+          @for (sol of state.nestingSolutions(); track sol.id; let idx = $index) {
+            <div 
+              role="button"
+              tabindex="0"
+              (click)="applySolution(idx)"
+              (keydown.enter)="applySolution(idx)"
+              (keydown.space)="applySolution(idx)"
+              [class.border-amber-400]="state.activeNestingSolutionIndex() === idx"
+              [class.bg-amber-950/20]="state.activeNestingSolutionIndex() === idx"
+              [class.border-neutral-800]="state.activeNestingSolutionIndex() !== idx"
+              class="p-4 bg-neutral-950 border rounded-xl hover:border-neutral-600 cursor-pointer transition-all flex items-center justify-between focus:outline-hidden focus:border-amber-400"
+            >
+              <div>
+                <div class="flex items-center gap-2 mb-1">
+                  <h3 class="text-sm font-semibold text-neutral-200">{{ sol.name }}</h3>
+                  @if (sol.recommended) {
+                    <span class="px-2 py-0.5 text-[10px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 rounded-full">
+                      RECOMMENDED
+                    </span>
+                  }
+                </div>
+                <p class="text-xs text-neutral-400 font-mono">{{ sol.algorithmName }}</p>
+              </div>
+
+              <div class="flex items-center gap-6 text-right">
+                <div>
+                  <div class="text-xs text-neutral-400">Utilization</div>
+                  <div class="text-base font-mono font-bold text-emerald-400">{{ sol.overallUtilization }}%</div>
+                </div>
+
+                <div>
+                  <div class="text-xs text-neutral-400">Yield</div>
+                  <div class="text-base font-mono font-bold text-neutral-100">{{ sol.piecesPerSheet }} pcs/sheet</div>
+                </div>
+
+                <div>
+                  <div class="text-xs text-neutral-400">Sheets Req.</div>
+                  <div class="text-base font-mono font-bold text-amber-400">{{ sol.sheetsRequired }}</div>
+                </div>
+
+                <button
+                  class="px-3 py-1.5 text-xs font-semibold rounded-lg bg-neutral-800 hover:bg-amber-400 hover:text-neutral-950 text-neutral-200 transition-colors"
+                >
+                  Apply
+                </button>
+              </div>
+            </div>
+          }
+        </div>
+
+        <div class="flex justify-end">
+          <button
+            (click)="showCompareModal.set(false)"
+            class="px-4 py-2 text-xs font-medium text-neutral-300 bg-neutral-800 hover:bg-neutral-700 rounded-lg"
+          >
+            Close
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+</div>
