@@ -141,7 +141,13 @@ export class DielineStateService {
       if (prefs.isDarkMode !== undefined) this.isDarkMode.set(prefs.isDarkMode);
       if (prefs.foldPercentage !== undefined) this.foldPercentage.set(prefs.foldPercentage);
       if (prefs.autoRotate3D !== undefined) this.autoRotate3D.set(prefs.autoRotate3D);
-      if (prefs.activeTab) this.activeTab.set(prefs.activeTab as WorkspaceTab);
+      if (prefs.activeTab) {
+        if (prefs.activeTab === 'viewer_3d' || prefs.activeTab === 'sheets') {
+          this.activeTab.set('editor_2d');
+        } else {
+          this.activeTab.set(prefs.activeTab as WorkspaceTab);
+        }
+      }
     }
 
     // 4. Hydrate Layer Visibility

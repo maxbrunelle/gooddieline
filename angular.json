@@ -55,13 +55,24 @@
             "development": {
               "optimization": false,
               "extractLicenses": false,
-              "sourceMap": true
+              "sourceMap": true,
+              "externalDependencies": ["@google/genai"]
             }
           },
           "defaultConfiguration": "production"
         },
         "serve": {
           "builder": "@angular/build:dev-server",
+          "options": {
+            "port": 3000,
+            "host": "0.0.0.0",
+            "allowedHosts": [
+              ".run.app",
+              "localhost",
+              "127.0.0.1",
+              "0.0.0.0"
+            ]
+          },
           "configurations": {
             "production": {
               "buildTarget": "app:build:production"

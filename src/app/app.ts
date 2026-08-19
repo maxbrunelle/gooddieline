@@ -4,9 +4,7 @@ import { Canvas2D } from './components/canvas-2d/canvas-2d';
 import { MaterialManager } from './components/material-manager/material-manager';
 import { NestingView } from './components/nesting-view/nesting-view';
 import { ReportsView } from './components/reports-view/reports-view';
-import { SheetManager } from './components/sheet-manager/sheet-manager';
 import { TemplatePicker } from './components/template-picker/template-picker';
-import { Viewer3D } from './components/viewer-3d/viewer-3d';
 import { DielineStateService, WorkspaceTab } from './core/services/dieline-state.service';
 
 @Component({
@@ -16,11 +14,9 @@ import { DielineStateService, WorkspaceTab } from './core/services/dieline-state
   imports: [
     MatIconModule,
     Canvas2D,
-    Viewer3D,
     NestingView,
     TemplatePicker,
     MaterialManager,
-    SheetManager,
     ReportsView
   ],
   templateUrl: './app.html',

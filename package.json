@@ -2,56 +2,14 @@
   "name": "dielineforge",
   "version": "1.0.0",
   "description": "Parametric Packaging Dieline Generator & Zünd Nesting Production CAD Software",
-  "author": "DielineForge",
-  "main": "electron/main.js",
   "scripts": {
     "ng": "ng",
-    "start": "ng serve",
+    "start": "cross-env ng serve --port=3000 --host=0.0.0.0 --allowed-hosts=true",
     "dev": "cross-env ng serve --port=3000 --host=0.0.0.0 --allowed-hosts=true ${DISABLE_HMR:+--live-reload=false}",
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
-    "lint": "ng lint",
-    "serve:ssr:app": "node dist/app/server/server.mjs",
-    "build:electron": "ng build --base-href ./ && node -e \"const fs=require('fs');const c='dist/app/browser/index.csr.html';const t='dist/app/browser/index.html';if(fs.existsSync(c))fs.copyFileSync(c,t);\"",
-    "electron:dev": "npm run build:electron && electron .",
-    "electron:build": "npm run build:electron && electron-builder",
-    "electron:build:win": "npm run build:electron && electron-builder --win --x64",
-    "electron:build:mac": "npm run build:electron && electron-builder --mac",
-    "electron:build:linux": "npm run build:electron && electron-builder --linux"
-  },
-  "build": {
-    "appId": "com.dielineforge.cad",
-    "productName": "DielineForge",
-    "electronVersion": "34.2.0",
-    "files": [
-      "dist/**/*",
-      "electron/**/*"
-    ],
-    "directories": {
-      "output": "dist-electron"
-    },
-    "win": {
-      "target": [
-        {
-          "target": "nsis",
-          "arch": [
-            "x64"
-          ]
-        },
-        {
-          "target": "portable",
-          "arch": [
-            "x64"
-          ]
-        }
-      ]
-    },
-    "nsis": {
-      "oneClick": false,
-      "allowToChangeInstallationDirectory": true,
-      "createDesktopShortcut": true
-    }
+    "lint": "ng lint"
   },
   "private": true,
   "dependencies": {
@@ -83,8 +41,6 @@
     "@types/three": "^0.185.4",
     "angular-eslint": "21.1.0",
     "cross-env": "^10.1.0",
-    "electron": "^34.2.0",
-    "electron-builder": "^26.8.1",
     "eslint": "^9.39.1",
     "jsdom": "^27.0.0",
     "postcss": "^8.5.3",

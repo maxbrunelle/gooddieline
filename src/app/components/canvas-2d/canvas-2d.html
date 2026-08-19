@@ -5,7 +5,7 @@
 >
   <!-- CAD Top Floating Toolbar -->
   <div 
-    class="absolute top-3 left-3 z-20 flex items-center gap-1.5 p-1.5 backdrop-blur-md rounded-xl shadow-xl border transition-colors"
+    class="absolute top-3 left-3 z-20 flex items-center gap-1 p-1 backdrop-blur-md rounded-xl shadow-lg border transition-colors"
     [class.bg-neutral-900/90]="state.isDarkMode()"
     [class.border-neutral-800]="state.isDarkMode()"
     [class.bg-white/95]="!state.isDarkMode()"
@@ -15,48 +15,42 @@
     <button
       id="tool_select"
       (click)="state.activeTool.set('select')"
-      [class.bg-neutral-800]="state.activeTool() === 'select' && state.isDarkMode()"
-      [class.text-[#7995f5]]="state.activeTool() === 'select' && state.isDarkMode()"
-      [class.bg-slate-100]="state.activeTool() === 'select' && !state.isDarkMode()"
-      [class.text-[#3850a2]]="state.activeTool() === 'select' && !state.isDarkMode()"
+      [class.bg-[#3850a2]]="state.activeTool() === 'select'"
+      [class.text-white]="state.activeTool() === 'select'"
       [class.text-neutral-300]="state.activeTool() !== 'select' && state.isDarkMode()"
       [class.text-slate-600]="state.activeTool() !== 'select' && !state.isDarkMode()"
-      class="flex items-center gap-1 px-2.5 py-1.5 text-xs font-medium rounded-lg hover:bg-neutral-800/80 transition-colors cursor-pointer"
+      class="flex items-center gap-1 px-2.5 py-1 text-xs font-medium rounded-lg transition-colors cursor-pointer"
       title="Select & Inspect Tool (V)"
     >
-      <mat-icon class="text-base scale-90">near_me</mat-icon>
+      <mat-icon class="text-sm">near_me</mat-icon>
       <span>Select</span>
     </button>
 
     <button
       id="tool_pan"
       (click)="state.activeTool.set('pan')"
-      [class.bg-neutral-800]="state.activeTool() === 'pan' && state.isDarkMode()"
-      [class.text-[#7995f5]]="state.activeTool() === 'pan' && state.isDarkMode()"
-      [class.bg-slate-100]="state.activeTool() === 'pan' && !state.isDarkMode()"
-      [class.text-[#3850a2]]="state.activeTool() === 'pan' && !state.isDarkMode()"
+      [class.bg-[#3850a2]]="state.activeTool() === 'pan'"
+      [class.text-white]="state.activeTool() === 'pan'"
       [class.text-neutral-300]="state.activeTool() !== 'pan' && state.isDarkMode()"
       [class.text-slate-600]="state.activeTool() !== 'pan' && !state.isDarkMode()"
-      class="flex items-center gap-1 px-2.5 py-1.5 text-xs font-medium rounded-lg hover:bg-neutral-800/80 transition-colors cursor-pointer"
+      class="flex items-center gap-1 px-2.5 py-1 text-xs font-medium rounded-lg transition-colors cursor-pointer"
       title="Pan Viewport (H / Space+Drag)"
     >
-      <mat-icon class="text-base scale-90">pan_tool</mat-icon>
+      <mat-icon class="text-sm">pan_tool</mat-icon>
       <span>Pan</span>
     </button>
 
     <button
       id="tool_measure"
       (click)="state.activeTool.set('measure'); resetMeasurement()"
-      [class.bg-neutral-800]="state.activeTool() === 'measure' && state.isDarkMode()"
-      [class.text-[#7995f5]]="state.activeTool() === 'measure' && state.isDarkMode()"
-      [class.bg-slate-100]="state.activeTool() === 'measure' && !state.isDarkMode()"
-      [class.text-[#3850a2]]="state.activeTool() === 'measure' && !state.isDarkMode()"
+      [class.bg-[#3850a2]]="state.activeTool() === 'measure'"
+      [class.text-white]="state.activeTool() === 'measure'"
       [class.text-neutral-300]="state.activeTool() !== 'measure' && state.isDarkMode()"
       [class.text-slate-600]="state.activeTool() !== 'measure' && !state.isDarkMode()"
-      class="flex items-center gap-1 px-2.5 py-1.5 text-xs font-medium rounded-lg hover:bg-neutral-800/80 transition-colors cursor-pointer"
+      class="flex items-center gap-1 px-2.5 py-1 text-xs font-medium rounded-lg transition-colors cursor-pointer"
       title="Point-to-Point Measurement Tape (M)"
     >
-      <mat-icon class="text-base scale-90">straighten</mat-icon>
+      <mat-icon class="text-sm">straighten</mat-icon>
       <span>Measure</span>
     </button>
 
@@ -74,10 +68,10 @@
       [class.hover:bg-neutral-800]="state.isDarkMode()"
       [class.text-slate-700]="!state.isDarkMode()"
       [class.hover:bg-slate-100]="!state.isDarkMode()"
-      class="flex items-center gap-1 px-2 py-1.5 text-xs font-medium rounded-lg transition-colors cursor-pointer"
+      class="flex items-center gap-1 px-2 py-1 text-xs font-medium rounded-lg transition-colors cursor-pointer"
       title="Zoom to Fit Dieline"
     >
-      <mat-icon class="text-base scale-90">aspect_ratio</mat-icon>
+      <mat-icon class="text-sm">aspect_ratio</mat-icon>
       <span>Fit</span>
     </button>
 
@@ -90,14 +84,14 @@
       [class.text-slate-500]="!state.isDarkMode()"
       [class.hover:text-slate-900]="!state.isDarkMode()"
       [class.hover:bg-slate-100]="!state.isDarkMode()"
-      class="p-1.5 rounded-lg transition-colors cursor-pointer"
+      class="p-1 rounded-lg transition-colors cursor-pointer"
       title="Zoom In (+)"
     >
-      <mat-icon class="text-base">add</mat-icon>
+      <mat-icon class="text-sm">add</mat-icon>
     </button>
 
     <span 
-      class="text-xs font-mono font-medium min-w-10 text-center"
+      class="text-xs font-mono font-medium min-w-9 text-center"
       [class.text-neutral-400]="state.isDarkMode()"
       [class.text-slate-600]="!state.isDarkMode()"
     >
@@ -113,76 +107,10 @@
       [class.text-slate-500]="!state.isDarkMode()"
       [class.hover:text-slate-900]="!state.isDarkMode()"
       [class.hover:bg-slate-100]="!state.isDarkMode()"
-      class="p-1.5 rounded-lg transition-colors cursor-pointer"
+      class="p-1 rounded-lg transition-colors cursor-pointer"
       title="Zoom Out (-)"
     >
-      <mat-icon class="text-base">remove</mat-icon>
-    </button>
-
-    <div 
-      class="h-4 w-px mx-1"
-      [class.bg-neutral-800]="state.isDarkMode()"
-      [class.bg-slate-200]="!state.isDarkMode()"
-    ></div>
-
-    <!-- Quick 1-Click Zünd .AI Export -->
-    <button
-      id="btn_quick_ai"
-      (click)="state.downloadAI()"
-      class="flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold text-white bg-[#3850a2] hover:bg-[#4865c2] rounded-lg shadow-md shadow-[#3850a2]/30 transition-all active:scale-95 cursor-pointer"
-      title="Export Zünd Cut Center (.ai) with 3 layers: crease, cut, reg"
-    >
-      <mat-icon class="text-base scale-90 font-bold">content_cut</mat-icon>
-      <span>Zünd (.AI)</span>
-    </button>
-
-    <!-- Quick Export Dropdown Buttons -->
-    <button
-      id="btn_quick_svg"
-      (click)="state.downloadSVG()"
-      [class.bg-neutral-800]="state.isDarkMode()"
-      [class.hover:bg-neutral-700]="state.isDarkMode()"
-      [class.text-neutral-300]="state.isDarkMode()"
-      [class.bg-slate-100]="!state.isDarkMode()"
-      [class.hover:bg-slate-200]="!state.isDarkMode()"
-      [class.text-slate-700]="!state.isDarkMode()"
-      class="flex items-center gap-1 px-2.5 py-1.5 text-xs font-medium rounded-lg transition-colors cursor-pointer"
-      title="Export Standard Zünd Production SVG"
-    >
-      <mat-icon class="text-base scale-90 text-rose-500">code</mat-icon>
-      <span>SVG</span>
-    </button>
-
-    <button
-      id="btn_quick_dxf"
-      (click)="state.downloadDXF()"
-      [class.bg-neutral-800]="state.isDarkMode()"
-      [class.hover:bg-neutral-700]="state.isDarkMode()"
-      [class.text-neutral-300]="state.isDarkMode()"
-      [class.bg-slate-100]="!state.isDarkMode()"
-      [class.hover:bg-slate-200]="!state.isDarkMode()"
-      [class.text-slate-700]="!state.isDarkMode()"
-      class="flex items-center gap-1 px-2.5 py-1.5 text-xs font-medium rounded-lg transition-colors cursor-pointer"
-      title="Export AutoCAD R12 DXF with Layers"
-    >
-      <mat-icon class="text-base scale-90 text-[#3850a2]">layers</mat-icon>
-      <span>DXF</span>
-    </button>
-
-    <button
-      id="btn_quick_pdf"
-      (click)="state.downloadPDF()"
-      [class.bg-neutral-800]="state.isDarkMode()"
-      [class.hover:bg-neutral-700]="state.isDarkMode()"
-      [class.text-neutral-300]="state.isDarkMode()"
-      [class.bg-slate-100]="!state.isDarkMode()"
-      [class.hover:bg-slate-200]="!state.isDarkMode()"
-      [class.text-slate-700]="!state.isDarkMode()"
-      class="flex items-center gap-1 px-2.5 py-1.5 text-xs font-medium rounded-lg transition-colors cursor-pointer"
-      title="Export Vector Production PDF Spec"
-    >
-      <mat-icon class="text-base scale-90 text-emerald-500">picture_as_pdf</mat-icon>
-      <span>PDF</span>
+      <mat-icon class="text-sm">remove</mat-icon>
     </button>
   </div>
 
