@@ -1,4 +1,3 @@
-import { CommonModule } from '@angular/common';
 import { 
   ChangeDetectionStrategy, 
   Component, 
@@ -16,7 +15,7 @@ import { DielineStateService } from '../../core/services/dieline-state.service';
   selector: 'app-nesting-view',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule, MatIconModule],
+  imports: [MatIconModule],
   templateUrl: './nesting-view.html',
   styleUrl: './nesting-view.css'
 })

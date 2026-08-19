@@ -1,4 +1,3 @@
-import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
 import { DielineStateService } from '../../core/services/dieline-state.service';
@@ -7,7 +6,7 @@ import { DielineStateService } from '../../core/services/dieline-state.service';
   selector: 'app-reports-view',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule, MatIconModule],
+  imports: [MatIconModule],
   templateUrl: './reports-view.html'
 })
 export class ReportsView {

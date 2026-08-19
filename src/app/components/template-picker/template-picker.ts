@@ -1,4 +1,3 @@
-import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
 import { TemplateCategory, TemplateDefinition } from '../../core/models/dieline.models';
@@ -8,7 +7,7 @@ import { DielineStateService } from '../../core/services/dieline-state.service';
   selector: 'app-template-picker',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule, MatIconModule],
+  imports: [MatIconModule],
   templateUrl: './template-picker.html'
 })
 export class TemplatePicker {

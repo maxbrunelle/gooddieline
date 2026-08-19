@@ -1,4 +1,3 @@
-import { CommonModule } from '@angular/common';
 import { 
   ChangeDetectionStrategy, 
   Component, 
@@ -16,7 +15,7 @@ import { DielineStateService } from '../../core/services/dieline-state.service';
   selector: 'app-canvas-2d',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule, MatIconModule],
+  imports: [MatIconModule],
   templateUrl: './canvas-2d.html',
   styleUrl: './canvas-2d.css'
 })

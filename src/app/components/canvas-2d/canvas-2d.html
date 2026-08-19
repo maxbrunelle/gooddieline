@@ -527,7 +527,7 @@
         @if (state.layerVisibility().PANEL_FILL) {
           @for (panel of geom.panels; track panel.id) {
             <polygon
-              [attr.points]="panel.polygon | json"
+              [attr.points]="panel.polygon"
               [class.fill-neutral-900/40]="state.isDarkMode()"
               [class.fill-slate-200/50]="!state.isDarkMode()"
               class="hover:fill-[#3850a2]/15 stroke-none transition-colors"

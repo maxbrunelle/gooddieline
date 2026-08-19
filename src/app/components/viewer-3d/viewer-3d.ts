@@ -1,4 +1,3 @@
-import { CommonModule } from '@angular/common';
 import { 
   AfterViewInit, 
   ChangeDetectionStrategy, 
@@ -18,7 +17,7 @@ import { DielineStateService } from '../../core/services/dieline-state.service';
   selector: 'app-viewer-3d',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule, MatIconModule],
+  imports: [MatIconModule],
   templateUrl: './viewer-3d.html',
   styleUrl: './viewer-3d.css'
 })

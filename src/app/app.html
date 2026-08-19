@@ -574,7 +574,7 @@
         >
           <div class="flex justify-between">
             <span>Substrate Type:</span>
-            <span class="font-semibold" [class.text-neutral-200]="state.isDarkMode()" [class.text-slate-900]="!state.isDarkMode()">{{ state.activeMaterial().category | uppercase }}</span>
+            <span class="font-semibold" [class.text-neutral-200]="state.isDarkMode()" [class.text-slate-900]="!state.isDarkMode()">{{ state.activeMaterial().category.toUpperCase() }}</span>
           </div>
           <div class="flex justify-between">
             <span>Recommended Knife:</span>

@@ -1,4 +1,3 @@
-import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
 import { Canvas2D } from './components/canvas-2d/canvas-2d';
@@ -15,7 +14,6 @@ import { DielineStateService, WorkspaceTab } from './core/services/dieline-state
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
-    CommonModule,
     MatIconModule,
     Canvas2D,
     Viewer3D,

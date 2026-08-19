@@ -14,7 +14,7 @@ This guide explains how to package DielineForge into a standalone Windows instal
 Open PowerShell or Command Prompt inside the extracted project folder (`gooddieline-main`):
 
 ```bash
-npm install
+npm install --legacy-peer-deps
 ```
 
 ---

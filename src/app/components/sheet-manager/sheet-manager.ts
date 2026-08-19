@@ -1,4 +1,3 @@
-import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
 import { SheetPreset } from '../../core/models/sheet.models';
@@ -8,7 +7,7 @@ import { DielineStateService } from '../../core/services/dieline-state.service';
   selector: 'app-sheet-manager',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule, MatIconModule],
+  imports: [MatIconModule],
   templateUrl: './sheet-manager.html'
 })
 export class SheetManager {
