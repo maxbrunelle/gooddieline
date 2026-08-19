@@ -1,6 +1,8 @@
 {
-  "name": "ai-studio-angular-app",
+  "name": "dielineforge",
   "version": "1.0.0",
+  "description": "Parametric Packaging Dieline Generator & Zünd Nesting Production CAD Software",
+  "author": "DielineForge",
   "main": "electron/main.js",
   "scripts": {
     "ng": "ng",
@@ -20,6 +22,7 @@
   "build": {
     "appId": "com.dielineforge.cad",
     "productName": "DielineForge",
+    "electronVersion": "34.2.0",
     "files": [
       "dist/app/browser/**/*",
       "electron/**/*"
@@ -79,6 +82,8 @@
     "@types/three": "^0.185.4",
     "angular-eslint": "21.1.0",
     "cross-env": "^10.1.0",
+    "electron": "^34.2.0",
+    "electron-builder": "^26.8.1",
     "eslint": "^9.39.1",
     "jsdom": "^27.0.0",
     "postcss": "^8.5.3",
