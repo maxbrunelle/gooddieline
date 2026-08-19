@@ -30,6 +30,7 @@ export class Viewer3D implements AfterViewInit, OnDestroy {
   private camera!: THREE.PerspectiveCamera;
   private renderer!: THREE.WebGLRenderer;
   private boxGroup!: THREE.Group;
+  private gridHelper!: THREE.GridHelper;
   private animationFrameId: number | null = null;
 
   // Interaction & Orbit
@@ -51,6 +52,21 @@ export class Viewer3D implements AfterViewInit, OnDestroy {
 
       if (this.boxGroup && this.scene) {
         this.build3DBox();
+      }
+    });
+
+    // Reactively update 3D scene background when dark/light mode toggles
+    effect(() => {
+      const isDark = this.state.isDarkMode();
+      if (this.scene) {
+        this.scene.background = new THREE.Color(isDark ? 0x0c0d10 : 0xf1f5f9);
+        if (this.gridHelper) {
+          this.scene.remove(this.gridHelper);
+          this.gridHelper.geometry.dispose();
+          this.gridHelper = new THREE.GridHelper(1200, 60, isDark ? 0x2e3440 : 0x94a3b8, isDark ? 0x181a20 : 0xe2e8f0);
+          this.gridHelper.position.y = -120;
+          this.scene.add(this.gridHelper);
+        }
       }
     });
   }
@@ -139,8 +155,9 @@ export class Viewer3D implements AfterViewInit, OnDestroy {
     const width = container.clientWidth;
     const height = container.clientHeight;
 
+    const isDark = this.state.isDarkMode();
     this.scene = new THREE.Scene();
-    this.scene.background = new THREE.Color(0x0c0d10);
+    this.scene.background = new THREE.Color(isDark ? 0x0c0d10 : 0xf1f5f9);
 
     const p = this.state.project().params;
     const maxDim = Math.max(p['length'] || 250, p['width'] || 180, p['height'] || 120);
@@ -184,9 +201,9 @@ export class Viewer3D implements AfterViewInit, OnDestroy {
     this.scene.add(bottomLight);
 
     // Ground Grid
-    const grid = new THREE.GridHelper(1200, 60, 0x2e3440, 0x181a20);
-    grid.position.y = -120;
-    this.scene.add(grid);
+    this.gridHelper = new THREE.GridHelper(1200, 60, isDark ? 0x2e3440 : 0x94a3b8, isDark ? 0x181a20 : 0xe2e8f0);
+    this.gridHelper.position.y = -120;
+    this.scene.add(this.gridHelper);
 
     this.boxGroup = new THREE.Group();
     this.scene.add(this.boxGroup);
@@ -419,136 +436,171 @@ export class Viewer3D implements AfterViewInit, OnDestroy {
     const L = p['length'] || 260;
     const W = p['width'] || 180;
     const H = p['height'] || 70;
-    const tuck = p['tuckFlap'] || 28;
-    const dust = p['dustFlapWidth'] || 35;
+    const tuck = p['tuckFlap'] || Math.max(35, Math.min(H * 0.85, 75));
     const angle = (Math.PI / 2) * f;
 
     const root = new THREE.Group();
+    root.position.set(0, (H / 2) * f, 0);
     this.boxGroup.add(root);
 
-    // 1. Base Tray (W wide × L long in X-Z plane)
-    const base = this.createPanel(W, L, color);
+    // 1. Base Tray (L wide along X, W deep along Z)
+    const base = this.createPanel(L, W, color);
     base.rotation.x = -Math.PI / 2;
     root.add(base);
 
-    // 2. Rear Wall (W × H) - hinges at Z = -L/2
+    // 2. Rear Wall (L × H) - hinges at Z = -W/2
     const rearPivot = new THREE.Group();
-    rearPivot.position.set(0, 0, -L / 2);
+    rearPivot.position.set(0, 0, -W / 2);
     root.add(rearPivot);
-    const rear = this.createPanel(W, H, color);
+    const rear = this.createPanel(L, H, color);
     rear.position.set(0, H / 2, 0);
     rearPivot.add(rear);
     rearPivot.rotation.x = angle;
 
-    // Rear Dust Flap Left (dust × H)
+    // Rear Dust Flap Left (H × H) - hinges at X = -L/2
     const rearDustLPivot = new THREE.Group();
-    rearDustLPivot.position.set(-W / 2, H / 2, 0);
+    rearDustLPivot.position.set(-L / 2, H / 2, 0);
     rearPivot.add(rearDustLPivot);
-    const dustL = this.createPanel(dust, H - 4, color);
-    dustL.position.set(-dust / 2, 0, 0);
+    const dustL = this.createPanel(H - 2, H - 4, color);
+    dustL.position.set(0, 0, (H - 2) / 2);
+    dustL.rotation.y = Math.PI / 2;
     rearDustLPivot.add(dustL);
-    rearDustLPivot.rotation.y = -angle;
+    rearDustLPivot.rotation.y = angle;
 
-    // Rear Dust Flap Right (dust × H)
+    // Rear Dust Flap Right (H × H) - hinges at X = L/2
     const rearDustRPivot = new THREE.Group();
-    rearDustRPivot.position.set(W / 2, H / 2, 0);
+    rearDustRPivot.position.set(L / 2, H / 2, 0);
     rearPivot.add(rearDustRPivot);
-    const dustR = this.createPanel(dust, H - 4, color);
-    dustR.position.set(dust / 2, 0, 0);
+    const dustR = this.createPanel(H - 2, H - 4, color);
+    dustR.position.set(0, 0, (H - 2) / 2);
+    dustR.rotation.y = -Math.PI / 2;
     rearDustRPivot.add(dustR);
-    rearDustRPivot.rotation.y = angle;
+    rearDustRPivot.rotation.y = -angle;
 
-    // Top Lid (W × L) - hinges from top of Rear Wall (Y = H)
+    // Top Lid (L × W) - hinges from top of Rear Wall (Y = H)
     const lidPivot = new THREE.Group();
     lidPivot.position.set(0, H, 0);
     rearPivot.add(lidPivot);
-    const lid = this.createPanel(W, L, color);
-    lid.position.set(0, L / 2, 0);
+    const lid = this.createPanel(L, W, color);
+    lid.position.set(0, W / 2, 0);
     lidPivot.add(lid);
     lidPivot.rotation.x = angle;
 
-    // Lid Left Wing (H - 2 × L)
+    // Lid Left Tuck Wing (H - 2 × W)
     const lidWingLPivot = new THREE.Group();
-    lidWingLPivot.position.set(-W / 2, L / 2, 0);
+    lidWingLPivot.position.set(-L / 2, W / 2, 0);
     lidPivot.add(lidWingLPivot);
-    const lidWingL = this.createPanel(H - 4, L - 8, color);
-    lidWingL.position.set(-(H - 4) / 2, 0, 0);
+    const lidWingL = this.createPanel(H - 4, W - 8, color);
+    lidWingL.position.set(0, 0, (H - 4) / 2);
+    lidWingL.rotation.y = Math.PI / 2;
     lidWingLPivot.add(lidWingL);
-    lidWingLPivot.rotation.y = -angle;
+    lidWingLPivot.rotation.y = angle * 0.95;
 
-    // Lid Right Wing (H - 2 × L)
+    // Lid Right Tuck Wing (H - 2 × W)
     const lidWingRPivot = new THREE.Group();
-    lidWingRPivot.position.set(W / 2, L / 2, 0);
+    lidWingRPivot.position.set(L / 2, W / 2, 0);
     lidPivot.add(lidWingRPivot);
-    const lidWingR = this.createPanel(H - 4, L - 8, color);
-    lidWingR.position.set((H - 4) / 2, 0, 0);
+    const lidWingR = this.createPanel(H - 4, W - 8, color);
+    lidWingR.position.set(0, 0, (H - 4) / 2);
+    lidWingR.rotation.y = -Math.PI / 2;
     lidWingRPivot.add(lidWingR);
-    lidWingRPivot.rotation.y = angle;
+    lidWingRPivot.rotation.y = -angle * 0.95;
 
-    // Front Tuck Flap (W × tuck) - hinges at Y = L on Lid
+    // Front Tuck Flap (L × tuck) - hinges at Y = W on Lid
     const tuckPivot = new THREE.Group();
-    tuckPivot.position.set(0, L, 0);
+    tuckPivot.position.set(0, W, 0);
     lidPivot.add(tuckPivot);
-    const tuckMesh = this.createPanel(W - 10, tuck, color);
+    const tuckMesh = this.createPanel(L - 6, tuck, color);
     tuckMesh.position.set(0, tuck / 2, 0);
     tuckPivot.add(tuckMesh);
-    tuckPivot.rotation.x = angle * 0.95;
+    tuckPivot.rotation.x = angle * 0.98;
 
-    // 3. Front Wall (W × H) - hinges at Z = L/2
+    // Left Tuck Ear Flap
+    const tuckEarLPivot = new THREE.Group();
+    tuckEarLPivot.position.set(-L / 2, tuck / 2, 0);
+    tuckPivot.add(tuckEarLPivot);
+    const tuckEarL = this.createPanel(H * 0.7, tuck - 4, color);
+    tuckEarL.position.set(0, 0, (H * 0.7) / 2);
+    tuckEarL.rotation.y = Math.PI / 2;
+    tuckEarLPivot.add(tuckEarL);
+    tuckEarLPivot.rotation.y = angle * 0.9;
+
+    // Right Tuck Ear Flap
+    const tuckEarRPivot = new THREE.Group();
+    tuckEarRPivot.position.set(L / 2, tuck / 2, 0);
+    tuckPivot.add(tuckEarRPivot);
+    const tuckEarR = this.createPanel(H * 0.7, tuck - 4, color);
+    tuckEarR.position.set(0, 0, (H * 0.7) / 2);
+    tuckEarR.rotation.y = -Math.PI / 2;
+    tuckEarRPivot.add(tuckEarR);
+    tuckEarRPivot.rotation.y = -angle * 0.9;
+
+    // 3. Front Wall (L × H) - hinges at Z = W/2
     const frontPivot = new THREE.Group();
-    frontPivot.position.set(0, 0, L / 2);
+    frontPivot.position.set(0, 0, W / 2);
     root.add(frontPivot);
-    const front = this.createPanel(W, H, color);
+    const front = this.createPanel(L, H, color);
     front.position.set(0, H / 2, 0);
     frontPivot.add(front);
     frontPivot.rotation.x = -angle;
 
-    // Front Rollover (W × (H - 2)) - rolls 180 deg inside
-    const frontRollPivot = new THREE.Group();
-    frontRollPivot.position.set(0, H, 0);
-    frontPivot.add(frontRollPivot);
-    const frontRoll = this.createPanel(W - 6, H - 2, color);
-    frontRoll.position.set(0, (H - 2) / 2, 0);
-    frontRollPivot.add(frontRoll);
-    frontRollPivot.rotation.x = -angle * 2.0;
+    // Front Dust Flap Left (H × H) - hinges at X = -L/2
+    const frontDustLPivot = new THREE.Group();
+    frontDustLPivot.position.set(-L / 2, H / 2, 0);
+    frontPivot.add(frontDustLPivot);
+    const fDustL = this.createPanel(H - 2, H - 4, color);
+    fDustL.position.set(0, 0, -(H - 2) / 2);
+    fDustL.rotation.y = -Math.PI / 2;
+    frontDustLPivot.add(fDustL);
+    frontDustLPivot.rotation.y = -angle;
 
-    // 4. Left Wall (L × H) - hinges at X = -W/2
+    // Front Dust Flap Right (H × H) - hinges at X = L/2
+    const frontDustRPivot = new THREE.Group();
+    frontDustRPivot.position.set(L / 2, H / 2, 0);
+    frontPivot.add(frontDustRPivot);
+    const fDustR = this.createPanel(H - 2, H - 4, color);
+    fDustR.position.set(0, 0, -(H - 2) / 2);
+    fDustR.rotation.y = Math.PI / 2;
+    frontDustRPivot.add(fDustR);
+    frontDustRPivot.rotation.y = angle;
+
+    // 4. Left Double Side Wall (W × H) - hinges at X = -L/2
     const leftPivot = new THREE.Group();
-    leftPivot.position.set(-W / 2, 0, 0);
+    leftPivot.position.set(-L / 2, 0, 0);
     root.add(leftPivot);
-    const leftW = this.createPanel(L, H, color);
-    leftW.rotation.y = Math.PI / 2;
-    leftW.position.set(0, H / 2, 0);
-    leftPivot.add(leftW);
+    const leftMesh = this.createPanel(W, H, color);
+    leftMesh.position.set(0, H / 2, 0);
+    leftMesh.rotation.y = Math.PI / 2;
+    leftPivot.add(leftMesh);
     leftPivot.rotation.z = -angle;
 
-    // Left Rollover Wall (rolls 180 deg inside)
+    // Left Inner Roll-Over Wall (rolls 180 deg inside over corner flaps)
     const leftRollPivot = new THREE.Group();
     leftRollPivot.position.set(0, H, 0);
     leftPivot.add(leftRollPivot);
-    const leftRoll = this.createPanel(L - 10, H - 2, color);
+    const leftRoll = this.createPanel(W - 4, H - 2, color);
+    leftRoll.position.set(0, -(H - 2) / 2, 0);
     leftRoll.rotation.y = Math.PI / 2;
-    leftRoll.position.set(0, (H - 2) / 2, 0);
     leftRollPivot.add(leftRoll);
     leftRollPivot.rotation.z = -angle * 2.0;
 
-    // 5. Right Wall (L × H) - hinges at X = W/2
+    // 5. Right Double Side Wall (W × H) - hinges at X = L/2
     const rightPivot = new THREE.Group();
-    rightPivot.position.set(W / 2, 0, 0);
+    rightPivot.position.set(L / 2, 0, 0);
     root.add(rightPivot);
-    const rightW = this.createPanel(L, H, color);
-    rightW.rotation.y = -Math.PI / 2;
-    rightW.position.set(0, H / 2, 0);
-    rightPivot.add(rightW);
+    const rightMesh = this.createPanel(W, H, color);
+    rightMesh.position.set(0, H / 2, 0);
+    rightMesh.rotation.y = -Math.PI / 2;
+    rightPivot.add(rightMesh);
     rightPivot.rotation.z = angle;
 
-    // Right Rollover Wall
+    // Right Inner Roll-Over Wall
     const rightRollPivot = new THREE.Group();
     rightRollPivot.position.set(0, H, 0);
     rightPivot.add(rightRollPivot);
-    const rightRoll = this.createPanel(L - 10, H - 2, color);
+    const rightRoll = this.createPanel(W - 4, H - 2, color);
+    rightRoll.position.set(0, -(H - 2) / 2, 0);
     rightRoll.rotation.y = -Math.PI / 2;
-    rightRoll.position.set(0, (H - 2) / 2, 0);
     rightRollPivot.add(rightRoll);
     rightRollPivot.rotation.z = angle * 2.0;
   }

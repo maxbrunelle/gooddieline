@@ -1,12 +1,30 @@
-<div class="relative w-full h-full flex flex-col bg-neutral-950 overflow-hidden select-none">
+<div 
+  class="relative w-full h-full flex flex-col overflow-hidden select-none transition-colors duration-200"
+  [class.bg-neutral-950]="state.isDarkMode()"
+  [class.bg-slate-100]="!state.isDarkMode()"
+>
   <!-- 3D Canvas Host -->
   <div #canvasContainer class="w-full h-full cursor-grab active:cursor-grabbing"></div>
 
   <!-- Top Floating 3D Control Bar -->
-  <div class="absolute top-4 left-4 z-20 flex items-center gap-2 p-2 bg-neutral-900/90 backdrop-blur-md border border-neutral-800 rounded-xl shadow-2xl">
+  <div 
+    class="absolute top-4 left-4 z-20 flex items-center gap-2 p-2 backdrop-blur-md border rounded-xl shadow-2xl transition-colors"
+    [class.bg-neutral-900/90]="state.isDarkMode()"
+    [class.border-neutral-800]="state.isDarkMode()"
+    [class.bg-white/90]="!state.isDarkMode()"
+    [class.border-slate-200]="!state.isDarkMode()"
+  >
     <button
       (click)="resetView()"
-      class="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-neutral-300 hover:text-white bg-neutral-800 hover:bg-neutral-700 rounded-lg transition-colors"
+      class="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg transition-colors cursor-pointer"
+      [class.bg-neutral-800]="state.isDarkMode()"
+      [class.text-neutral-300]="state.isDarkMode()"
+      [class.hover:text-white]="state.isDarkMode()"
+      [class.hover:bg-neutral-700]="state.isDarkMode()"
+      [class.bg-slate-100]="!state.isDarkMode()"
+      [class.text-slate-700]="!state.isDarkMode()"
+      [class.hover:text-slate-900]="!state.isDarkMode()"
+      [class.hover:bg-slate-200]="!state.isDarkMode()"
       title="Reset 3D Camera Orbit"
     >
       <mat-icon class="text-sm">center_focus_strong</mat-icon>
@@ -15,32 +33,56 @@
 
     <button
       (click)="toggleAutoRotate()"
-      [class.bg-amber-500]="state.autoRotate3D()"
-      [class.text-neutral-950]="state.autoRotate3D()"
-      [class.bg-neutral-800]="!state.autoRotate3D()"
-      [class.text-neutral-300]="!state.autoRotate3D()"
-      class="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg transition-colors"
+      [class.bg-[#3850a2]]="state.autoRotate3D()"
+      [class.text-white]="state.autoRotate3D()"
+      [class.bg-neutral-800]="!state.autoRotate3D() && state.isDarkMode()"
+      [class.text-neutral-300]="!state.autoRotate3D() && state.isDarkMode()"
+      [class.bg-slate-100]="!state.autoRotate3D() && !state.isDarkMode()"
+      [class.text-slate-700]="!state.autoRotate3D() && !state.isDarkMode()"
+      class="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg transition-colors cursor-pointer"
       title="Toggle Auto Turntable Orbit"
     >
       <mat-icon class="text-sm">360</mat-icon>
       <span>Turntable</span>
     </button>
 
-    <div class="h-4 w-px bg-neutral-800 mx-1"></div>
+    <div 
+      class="h-4 w-px mx-1"
+      [class.bg-neutral-800]="state.isDarkMode()"
+      [class.bg-slate-200]="!state.isDarkMode()"
+    ></div>
 
-    <span class="text-xs text-neutral-400 font-mono">
+    <span 
+      class="text-xs font-mono"
+      [class.text-neutral-400]="state.isDarkMode()"
+      [class.text-slate-600]="!state.isDarkMode()"
+    >
       {{ state.activeMaterial().name }}
     </span>
   </div>
 
   <!-- Bottom Floating Interactive Fold Slider -->
-  <div class="absolute bottom-6 left-1/2 -translate-x-1/2 z-20 w-full max-w-md p-4 bg-neutral-900/90 backdrop-blur-md border border-neutral-800 rounded-2xl shadow-2xl flex flex-col gap-2">
+  <div 
+    class="absolute bottom-6 left-1/2 -translate-x-1/2 z-20 w-full max-w-md p-4 backdrop-blur-md border rounded-2xl shadow-2xl flex flex-col gap-2 transition-colors"
+    [class.bg-neutral-900/90]="state.isDarkMode()"
+    [class.border-neutral-800]="state.isDarkMode()"
+    [class.bg-white/95]="!state.isDarkMode()"
+    [class.border-slate-200]="!state.isDarkMode()"
+  >
     <div class="flex items-center justify-between text-xs">
       <div class="flex items-center gap-2">
-        <mat-icon class="text-amber-400 text-sm">unfold_more</mat-icon>
-        <span class="font-semibold text-neutral-200">Assembly Fold Sequence</span>
+        <mat-icon [class.text-[#7995f5]]="state.isDarkMode()" [class.text-[#3850a2]]="!state.isDarkMode()" class="text-sm">unfold_more</mat-icon>
+        <span 
+          class="font-semibold"
+          [class.text-neutral-200]="state.isDarkMode()"
+          [class.text-slate-800]="!state.isDarkMode()"
+        >Assembly Fold Sequence</span>
       </div>
-      <span class="font-mono font-bold text-amber-400 text-sm">
+      <span 
+        class="font-mono font-bold text-sm"
+        [class.text-[#7995f5]]="state.isDarkMode()"
+        [class.text-[#3850a2]]="!state.isDarkMode()"
+      >
         {{ state.foldPercentage() }}%
       </span>
     </div>
@@ -49,7 +91,13 @@
     <div class="flex items-center gap-3">
       <button
         (click)="updateFold(0)"
-        class="px-2 py-1 text-[11px] font-mono text-neutral-400 hover:text-white bg-neutral-800 rounded-md"
+        class="px-2 py-1 text-[11px] font-mono rounded-md cursor-pointer transition-colors"
+        [class.bg-neutral-800]="state.isDarkMode()"
+        [class.text-neutral-400]="state.isDarkMode()"
+        [class.hover:text-white]="state.isDarkMode()"
+        [class.bg-slate-100]="!state.isDarkMode()"
+        [class.text-slate-600]="!state.isDarkMode()"
+        [class.hover:text-slate-900]="!state.isDarkMode()"
       >
         Flat (0%)
       </button>
@@ -62,18 +110,32 @@
         step="1"
         [value]="state.foldPercentage()"
         (input)="updateFold(+foldRange.value)"
-        class="flex-1 accent-amber-400 cursor-ew-resize h-1.5 bg-neutral-800 rounded-lg"
+        class="flex-1 accent-[#3850a2] cursor-ew-resize h-1.5 rounded-lg"
+        [class.bg-neutral-800]="state.isDarkMode()"
+        [class.bg-slate-200]="!state.isDarkMode()"
       />
 
       <button
         (click)="updateFold(100)"
-        class="px-2 py-1 text-[11px] font-mono text-neutral-400 hover:text-white bg-neutral-800 rounded-md"
+        class="px-2 py-1 text-[11px] font-mono rounded-md cursor-pointer transition-colors"
+        [class.bg-neutral-800]="state.isDarkMode()"
+        [class.text-neutral-400]="state.isDarkMode()"
+        [class.hover:text-white]="state.isDarkMode()"
+        [class.bg-slate-100]="!state.isDarkMode()"
+        [class.text-slate-600]="!state.isDarkMode()"
+        [class.hover:text-slate-900]="!state.isDarkMode()"
       >
         Formed (100%)
       </button>
     </div>
 
-    <div class="flex items-center justify-between text-[10px] text-neutral-500 font-mono pt-1 border-t border-neutral-800/80">
+    <div 
+      class="flex items-center justify-between text-[10px] font-mono pt-1 border-t"
+      [class.border-neutral-800/80]="state.isDarkMode()"
+      [class.text-neutral-500]="state.isDarkMode()"
+      [class.border-slate-100]="!state.isDarkMode()"
+      [class.text-slate-400]="!state.isDarkMode()"
+    >
       <span>Drag mouse to orbit • Scroll to zoom</span>
       <span>Live Three.js WebGL</span>
     </div>

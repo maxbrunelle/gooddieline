@@ -1,21 +1,54 @@
-<div class="flex flex-col w-screen h-screen bg-neutral-950 text-neutral-100 font-sans overflow-hidden select-none">
+<div 
+  class="flex flex-col w-screen h-screen font-sans overflow-hidden select-none transition-colors duration-200"
+  [class.bg-neutral-950]="state.isDarkMode()"
+  [class.text-neutral-100]="state.isDarkMode()"
+  [class.bg-slate-100]="!state.isDarkMode()"
+  [class.text-slate-900]="!state.isDarkMode()"
+  [class.dark]="state.isDarkMode()"
+  [class.light]="!state.isDarkMode()"
+>
   <!-- Top Global CAD Title & Mode Navigation Header -->
-  <header class="h-13 bg-neutral-900 border-b border-neutral-800 px-4 flex items-center justify-between shrink-0 z-30">
+  <header 
+    class="h-13 px-4 flex items-center justify-between shrink-0 z-30 transition-colors duration-200 border-b"
+    [class.bg-neutral-900]="state.isDarkMode()"
+    [class.border-neutral-800]="state.isDarkMode()"
+    [class.bg-white]="!state.isDarkMode()"
+    [class.border-slate-200]="!state.isDarkMode()"
+    [class.shadow-xs]="!state.isDarkMode()"
+  >
     <!-- Brand & Project Info -->
     <div class="flex items-center gap-3">
-      <div class="flex items-center gap-2 pr-3 border-r border-neutral-800">
-        <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center shadow-md">
-          <mat-icon class="text-neutral-950 text-lg font-bold">architecture</mat-icon>
+      <div 
+        class="flex items-center gap-2 pr-3 border-r"
+        [class.border-neutral-800]="state.isDarkMode()"
+        [class.border-slate-200]="!state.isDarkMode()"
+      >
+        <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-[#3850a2] to-[#253675] flex items-center justify-center shadow-md shadow-[#3850a2]/30">
+          <mat-icon class="text-white text-lg font-bold">architecture</mat-icon>
         </div>
         <div>
-          <div class="text-xs font-black tracking-wider text-neutral-100 flex items-center gap-1.5">
+          <div 
+            class="text-xs font-black tracking-wider flex items-center gap-1.5"
+            [class.text-neutral-100]="state.isDarkMode()"
+            [class.text-slate-900]="!state.isDarkMode()"
+          >
             <span>DIELINEFORGE</span>
-            <span class="text-[9px] font-mono font-normal px-1 py-0.2 rounded bg-amber-400/20 text-amber-300 border border-amber-400/30">CAD</span>
+            <span class="text-[9px] font-mono font-bold px-1.5 py-0.2 rounded bg-[#3850a2]/20 text-[#3850a2] border border-[#3850a2]/30">CAD</span>
           </div>
-          <div class="text-[10px] text-neutral-400 font-mono flex items-center gap-1">
+          <div 
+            class="text-[10px] font-mono flex items-center gap-1"
+            [class.text-neutral-400]="state.isDarkMode()"
+            [class.text-slate-500]="!state.isDarkMode()"
+          >
             <span>{{ state.project().jobNumber }}</span>
-            <span class="text-neutral-600">•</span>
-            <span class="text-neutral-300 font-semibold truncate max-w-40">{{ state.project().name }}</span>
+            <span [class.text-neutral-600]="state.isDarkMode()" [class.text-slate-300]="!state.isDarkMode()">•</span>
+            <span 
+              class="font-semibold truncate max-w-40"
+              [class.text-neutral-300]="state.isDarkMode()"
+              [class.text-slate-700]="!state.isDarkMode()"
+            >
+              {{ state.project().name }}
+            </span>
           </div>
         </div>
       </div>
@@ -25,10 +58,14 @@
         <button
           id="nav_editor_2d"
           (click)="setTab('editor_2d')"
-          [class.bg-neutral-800]="state.activeTab() === 'editor_2d'"
-          [class.text-amber-400]="state.activeTab() === 'editor_2d'"
-          [class.text-neutral-300]="state.activeTab() !== 'editor_2d'"
-          class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium hover:bg-neutral-800/80 transition-colors"
+          [class.bg-neutral-800]="state.activeTab() === 'editor_2d' && state.isDarkMode()"
+          [class.text-[#7995f5]]="state.activeTab() === 'editor_2d' && state.isDarkMode()"
+          [class.bg-slate-100]="state.activeTab() === 'editor_2d' && !state.isDarkMode()"
+          [class.text-[#3850a2]]="state.activeTab() === 'editor_2d' && !state.isDarkMode()"
+          [class.font-bold]="state.activeTab() === 'editor_2d'"
+          [class.text-neutral-400]="state.activeTab() !== 'editor_2d' && state.isDarkMode()"
+          [class.text-slate-600]="state.activeTab() !== 'editor_2d' && !state.isDarkMode()"
+          class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium hover:bg-neutral-800/80 transition-colors cursor-pointer"
         >
           <mat-icon class="text-sm">grid_view</mat-icon>
           <span>2D CAD Editor</span>
@@ -37,10 +74,14 @@
         <button
           id="nav_viewer_3d"
           (click)="setTab('viewer_3d')"
-          [class.bg-neutral-800]="state.activeTab() === 'viewer_3d'"
-          [class.text-amber-400]="state.activeTab() === 'viewer_3d'"
-          [class.text-neutral-300]="state.activeTab() !== 'viewer_3d'"
-          class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium hover:bg-neutral-800/80 transition-colors"
+          [class.bg-neutral-800]="state.activeTab() === 'viewer_3d' && state.isDarkMode()"
+          [class.text-[#7995f5]]="state.activeTab() === 'viewer_3d' && state.isDarkMode()"
+          [class.bg-slate-100]="state.activeTab() === 'viewer_3d' && !state.isDarkMode()"
+          [class.text-[#3850a2]]="state.activeTab() === 'viewer_3d' && !state.isDarkMode()"
+          [class.font-bold]="state.activeTab() === 'viewer_3d'"
+          [class.text-neutral-400]="state.activeTab() !== 'viewer_3d' && state.isDarkMode()"
+          [class.text-slate-600]="state.activeTab() !== 'viewer_3d' && !state.isDarkMode()"
+          class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium hover:bg-neutral-800/80 transition-colors cursor-pointer"
         >
           <mat-icon class="text-sm">view_in_ar</mat-icon>
           <span>3D Folding</span>
@@ -49,10 +90,14 @@
         <button
           id="nav_templates"
           (click)="setTab('templates')"
-          [class.bg-neutral-800]="state.activeTab() === 'templates'"
-          [class.text-amber-400]="state.activeTab() === 'templates'"
-          [class.text-neutral-300]="state.activeTab() !== 'templates'"
-          class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium hover:bg-neutral-800/80 transition-colors"
+          [class.bg-neutral-800]="state.activeTab() === 'templates' && state.isDarkMode()"
+          [class.text-[#7995f5]]="state.activeTab() === 'templates' && state.isDarkMode()"
+          [class.bg-slate-100]="state.activeTab() === 'templates' && !state.isDarkMode()"
+          [class.text-[#3850a2]]="state.activeTab() === 'templates' && !state.isDarkMode()"
+          [class.font-bold]="state.activeTab() === 'templates'"
+          [class.text-neutral-400]="state.activeTab() !== 'templates' && state.isDarkMode()"
+          [class.text-slate-600]="state.activeTab() !== 'templates' && !state.isDarkMode()"
+          class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium hover:bg-neutral-800/80 transition-colors cursor-pointer"
         >
           <mat-icon class="text-sm">category</mat-icon>
           <span>Templates</span>
@@ -61,10 +106,14 @@
         <button
           id="nav_materials"
           (click)="setTab('materials')"
-          [class.bg-neutral-800]="state.activeTab() === 'materials'"
-          [class.text-amber-400]="state.activeTab() === 'materials'"
-          [class.text-neutral-300]="state.activeTab() !== 'materials'"
-          class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium hover:bg-neutral-800/80 transition-colors"
+          [class.bg-neutral-800]="state.activeTab() === 'materials' && state.isDarkMode()"
+          [class.text-[#7995f5]]="state.activeTab() === 'materials' && state.isDarkMode()"
+          [class.bg-slate-100]="state.activeTab() === 'materials' && !state.isDarkMode()"
+          [class.text-[#3850a2]]="state.activeTab() === 'materials' && !state.isDarkMode()"
+          [class.font-bold]="state.activeTab() === 'materials'"
+          [class.text-neutral-400]="state.activeTab() !== 'materials' && state.isDarkMode()"
+          [class.text-slate-600]="state.activeTab() !== 'materials' && !state.isDarkMode()"
+          class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium hover:bg-neutral-800/80 transition-colors cursor-pointer"
         >
           <mat-icon class="text-sm">layers</mat-icon>
           <span>Materials</span>
@@ -73,10 +122,14 @@
         <button
           id="nav_sheets"
           (click)="setTab('sheets')"
-          [class.bg-neutral-800]="state.activeTab() === 'sheets'"
-          [class.text-amber-400]="state.activeTab() === 'sheets'"
-          [class.text-neutral-300]="state.activeTab() !== 'sheets'"
-          class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium hover:bg-neutral-800/80 transition-colors"
+          [class.bg-neutral-800]="state.activeTab() === 'sheets' && state.isDarkMode()"
+          [class.text-[#7995f5]]="state.activeTab() === 'sheets' && state.isDarkMode()"
+          [class.bg-slate-100]="state.activeTab() === 'sheets' && !state.isDarkMode()"
+          [class.text-[#3850a2]]="state.activeTab() === 'sheets' && !state.isDarkMode()"
+          [class.font-bold]="state.activeTab() === 'sheets'"
+          [class.text-neutral-400]="state.activeTab() !== 'sheets' && state.isDarkMode()"
+          [class.text-slate-600]="state.activeTab() !== 'sheets' && !state.isDarkMode()"
+          class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium hover:bg-neutral-800/80 transition-colors cursor-pointer"
         >
           <mat-icon class="text-sm">crop_free</mat-icon>
           <span>Sheets</span>
@@ -91,7 +144,13 @@
         id="btn_undo"
         (click)="state.undo()"
         [disabled]="!state.canUndo()"
-        class="p-1.5 text-neutral-400 hover:text-white hover:bg-neutral-800 rounded-lg transition-colors disabled:opacity-30"
+        [class.text-neutral-400]="state.isDarkMode()"
+        [class.hover:text-white]="state.isDarkMode()"
+        [class.hover:bg-neutral-800]="state.isDarkMode()"
+        [class.text-slate-500]="!state.isDarkMode()"
+        [class.hover:text-slate-900]="!state.isDarkMode()"
+        [class.hover:bg-slate-100]="!state.isDarkMode()"
+        class="p-1.5 rounded-lg transition-colors disabled:opacity-30 cursor-pointer"
         title="Undo (Ctrl+Z)"
       >
         <mat-icon class="text-sm">undo</mat-icon>
@@ -101,19 +160,58 @@
         id="btn_redo"
         (click)="state.redo()"
         [disabled]="!state.canRedo()"
-        class="p-1.5 text-neutral-400 hover:text-white hover:bg-neutral-800 rounded-lg transition-colors disabled:opacity-30"
+        [class.text-neutral-400]="state.isDarkMode()"
+        [class.hover:text-white]="state.isDarkMode()"
+        [class.hover:bg-neutral-800]="state.isDarkMode()"
+        [class.text-slate-500]="!state.isDarkMode()"
+        [class.hover:text-slate-900]="!state.isDarkMode()"
+        [class.hover:bg-slate-100]="!state.isDarkMode()"
+        class="p-1.5 rounded-lg transition-colors disabled:opacity-30 cursor-pointer"
         title="Redo (Ctrl+Y)"
       >
         <mat-icon class="text-sm">redo</mat-icon>
       </button>
 
-      <div class="h-4 w-px bg-neutral-800 mx-1"></div>
+      <div 
+        class="h-4 w-px mx-1"
+        [class.bg-neutral-800]="state.isDarkMode()"
+        [class.bg-slate-200]="!state.isDarkMode()"
+      ></div>
+
+      <!-- Light / Dark Mode Toggle Button -->
+      <button
+        id="btn_toggle_theme"
+        (click)="state.toggleDarkMode()"
+        class="flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-medium rounded-lg transition-colors cursor-pointer"
+        [class.bg-neutral-800]="state.isDarkMode()"
+        [class.hover:bg-neutral-700]="state.isDarkMode()"
+        [class.text-neutral-300]="state.isDarkMode()"
+        [class.bg-slate-100]="!state.isDarkMode()"
+        [class.hover:bg-slate-200]="!state.isDarkMode()"
+        [class.text-slate-700]="!state.isDarkMode()"
+        [class.border]="!state.isDarkMode()"
+        [class.border-slate-200]="!state.isDarkMode()"
+        [title]="state.isDarkMode() ? 'Switch to Light Mode' : 'Switch to Dark Mode'"
+      >
+        <mat-icon class="text-sm scale-90" [class.text-yellow-400]="state.isDarkMode()" [class.text-[#3850a2]]="!state.isDarkMode()">
+          {{ state.isDarkMode() ? 'light_mode' : 'dark_mode' }}
+        </mat-icon>
+        <span class="hidden sm:inline font-medium">{{ state.isDarkMode() ? 'Light' : 'Dark' }}</span>
+      </button>
 
       <!-- Project Metadata Modal Trigger -->
       <button
         id="btn_project_settings"
         (click)="showProjectModal.set(true)"
-        class="flex items-center gap-1 px-2.5 py-1.5 text-xs font-medium text-neutral-300 bg-neutral-800 hover:bg-neutral-700 rounded-lg transition-colors"
+        [class.bg-neutral-800]="state.isDarkMode()"
+        [class.hover:bg-neutral-700]="state.isDarkMode()"
+        [class.text-neutral-300]="state.isDarkMode()"
+        [class.bg-slate-100]="!state.isDarkMode()"
+        [class.hover:bg-slate-200]="!state.isDarkMode()"
+        [class.text-slate-700]="!state.isDarkMode()"
+        [class.border]="!state.isDarkMode()"
+        [class.border-slate-200]="!state.isDarkMode()"
+        class="flex items-center gap-1 px-2.5 py-1.5 text-xs font-medium rounded-lg transition-colors cursor-pointer"
         title="Job & Customer Metadata"
       >
         <mat-icon class="text-sm">assignment</mat-icon>
@@ -122,15 +220,21 @@
 
       <!-- Auto-save Storage Status Indicator -->
       <div
-        class="hidden lg:flex items-center gap-1.5 px-2.5 py-1 text-[11px] font-mono text-neutral-400 bg-neutral-900/80 border border-neutral-800 rounded-md select-none"
+        class="hidden lg:flex items-center gap-1.5 px-2.5 py-1 text-[11px] font-mono rounded-md select-none border"
+        [class.bg-neutral-900/80]="state.isDarkMode()"
+        [class.border-neutral-800]="state.isDarkMode()"
+        [class.text-neutral-400]="state.isDarkMode()"
+        [class.bg-slate-50]="!state.isDarkMode()"
+        [class.border-slate-200]="!state.isDarkMode()"
+        [class.text-slate-600]="!state.isDarkMode()"
         [title]="state.lastSavedTimestamp()"
       >
         @if (state.storageStatus() === 'saving') {
-          <span class="w-1.5 h-1.5 rounded-full bg-amber-400 animate-ping"></span>
-          <span class="text-amber-400">Saving...</span>
+          <span class="w-1.5 h-1.5 rounded-full bg-[#3850a2] animate-ping"></span>
+          <span class="text-[#3850a2] font-semibold">Saving...</span>
         } @else {
           <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
-          <span class="text-neutral-400">{{ state.lastSavedTimestamp() }}</span>
+          <span>{{ state.lastSavedTimestamp() }}</span>
         }
       </div>
 
@@ -138,7 +242,7 @@
       <button
         id="btn_export_suite"
         (click)="showExportModal.set(true)"
-        class="flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold text-neutral-950 bg-amber-400 hover:bg-amber-300 rounded-lg shadow-md transition-all active:scale-95 ml-1 cursor-pointer"
+        class="flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold text-white bg-[#3850a2] hover:bg-[#4865c2] rounded-lg shadow-md shadow-[#3850a2]/30 transition-all active:scale-95 ml-1 cursor-pointer"
       >
         <mat-icon class="text-sm font-bold">file_download</mat-icon>
         <span>Export CNC / Vector</span>
@@ -176,32 +280,75 @@
     </main>
 
     <!-- Right Parametric Property Inspector (Pinned CAD Inspector) -->
-    <aside class="w-84 h-full bg-neutral-900 border-l border-neutral-800 flex flex-col shrink-0 z-20 overflow-y-auto">
+    <aside 
+      class="w-84 h-full flex flex-col shrink-0 z-20 overflow-y-auto transition-colors duration-200 border-l"
+      [class.bg-neutral-900]="state.isDarkMode()"
+      [class.border-neutral-800]="state.isDarkMode()"
+      [class.bg-white]="!state.isDarkMode()"
+      [class.border-slate-200]="!state.isDarkMode()"
+    >
       <!-- Section 1: Active Template Card & Units Selector -->
-      <div class="p-4 border-b border-neutral-800 bg-neutral-950/40 space-y-3">
+      <div 
+        class="p-4 border-b space-y-3"
+        [class.bg-neutral-950/40]="state.isDarkMode()"
+        [class.border-neutral-800]="state.isDarkMode()"
+        [class.bg-slate-50/70]="!state.isDarkMode()"
+        [class.border-slate-200]="!state.isDarkMode()"
+      >
         <div class="flex items-center justify-between">
-          <span class="text-[10px] font-mono text-amber-400 font-semibold uppercase tracking-wider">Active Geometry</span>
-          <span class="text-[10px] font-mono text-neutral-400 px-1.5 py-0.2 rounded bg-neutral-800">{{ state.activeTemplate().code }}</span>
+          <span 
+            class="text-[10px] font-mono font-semibold uppercase tracking-wider"
+            [class.text-[#7995f5]]="state.isDarkMode()"
+            [class.text-[#3850a2]]="!state.isDarkMode()"
+          >Active Geometry</span>
+          <span 
+            class="text-[10px] font-mono px-1.5 py-0.2 rounded"
+            [class.text-neutral-400]="state.isDarkMode()"
+            [class.bg-neutral-800]="state.isDarkMode()"
+            [class.text-slate-600]="!state.isDarkMode()"
+            [class.bg-slate-200]="!state.isDarkMode()"
+          >{{ state.activeTemplate().code }}</span>
         </div>
-        <h2 class="text-sm font-bold text-neutral-100 flex items-center gap-1.5">
-          <mat-icon class="text-amber-400 text-sm">inventory_2</mat-icon>
+        <h2 
+          class="text-sm font-bold flex items-center gap-1.5"
+          [class.text-neutral-100]="state.isDarkMode()"
+          [class.text-slate-900]="!state.isDarkMode()"
+        >
+          <mat-icon [class.text-[#7995f5]]="state.isDarkMode()" [class.text-[#3850a2]]="!state.isDarkMode()" class="text-sm">inventory_2</mat-icon>
           <span>{{ state.activeTemplate().name }}</span>
         </h2>
 
         <!-- Working Units Segmented Switcher in Sidebar -->
-        <div class="flex items-center justify-between bg-neutral-950 p-1.5 rounded-xl border border-neutral-800/90">
-          <div class="flex items-center gap-1 text-[11px] text-neutral-400 font-medium pl-1">
-            <mat-icon class="text-xs text-amber-400">straighten</mat-icon>
+        <div 
+          class="flex items-center justify-between p-1.5 rounded-xl border"
+          [class.bg-neutral-950]="state.isDarkMode()"
+          [class.border-neutral-800/90]="state.isDarkMode()"
+          [class.bg-white]="!state.isDarkMode()"
+          [class.border-slate-200]="!state.isDarkMode()"
+        >
+          <div 
+            class="flex items-center gap-1 text-[11px] font-medium pl-1"
+            [class.text-neutral-400]="state.isDarkMode()"
+            [class.text-slate-500]="!state.isDarkMode()"
+          >
+            <mat-icon class="text-xs" [class.text-[#7995f5]]="state.isDarkMode()" [class.text-[#3850a2]]="!state.isDarkMode()">straighten</mat-icon>
             <span>Unit:</span>
           </div>
-          <div class="flex items-center gap-1 bg-neutral-900 p-0.5 rounded-lg border border-neutral-800">
+          <div 
+            class="flex items-center gap-1 p-0.5 rounded-lg border"
+            [class.bg-neutral-900]="state.isDarkMode()"
+            [class.border-neutral-800]="state.isDarkMode()"
+            [class.bg-slate-100]="!state.isDarkMode()"
+            [class.border-slate-200]="!state.isDarkMode()"
+          >
             <button
               id="sidebar_unit_mm"
               (click)="state.setUnit('mm')"
-              [class.bg-amber-400]="state.unit() === 'mm'"
-              [class.text-neutral-950]="state.unit() === 'mm'"
+              [class.bg-[#3850a2]]="state.unit() === 'mm'"
+              [class.text-white]="state.unit() === 'mm'"
               [class.font-bold]="state.unit() === 'mm'"
-              [class.text-neutral-400]="state.unit() !== 'mm'"
+              [class.text-neutral-400]="state.unit() !== 'mm' && state.isDarkMode()"
+              [class.text-slate-600]="state.unit() !== 'mm' && !state.isDarkMode()"
               class="px-2 py-0.5 text-xs rounded-md transition-all cursor-pointer"
               title="Millimeters"
             >
@@ -210,10 +357,11 @@
             <button
               id="sidebar_unit_in"
               (click)="state.setUnit('in')"
-              [class.bg-amber-400]="state.unit() === 'in'"
-              [class.text-neutral-950]="state.unit() === 'in'"
+              [class.bg-[#3850a2]]="state.unit() === 'in'"
+              [class.text-white]="state.unit() === 'in'"
               [class.font-bold]="state.unit() === 'in'"
-              [class.text-neutral-400]="state.unit() !== 'in'"
+              [class.text-neutral-400]="state.unit() !== 'in' && state.isDarkMode()"
+              [class.text-slate-600]="state.unit() !== 'in' && !state.isDarkMode()"
               class="px-2.5 py-0.5 text-xs rounded-md transition-all cursor-pointer"
               title="Inches (1 in = 25.4 mm)"
             >
@@ -222,10 +370,11 @@
             <button
               id="sidebar_unit_cm"
               (click)="state.setUnit('cm')"
-              [class.bg-amber-400]="state.unit() === 'cm'"
-              [class.text-neutral-950]="state.unit() === 'cm'"
+              [class.bg-[#3850a2]]="state.unit() === 'cm'"
+              [class.text-white]="state.unit() === 'cm'"
               [class.font-bold]="state.unit() === 'cm'"
-              [class.text-neutral-400]="state.unit() !== 'cm'"
+              [class.text-neutral-400]="state.unit() !== 'cm' && state.isDarkMode()"
+              [class.text-slate-600]="state.unit() !== 'cm' && !state.isDarkMode()"
               class="px-2 py-0.5 text-xs rounded-md transition-all cursor-pointer"
               title="Centimeters"
             >
@@ -236,10 +385,26 @@
       </div>
 
       <!-- Section 2: Parametric Dimensions (Real-Time Inputs & Sliders) -->
-      <div class="p-4 border-b border-neutral-800 space-y-4">
-        <div class="text-[11px] font-bold text-neutral-300 uppercase tracking-wider flex items-center justify-between">
+      <div 
+        class="p-4 border-b space-y-4"
+        [class.border-neutral-800]="state.isDarkMode()"
+        [class.border-slate-200]="!state.isDarkMode()"
+      >
+        <div 
+          class="text-[11px] font-bold uppercase tracking-wider flex items-center justify-between"
+          [class.text-neutral-300]="state.isDarkMode()"
+          [class.text-slate-700]="!state.isDarkMode()"
+        >
           <span>Parametric Variables</span>
-          <span class="text-amber-400 font-mono text-[10px] font-bold bg-neutral-950 px-1.5 py-0.5 rounded border border-neutral-800">
+          <span 
+            class="font-mono text-[10px] font-bold px-1.5 py-0.5 rounded border"
+            [class.text-[#7995f5]]="state.isDarkMode()"
+            [class.bg-neutral-950]="state.isDarkMode()"
+            [class.border-[#3850a2]/30]="state.isDarkMode()"
+            [class.text-[#3850a2]]="!state.isDarkMode()"
+            [class.bg-slate-100]="!state.isDarkMode()"
+            [class.border-slate-300]="!state.isDarkMode()"
+          >
             {{ state.unit() === 'in' ? 'inches (in)' : state.unit() === 'cm' ? 'centimeters (cm)' : 'millimeters (mm)' }}
           </span>
         </div>
@@ -253,7 +418,12 @@
 
           <div class="space-y-1.5">
             <div class="flex items-center justify-between text-xs">
-              <label [for]="'param-input-' + param.key" class="text-neutral-300 font-medium">{{ param.label }}</label>
+              <label 
+                [for]="'param-input-' + param.key" 
+                class="font-medium"
+                [class.text-neutral-300]="state.isDarkMode()"
+                [class.text-slate-700]="!state.isDarkMode()"
+              >{{ param.label }}</label>
               <div class="flex items-center gap-1">
                 <input
                   #numInput
@@ -265,9 +435,15 @@
                   [step]="stepUnit"
                   [value]="curDisplayVal"
                   (input)="state.updateParamFromUnit(param.key, +numInput.value)"
-                  class="w-20 px-2 py-0.5 bg-neutral-950 border border-neutral-700 rounded text-right font-mono text-xs text-neutral-100 focus:outline-hidden focus:border-amber-400"
+                  class="w-20 px-2 py-0.5 rounded text-right font-mono text-xs focus:outline-hidden focus:border-[#3850a2] border"
+                  [class.bg-neutral-950]="state.isDarkMode()"
+                  [class.border-neutral-700]="state.isDarkMode()"
+                  [class.text-neutral-100]="state.isDarkMode()"
+                  [class.bg-white]="!state.isDarkMode()"
+                  [class.border-slate-300]="!state.isDarkMode()"
+                  [class.text-slate-900]="!state.isDarkMode()"
                 />
-                <span class="text-[10px] text-neutral-500 font-mono w-4">{{ state.unit() }}</span>
+                <span class="text-[10px] font-mono w-4" [class.text-neutral-500]="state.isDarkMode()" [class.text-slate-400]="!state.isDarkMode()">{{ state.unit() }}</span>
               </div>
             </div>
             <input
@@ -279,16 +455,26 @@
               [step]="stepUnit"
               [value]="curDisplayVal"
               (input)="state.updateParamFromUnit(param.key, +rangeInput.value)"
-              class="w-full accent-amber-400 cursor-ew-resize h-1 bg-neutral-800 rounded"
+              class="w-full accent-[#3850a2] cursor-ew-resize h-1 rounded"
+              [class.bg-neutral-800]="state.isDarkMode()"
+              [class.bg-slate-200]="!state.isDarkMode()"
             />
           </div>
         }
 
         <!-- Active Box Envelope Summary -->
         @if (state.project().params['length'] && state.project().params['width']) {
-          <div class="p-2.5 bg-neutral-950 rounded-xl border border-neutral-800 text-[11px] font-mono space-y-1 text-neutral-400">
-            <div class="text-[10px] text-neutral-500 font-semibold uppercase tracking-wider">Internal Box Dimensions</div>
-            <div class="text-xs font-bold text-amber-300">
+          <div 
+            class="p-2.5 rounded-xl border text-[11px] font-mono space-y-1"
+            [class.bg-neutral-950]="state.isDarkMode()"
+            [class.border-neutral-800]="state.isDarkMode()"
+            [class.text-neutral-400]="state.isDarkMode()"
+            [class.bg-slate-50]="!state.isDarkMode()"
+            [class.border-slate-200]="!state.isDarkMode()"
+            [class.text-slate-600]="!state.isDarkMode()"
+          >
+            <div class="text-[10px] font-semibold uppercase tracking-wider" [class.text-neutral-500]="state.isDarkMode()" [class.text-slate-400]="!state.isDarkMode()">Internal Box Dimensions</div>
+            <div class="text-xs font-bold" [class.text-[#7995f5]]="state.isDarkMode()" [class.text-[#3850a2]]="!state.isDarkMode()">
               {{ state.formatUnit(state.project().params['length']) }} × {{ state.formatUnit(state.project().params['width']) }}
               @if (state.project().params['height']) {
                 × {{ state.formatUnit(state.project().params['height']) }}
@@ -299,10 +485,18 @@
       </div>
 
       <!-- Section 3: Material & Tooling Configuration -->
-      <div class="p-4 border-b border-neutral-800 space-y-3">
-        <div class="text-[11px] font-bold text-neutral-300 uppercase tracking-wider flex items-center justify-between">
+      <div 
+        class="p-4 border-b space-y-3"
+        [class.border-neutral-800]="state.isDarkMode()"
+        [class.border-slate-200]="!state.isDarkMode()"
+      >
+        <div 
+          class="text-[11px] font-bold uppercase tracking-wider flex items-center justify-between"
+          [class.text-neutral-300]="state.isDarkMode()"
+          [class.text-slate-700]="!state.isDarkMode()"
+        >
           <span>Substrate & Tooling</span>
-          <button (click)="setTab('materials')" class="text-amber-400 hover:underline text-[10px]">Library</button>
+          <button (click)="setTab('materials')" [class.text-[#7995f5]]="state.isDarkMode()" [class.text-[#3850a2]]="!state.isDarkMode()" class="hover:underline text-[10px] cursor-pointer">Library</button>
         </div>
 
         <select
@@ -310,38 +504,106 @@
           aria-label="Select Packaging Substrate Material"
           [value]="state.activeMaterialId()"
           (change)="state.setMaterial(matSelect.value)"
-          class="w-full px-3 py-2 bg-neutral-950 border border-neutral-700 rounded-lg text-xs text-neutral-100 focus:outline-hidden focus:border-amber-400"
+          class="w-full px-3 py-2 rounded-lg text-xs focus:outline-hidden focus:border-[#3850a2] border"
+          [class.bg-neutral-950]="state.isDarkMode()"
+          [class.border-neutral-700]="state.isDarkMode()"
+          [class.text-neutral-100]="state.isDarkMode()"
+          [class.bg-white]="!state.isDarkMode()"
+          [class.border-slate-300]="!state.isDarkMode()"
+          [class.text-slate-900]="!state.isDarkMode()"
         >
           @for (mat of state.materials(); track mat.id) {
             <option [value]="mat.id">{{ mat.name }} ({{ mat.thickness }}mm)</option>
           }
         </select>
 
-        <div class="p-2.5 bg-neutral-950 rounded-xl border border-neutral-800/80 text-[11px] font-mono space-y-1 text-neutral-400">
+        <!-- Material Thickness / Caliper Live Input -->
+        <div class="space-y-1.5 pt-1">
+          <div class="flex items-center justify-between text-xs">
+            <label 
+              for="mat-thickness-input" 
+              class="font-medium"
+              [class.text-neutral-300]="state.isDarkMode()"
+              [class.text-slate-700]="!state.isDarkMode()"
+            >Thickness (Caliper)</label>
+            <div class="flex items-center gap-1">
+              <input
+                #thickInput
+                id="mat-thickness-input"
+                aria-label="Material Caliper Thickness"
+                type="number"
+                min="0.2"
+                max="15"
+                step="0.1"
+                [value]="state.activeMaterial().thickness"
+                (input)="state.updateActiveMaterialThickness(+thickInput.value)"
+                class="w-20 px-2 py-0.5 rounded text-right font-mono text-xs focus:outline-hidden focus:border-[#3850a2] border"
+                [class.bg-neutral-950]="state.isDarkMode()"
+                [class.border-neutral-700]="state.isDarkMode()"
+                [class.text-neutral-100]="state.isDarkMode()"
+                [class.bg-white]="!state.isDarkMode()"
+                [class.border-slate-300]="!state.isDarkMode()"
+                [class.text-slate-900]="!state.isDarkMode()"
+              />
+              <span class="text-[10px] font-mono w-4" [class.text-neutral-500]="state.isDarkMode()" [class.text-slate-400]="!state.isDarkMode()">mm</span>
+            </div>
+          </div>
+          <input
+            #thickRange
+            aria-label="Material Thickness slider"
+            type="range"
+            min="0.2"
+            max="12"
+            step="0.1"
+            [value]="state.activeMaterial().thickness"
+            (input)="state.updateActiveMaterialThickness(+thickRange.value)"
+            class="w-full accent-[#3850a2] cursor-ew-resize h-1 rounded"
+            [class.bg-neutral-800]="state.isDarkMode()"
+            [class.bg-slate-200]="!state.isDarkMode()"
+          />
+        </div>
+
+        <div 
+          class="p-2.5 rounded-xl border text-[11px] font-mono space-y-1"
+          [class.bg-neutral-950]="state.isDarkMode()"
+          [class.border-neutral-800/80]="state.isDarkMode()"
+          [class.text-neutral-400]="state.isDarkMode()"
+          [class.bg-slate-50]="!state.isDarkMode()"
+          [class.border-slate-200]="!state.isDarkMode()"
+          [class.text-slate-600]="!state.isDarkMode()"
+        >
           <div class="flex justify-between">
-            <span>Caliper:</span>
-            <span class="text-neutral-200">{{ state.activeMaterial().thickness }} mm</span>
+            <span>Substrate Type:</span>
+            <span class="font-semibold" [class.text-neutral-200]="state.isDarkMode()" [class.text-slate-900]="!state.isDarkMode()">{{ state.activeMaterial().category | uppercase }}</span>
           </div>
           <div class="flex justify-between">
             <span>Recommended Knife:</span>
-            <span class="text-rose-400">{{ state.activeMaterial().recommendedKnife }}</span>
+            <span class="text-rose-500 font-semibold">{{ state.activeMaterial().recommendedKnife }}</span>
           </div>
           <div class="flex justify-between">
             <span>Recommended Crease:</span>
-            <span class="text-blue-400">{{ state.activeMaterial().recommendedCreaseWheel }}</span>
+            <span class="text-yellow-500 font-semibold">{{ state.activeMaterial().recommendedCreaseWheel }}</span>
           </div>
         </div>
       </div>
 
       <!-- Section 4: Production Order & Stock Sheet Presets -->
-      <div class="p-4 border-b border-neutral-800 space-y-3">
-        <div class="text-[11px] font-bold text-neutral-300 uppercase tracking-wider flex items-center justify-between">
+      <div 
+        class="p-4 border-b space-y-3"
+        [class.border-neutral-800]="state.isDarkMode()"
+        [class.border-slate-200]="!state.isDarkMode()"
+      >
+        <div 
+          class="text-[11px] font-bold uppercase tracking-wider flex items-center justify-between"
+          [class.text-neutral-300]="state.isDarkMode()"
+          [class.text-slate-700]="!state.isDarkMode()"
+        >
           <span>Nesting & Production</span>
-          <button (click)="setTab('sheets')" class="text-amber-400 hover:underline text-[10px]">Sheets</button>
+          <button (click)="setTab('sheets')" [class.text-[#7995f5]]="state.isDarkMode()" [class.text-[#3850a2]]="!state.isDarkMode()" class="hover:underline text-[10px] cursor-pointer">Sheets</button>
         </div>
 
         <div>
-          <label for="target-order-qty" class="block text-xs text-neutral-400 mb-1">Target Order Quantity</label>
+          <label for="target-order-qty" class="block text-xs mb-1" [class.text-neutral-400]="state.isDarkMode()" [class.text-slate-600]="!state.isDarkMode()">Target Order Quantity</label>
           <div class="flex items-center gap-2">
             <input
               #qtyInput
@@ -350,20 +612,32 @@
               min="1"
               [value]="state.project().orderQuantity"
               (input)="state.setOrderQuantity(+qtyInput.value)"
-              class="w-full px-3 py-1.5 bg-neutral-950 border border-neutral-700 rounded-lg font-mono text-xs text-neutral-100 focus:outline-hidden focus:border-amber-400"
+              class="w-full px-3 py-1.5 rounded-lg font-mono text-xs focus:outline-hidden focus:border-[#3850a2] border"
+              [class.bg-neutral-950]="state.isDarkMode()"
+              [class.border-neutral-700]="state.isDarkMode()"
+              [class.text-neutral-100]="state.isDarkMode()"
+              [class.bg-white]="!state.isDarkMode()"
+              [class.border-slate-300]="!state.isDarkMode()"
+              [class.text-slate-900]="!state.isDarkMode()"
             />
-            <span class="text-xs text-neutral-400 font-mono">boxes</span>
+            <span class="text-xs font-mono" [class.text-neutral-400]="state.isDarkMode()" [class.text-slate-500]="!state.isDarkMode()">boxes</span>
           </div>
         </div>
 
         <div>
-          <label for="sheet-preset-select" class="block text-xs text-neutral-400 mb-1">Raw Stock Sheet Preset</label>
+          <label for="sheet-preset-select" class="block text-xs mb-1" [class.text-neutral-400]="state.isDarkMode()" [class.text-slate-600]="!state.isDarkMode()">Raw Stock Sheet Preset</label>
           <select
             #sheetSelect
             id="sheet-preset-select"
             [value]="state.activeSheetId()"
             (change)="state.setSheetPreset(sheetSelect.value)"
-            class="w-full px-3 py-2 bg-neutral-950 border border-neutral-700 rounded-lg text-xs text-neutral-100 focus:outline-hidden focus:border-amber-400"
+            class="w-full px-3 py-2 rounded-lg text-xs focus:outline-hidden focus:border-[#3850a2] border"
+            [class.bg-neutral-950]="state.isDarkMode()"
+            [class.border-neutral-700]="state.isDarkMode()"
+            [class.text-neutral-100]="state.isDarkMode()"
+            [class.bg-white]="!state.isDarkMode()"
+            [class.border-slate-300]="!state.isDarkMode()"
+            [class.text-slate-900]="!state.isDarkMode()"
           >
             @for (sh of state.sheets(); track sh.id) {
               <option [value]="sh.id">{{ sh.name }} ({{ sh.width }}×{{ sh.height }}mm)</option>
@@ -376,10 +650,15 @@
       @let report = state.validationReport();
       <div class="p-4 space-y-2">
         <div class="flex items-center justify-between">
-          <span class="text-[11px] font-bold text-neutral-300 uppercase tracking-wider">Pre-Flight Audit</span>
           <span 
-            [class.text-emerald-400]="report.isValidForProduction"
-            [class.text-amber-400]="!report.isValidForProduction"
+            class="text-[11px] font-bold uppercase tracking-wider"
+            [class.text-neutral-300]="state.isDarkMode()"
+            [class.text-slate-700]="!state.isDarkMode()"
+          >Pre-Flight Audit</span>
+          <span 
+            [class.text-emerald-500]="report.isValidForProduction"
+            [class.text-[#7995f5]]="!report.isValidForProduction && state.isDarkMode()"
+            [class.text-[#3850a2]]="!report.isValidForProduction && !state.isDarkMode()"
             class="text-xs font-mono font-bold"
           >
             {{ report.isValidForProduction ? 'PASSED' : 'CHECK' }}
@@ -388,23 +667,27 @@
 
         <div class="space-y-1.5 text-xs">
           @if (report.errors.length === 0) {
-            <div class="text-[11px] text-emerald-400 flex items-center gap-1.5 py-1">
+            <div class="text-[11px] text-emerald-500 flex items-center gap-1.5 py-1">
               <mat-icon class="text-xs scale-75">check_circle</mat-icon>
               <span>All 8 pre-flight production audits passed cleanly.</span>
             </div>
           } @else {
             @for (err of report.errors; track err.id) {
-              <div class="flex items-start gap-1.5 text-[11px] py-1 border-b border-neutral-800/50">
+              <div 
+                class="flex items-start gap-1.5 text-[11px] py-1 border-b"
+                [class.border-neutral-800/50]="state.isDarkMode()"
+                [class.border-slate-200]="!state.isDarkMode()"
+              >
                 <mat-icon 
-                  [class.text-amber-400]="err.severity === 'warning'"
-                  [class.text-rose-400]="err.severity === 'error'"
+                  [class.text-amber-500]="err.severity === 'warning'"
+                  [class.text-rose-500]="err.severity === 'error'"
                   class="text-xs scale-75 shrink-0 mt-0.5"
                 >
                   {{ err.severity === 'warning' ? 'warning' : 'error' }}
                 </mat-icon>
                 <div class="flex-1">
-                  <div class="text-neutral-300 font-medium">{{ err.message }}</div>
-                  <div class="text-[10px] text-neutral-500 leading-tight">{{ err.suggestedAction }}</div>
+                  <div [class.text-neutral-300]="state.isDarkMode()" [class.text-slate-800]="!state.isDarkMode()" class="font-medium">{{ err.message }}</div>
+                  <div [class.text-neutral-500]="state.isDarkMode()" [class.text-slate-500]="!state.isDarkMode()" class="text-[10px] leading-tight">{{ err.suggestedAction }}</div>
                 </div>
               </div>
             }
@@ -420,7 +703,7 @@
       <div class="bg-neutral-900 border border-neutral-700 rounded-2xl p-6 shadow-2xl max-w-lg w-full">
         <div class="flex items-center justify-between mb-4">
           <h2 class="text-base font-bold text-neutral-100 flex items-center gap-2">
-            <mat-icon class="text-amber-400">assignment</mat-icon>
+            <mat-icon class="text-[#7995f5]">assignment</mat-icon>
             <span>Job Ticket Specification</span>
           </h2>
           <button (click)="showProjectModal.set(false)" class="text-neutral-400 hover:text-white">
@@ -437,7 +720,7 @@
               type="text"
               [value]="state.project().name"
               (input)="updateJobName(jobNameInput.value)"
-              class="w-full px-3 py-2 bg-neutral-950 border border-neutral-700 rounded-lg text-neutral-100 focus:outline-hidden focus:border-amber-400"
+              class="w-full px-3 py-2 bg-neutral-950 border border-neutral-700 rounded-lg text-neutral-100 focus:outline-hidden focus:border-[#3850a2]"
             />
           </div>
 
@@ -450,7 +733,7 @@
                 type="text"
                 [value]="state.project().jobNumber"
                 (input)="updateJobNumber(jobNumInput.value)"
-                class="w-full px-3 py-2 bg-neutral-950 border border-neutral-700 rounded-lg text-neutral-100 font-mono focus:outline-hidden focus:border-amber-400"
+                class="w-full px-3 py-2 bg-neutral-950 border border-neutral-700 rounded-lg text-neutral-100 font-mono focus:outline-hidden focus:border-[#3850a2]"
               />
             </div>
             <div>
@@ -461,7 +744,7 @@
                 type="text"
                 [value]="state.project().customerName"
                 (input)="updateCustomerName(custInput.value)"
-                class="w-full px-3 py-2 bg-neutral-950 border border-neutral-700 rounded-lg text-neutral-100 focus:outline-hidden focus:border-amber-400"
+                class="w-full px-3 py-2 bg-neutral-950 border border-neutral-700 rounded-lg text-neutral-100 focus:outline-hidden focus:border-[#3850a2]"
               />
             </div>
           </div>
@@ -474,7 +757,7 @@
               rows="3"
               [value]="state.project().notes"
               (input)="updateNotes(notesInput.value)"
-              class="w-full px-3 py-2 bg-neutral-950 border border-neutral-700 rounded-lg text-neutral-100 focus:outline-hidden focus:border-amber-400"
+              class="w-full px-3 py-2 bg-neutral-950 border border-neutral-700 rounded-lg text-neutral-100 focus:outline-hidden focus:border-[#3850a2]"
             ></textarea>
           </div>
         </div>
@@ -482,7 +765,7 @@
         <div class="flex justify-end">
           <button
             (click)="showProjectModal.set(false)"
-            class="px-4 py-2 text-xs font-semibold text-neutral-950 bg-amber-400 hover:bg-amber-300 rounded-lg transition-colors"
+            class="px-4 py-2 text-xs font-semibold text-white bg-[#3850a2] hover:bg-[#4865c2] rounded-lg transition-colors"
           >
             Save Job Info
           </button>
@@ -498,7 +781,7 @@
         <div class="flex items-center justify-between mb-4">
           <div>
             <h2 class="text-base font-bold text-neutral-100 flex items-center gap-2">
-              <mat-icon class="text-amber-400">file_download</mat-icon>
+              <mat-icon class="text-[#7995f5]">file_download</mat-icon>
               <span>Export Production Package</span>
             </h2>
             <p class="text-xs text-neutral-400">Generate 1:1 millimeter vector files for Zünd, Esko Kongsberg, and CAD/CAM software.</p>
@@ -510,22 +793,22 @@
 
         <div class="space-y-3 mb-6">
           <!-- Primary Hero: Zünd Cut Center .AI Export -->
-          <div class="p-4 bg-amber-950/30 border-2 border-amber-500/60 rounded-xl space-y-2.5">
+          <div class="p-4 bg-[#3850a2]/15 border-2 border-[#3850a2]/60 rounded-xl space-y-2.5">
             <div class="flex items-center justify-between">
-              <div class="flex items-center gap-2 text-amber-400 font-bold text-sm">
+              <div class="flex items-center gap-2 text-[#7995f5] font-bold text-sm">
                 <mat-icon class="text-base">content_cut</mat-icon>
                 <span>Zünd Cut Center (.AI)</span>
               </div>
-              <span class="text-[10px] font-mono font-semibold px-2 py-0.5 rounded-full bg-amber-400 text-neutral-950 uppercase tracking-wider">
+              <span class="text-[10px] font-mono font-semibold px-2 py-0.5 rounded-full bg-[#3850a2] text-white uppercase tracking-wider">
                 Recommended ZCC
               </span>
             </div>
             
             <p class="text-xs text-neutral-300">
               Adobe Illustrator (.ai) format formatted with exact 3-layer structure:
-              <span class="font-mono text-blue-400 font-semibold">crease</span>,
+              <span class="font-mono text-yellow-400 font-semibold">crease</span>,
               <span class="font-mono text-rose-400 font-semibold">cut</span>, and
-              <span class="font-mono text-amber-400 font-semibold">reg</span>.
+              <span class="font-mono text-[#a4b9ff] font-semibold">reg</span>.
               Includes 4 optical registration dots in the 4 corners of the box.
             </p>
 
@@ -533,7 +816,7 @@
               <button
                 id="btn_download_ai_single"
                 (click)="state.downloadAI(-1); showExportModal.set(false)"
-                class="flex-1 py-2 px-3 text-xs font-bold text-neutral-950 bg-amber-400 hover:bg-amber-300 rounded-lg shadow-md transition-all active:scale-95 cursor-pointer flex items-center justify-center gap-1.5"
+                class="flex-1 py-2 px-3 text-xs font-bold text-white bg-[#3850a2] hover:bg-[#4865c2] rounded-lg shadow-md shadow-[#3850a2]/30 transition-all active:scale-95 cursor-pointer flex items-center justify-center gap-1.5"
               >
                 <mat-icon class="text-sm">file_download</mat-icon>
                 <span>Download Zünd .AI (Dieline)</span>
@@ -568,14 +851,14 @@
 
             <!-- 2. Nesting Layout Sheet SVG -->
             <div class="p-3.5 bg-neutral-950 border border-neutral-800 rounded-xl space-y-2">
-              <div class="flex items-center gap-2 text-amber-400 font-bold text-xs">
+              <div class="flex items-center gap-2 text-[#7995f5] font-bold text-xs">
                 <mat-icon class="text-sm">dashboard</mat-icon>
                 <span>Zünd Nested Sheet (SVG)</span>
               </div>
               <p class="text-[11px] text-neutral-400">Full sheet layout with 4 corner registration camera marks for ZCC.</p>
               <button
                 (click)="state.downloadSVG(state.selectedSheetIndex()); showExportModal.set(false)"
-                class="w-full py-1.5 text-xs font-semibold text-neutral-200 bg-neutral-800 hover:bg-amber-400 hover:text-neutral-950 rounded-lg transition-colors cursor-pointer"
+                class="w-full py-1.5 text-xs font-semibold text-neutral-200 bg-neutral-800 hover:bg-[#3850a2] hover:text-white rounded-lg transition-colors cursor-pointer"
               >
                 Download Sheet SVG
               </button>
@@ -632,7 +915,7 @@
         <!-- Modal Header -->
         <div class="flex items-center justify-between pb-4 border-b border-neutral-800">
           <div class="flex items-center gap-3">
-            <div class="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400">
+            <div class="w-10 h-10 rounded-xl bg-[#3850a2]/20 border border-[#3850a2]/30 flex items-center justify-center text-[#7995f5]">
               <mat-icon>folder_special</mat-icon>
             </div>
             <div>
@@ -649,9 +932,9 @@
         </div>
 
         <!-- Current Workspace Snapshot Saver -->
-        <div class="p-4 bg-neutral-950 border border-amber-500/30 rounded-xl space-y-3">
+        <div class="p-4 bg-neutral-950 border border-[#3850a2]/40 rounded-xl space-y-3">
           <div class="flex items-center justify-between">
-            <div class="flex items-center gap-2 text-amber-400 font-semibold text-xs">
+            <div class="flex items-center gap-2 text-[#7995f5] font-semibold text-xs">
               <mat-icon class="text-sm">bookmark_add</mat-icon>
               <span>Save Current Project Snapshot to Library</span>
             </div>
@@ -664,11 +947,11 @@
               [value]="saveSnapshotName()"
               (input)="saveSnapshotName.set($any($event.target).value)"
               [placeholder]="'Project title (default: ' + state.project().name + ')'"
-              class="w-full sm:flex-1 bg-neutral-900 border border-neutral-700 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-amber-400"
+              class="w-full sm:flex-1 bg-neutral-900 border border-neutral-700 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-[#3850a2]"
             />
             <button
               (click)="saveCurrentToLibrary()"
-              class="w-full sm:w-auto px-4 py-2 bg-amber-400 hover:bg-amber-300 text-neutral-950 font-bold text-xs rounded-lg transition-all active:scale-95 cursor-pointer flex items-center justify-center gap-1.5 shrink-0"
+              class="w-full sm:w-auto px-4 py-2 bg-[#3850a2] hover:bg-[#4865c2] text-white font-bold text-xs rounded-lg transition-all active:scale-95 cursor-pointer flex items-center justify-center gap-1.5 shrink-0"
             >
               <mat-icon class="text-sm font-bold">save</mat-icon>
               <span>Save Snapshot</span>
@@ -687,7 +970,7 @@
             <div class="p-8 text-center bg-neutral-950/60 border border-dashed border-neutral-800 rounded-xl space-y-2">
               <mat-icon class="text-3xl text-neutral-600">inventory_2</mat-icon>
               <p class="text-xs text-neutral-400">No saved projects found in LocalStorage yet.</p>
-              <p class="text-[11px] text-neutral-400">Click <strong class="text-amber-400">Save Snapshot</strong> above to save your current work.</p>
+              <p class="text-[11px] text-neutral-400">Click <strong class="text-[#7995f5]">Save Snapshot</strong> above to save your current work.</p>
             </div>
           } @else {
             <div class="grid grid-cols-1 gap-2.5">
@@ -696,7 +979,7 @@
                   <div class="space-y-1">
                     <div class="flex items-center gap-2">
                       <span class="font-bold text-xs text-white">{{ proj.name }}</span>
-                      <span class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-neutral-800 text-amber-300">{{ proj.jobNumber }}</span>
+                      <span class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-neutral-800 text-[#7995f5]">{{ proj.jobNumber }}</span>
                     </div>
                     <div class="flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px] text-neutral-400 font-mono">
                       <span>Type: <strong class="text-neutral-300">{{ proj.templateName }}</strong></span>
@@ -711,7 +994,7 @@
                     <!-- Load Project -->
                     <button
                       (click)="loadSavedProject(proj.id)"
-                      class="px-2.5 py-1.5 bg-amber-400/10 hover:bg-amber-400 hover:text-neutral-950 text-amber-300 font-semibold text-xs rounded-lg transition-colors cursor-pointer flex items-center gap-1"
+                      class="px-2.5 py-1.5 bg-[#3850a2]/20 hover:bg-[#3850a2] text-[#7995f5] hover:text-white font-semibold text-xs rounded-lg transition-colors cursor-pointer flex items-center gap-1"
                       title="Load into active workspace"
                     >
                       <mat-icon class="text-sm">play_arrow</mat-icon>
@@ -771,8 +1054,8 @@
 
   <!-- Toast Notification Overlay -->
   @if (notificationMessage()) {
-    <div class="fixed bottom-6 right-6 z-50 flex items-center gap-2.5 px-4 py-2.5 bg-neutral-900 border border-amber-400/50 text-white text-xs font-medium rounded-xl shadow-2xl animate-bounce">
-      <mat-icon class="text-sm text-amber-400">check_circle</mat-icon>
+    <div class="fixed bottom-6 right-6 z-50 flex items-center gap-2.5 px-4 py-2.5 bg-neutral-900 border border-[#3850a2]/50 text-white text-xs font-medium rounded-xl shadow-2xl animate-bounce">
+      <mat-icon class="text-sm text-[#7995f5]">check_circle</mat-icon>
       <span>{{ notificationMessage() }}</span>
     </div>
   }

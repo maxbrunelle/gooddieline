@@ -194,6 +194,11 @@ export class DielineStateService {
     this.storage.saveLayerVisibility(this.layerVisibility());
   }
 
+  toggleDarkMode(): void {
+    this.isDarkMode.update(dark => !dark);
+    this.saveWorkspacePreferences();
+  }
+
   // Computed Properties
   activeTemplate = computed(() => {
     return this.templates().find(t => t.id === this.activeTemplateId()) || this.templates()[0];
@@ -210,7 +215,14 @@ export class DielineStateService {
   geometry = computed<DielineGeometry>(() => {
     const tId = this.activeTemplateId();
     const params = this.project().params;
-    return generateDielineGeometry(tId, params);
+    const mat = this.activeMaterial();
+    const t = mat ? mat.thickness : (params['caliper'] || 2.5);
+    return generateDielineGeometry(tId, {
+      ...params,
+      caliper: t,
+      thickness: t,
+      materialThickness: t
+    });
   });
 
   activeNestingSolution = computed<NestingSolution | null>(() => {
@@ -275,9 +287,36 @@ export class DielineStateService {
     this.project.update(p => ({
       ...p,
       materialId,
+      params: {
+        ...p.params,
+        caliper: m.thickness,
+        thickness: m.thickness,
+        materialThickness: m.thickness
+      },
       modifiedDate: new Date().toISOString().split('T')[0]
     }));
     this.pushHistoryState(`Select Material: ${m.name}`);
+    this.recalculateNesting();
+    this.autoSave();
+  }
+
+  updateActiveMaterialThickness(thicknessMm: number): void {
+    if (!thicknessMm || thicknessMm <= 0) return;
+    const num = Number(thicknessMm);
+    const activeMat = this.activeMaterial();
+    const updated = { ...activeMat, thickness: num };
+    this.materials.update(list => list.map(m => m.id === activeMat.id ? updated : m));
+    this.project.update(p => ({
+      ...p,
+      params: {
+        ...p.params,
+        caliper: num,
+        thickness: num,
+        materialThickness: num
+      },
+      modifiedDate: new Date().toISOString().split('T')[0]
+    }));
+    this.pushHistoryState(`Change Material Thickness: ${num}mm`);
     this.recalculateNesting();
     this.autoSave();
   }

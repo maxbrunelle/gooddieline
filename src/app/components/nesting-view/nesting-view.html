@@ -1,13 +1,23 @@
-<div class="relative w-full h-full flex flex-col bg-neutral-950 overflow-hidden select-none">
+<div 
+  class="relative w-full h-full flex flex-col overflow-hidden select-none transition-colors duration-200"
+  [class.bg-neutral-950]="state.isDarkMode()"
+  [class.bg-slate-100]="!state.isDarkMode()"
+>
   <!-- Nesting Studio Top Controls & Stats Bar -->
-  <div class="h-14 bg-neutral-900 border-b border-neutral-800 px-4 flex items-center justify-between z-20">
+  <div 
+    class="h-14 border-b px-4 flex items-center justify-between z-20 transition-colors"
+    [class.bg-neutral-900]="state.isDarkMode()"
+    [class.border-neutral-800]="state.isDarkMode()"
+    [class.bg-white]="!state.isDarkMode()"
+    [class.border-slate-200]="!state.isDarkMode()"
+  >
     <div class="flex items-center gap-3">
       <!-- Re-Nest / Optimize Button -->
       <button
         id="btn_auto_nest"
         (click)="state.recalculateNesting()"
         [disabled]="state.isOptimizingNesting()"
-        class="flex items-center gap-1.5 px-3.5 py-1.5 bg-amber-500 hover:bg-amber-400 text-neutral-950 font-semibold text-xs rounded-lg shadow-md transition-all active:scale-95 disabled:opacity-50"
+        class="flex items-center gap-1.5 px-3.5 py-1.5 bg-[#3850a2] hover:bg-[#4865c2] text-white font-semibold text-xs rounded-lg shadow-md shadow-[#3850a2]/30 transition-all active:scale-95 disabled:opacity-50 cursor-pointer"
       >
         <mat-icon class="text-sm">auto_fix_high</mat-icon>
         <span>{{ state.isOptimizingNesting() ? 'Optimizing...' : 'Optimize Nest' }}</span>
@@ -17,33 +27,63 @@
       <button
         id="btn_compare_solutions"
         (click)="showCompareModal.set(true)"
-        class="flex items-center gap-1.5 px-3 py-1.5 bg-neutral-800 hover:bg-neutral-700 text-neutral-200 text-xs font-medium rounded-lg border border-neutral-700 transition-colors"
+        class="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg border transition-colors cursor-pointer"
+        [class.bg-neutral-800]="state.isDarkMode()"
+        [class.hover:bg-neutral-700]="state.isDarkMode()"
+        [class.text-neutral-200]="state.isDarkMode()"
+        [class.border-neutral-700]="state.isDarkMode()"
+        [class.bg-slate-100]="!state.isDarkMode()"
+        [class.hover:bg-slate-200]="!state.isDarkMode()"
+        [class.text-slate-700]="!state.isDarkMode()"
+        [class.border-slate-300]="!state.isDarkMode()"
       >
-        <mat-icon class="text-sm text-amber-400">compare_arrows</mat-icon>
+        <mat-icon class="text-sm" [class.text-[#7995f5]]="state.isDarkMode()" [class.text-[#3850a2]]="!state.isDarkMode()">compare_arrows</mat-icon>
         <span>Compare Solutions ({{ state.nestingSolutions().length }})</span>
       </button>
 
-      <div class="h-5 w-px bg-neutral-800 mx-1"></div>
+      <div 
+        class="h-5 w-px mx-1"
+        [class.bg-neutral-800]="state.isDarkMode()"
+        [class.bg-slate-200]="!state.isDarkMode()"
+      ></div>
 
       <!-- Sheet Switcher Carousel -->
       @if (state.activeNestingSolution(); as sol) {
-        <div class="flex items-center gap-1.5 bg-neutral-950 border border-neutral-800 px-2 py-1 rounded-lg">
+        <div 
+          class="flex items-center gap-1.5 px-2 py-1 rounded-lg border"
+          [class.bg-neutral-950]="state.isDarkMode()"
+          [class.border-neutral-800]="state.isDarkMode()"
+          [class.bg-slate-50]="!state.isDarkMode()"
+          [class.border-slate-300]="!state.isDarkMode()"
+        >
           <button
             (click)="prevSheet()"
             [disabled]="state.selectedSheetIndex() === 0"
-            class="p-0.5 text-neutral-400 hover:text-white disabled:opacity-30"
+            class="p-0.5 disabled:opacity-30 cursor-pointer"
+            [class.text-neutral-400]="state.isDarkMode()"
+            [class.hover:text-white]="state.isDarkMode()"
+            [class.text-slate-500]="!state.isDarkMode()"
+            [class.hover:text-slate-900]="!state.isDarkMode()"
           >
             <mat-icon class="text-base">chevron_left</mat-icon>
           </button>
 
-          <span class="text-xs font-mono text-neutral-300 min-w-20 text-center">
+          <span 
+            class="text-xs font-mono min-w-20 text-center font-medium"
+            [class.text-neutral-300]="state.isDarkMode()"
+            [class.text-slate-700]="!state.isDarkMode()"
+          >
             Sheet {{ state.selectedSheetIndex() + 1 }} / {{ sol.sheetsRequired }}
           </span>
 
           <button
             (click)="nextSheet(sol.sheetsRequired)"
             [disabled]="state.selectedSheetIndex() >= sol.sheetsRequired - 1"
-            class="p-0.5 text-neutral-400 hover:text-white disabled:opacity-30"
+            class="p-0.5 disabled:opacity-30 cursor-pointer"
+            [class.text-neutral-400]="state.isDarkMode()"
+            [class.hover:text-white]="state.isDarkMode()"
+            [class.text-slate-500]="!state.isDarkMode()"
+            [class.hover:text-slate-900]="!state.isDarkMode()"
           >
             <mat-icon class="text-base">chevron_right</mat-icon>
           </button>
@@ -55,30 +95,62 @@
     @if (state.activeNestingSolution(); as sol) {
       @let currentSheet = sol.sheets[state.selectedSheetIndex()] || sol.sheets[0];
       <div class="flex items-center gap-3 text-xs">
-        <div class="px-3 py-1 bg-neutral-800/80 border border-neutral-700/60 rounded-lg flex items-center gap-1.5">
-          <span class="text-neutral-400">Utilization:</span>
-          <strong class="font-mono text-emerald-400 font-bold text-sm">{{ currentSheet.utilizationPercent }}%</strong>
+        <div 
+          class="px-3 py-1 rounded-lg flex items-center gap-1.5 border"
+          [class.bg-neutral-800/80]="state.isDarkMode()"
+          [class.border-neutral-700/60]="state.isDarkMode()"
+          [class.bg-slate-100]="!state.isDarkMode()"
+          [class.border-slate-200]="!state.isDarkMode()"
+        >
+          <span [class.text-neutral-400]="state.isDarkMode()" [class.text-slate-500]="!state.isDarkMode()">Utilization:</span>
+          <strong class="font-mono text-emerald-500 font-bold text-sm">{{ currentSheet.utilizationPercent }}%</strong>
         </div>
 
-        <div class="px-3 py-1 bg-neutral-800/80 border border-neutral-700/60 rounded-lg flex items-center gap-1.5">
-          <span class="text-neutral-400">Waste:</span>
-          <strong class="font-mono text-rose-400 font-bold text-sm">{{ currentSheet.wastePercent }}%</strong>
+        <div 
+          class="px-3 py-1 rounded-lg flex items-center gap-1.5 border"
+          [class.bg-neutral-800/80]="state.isDarkMode()"
+          [class.border-neutral-700/60]="state.isDarkMode()"
+          [class.bg-slate-100]="!state.isDarkMode()"
+          [class.border-slate-200]="!state.isDarkMode()"
+        >
+          <span [class.text-neutral-400]="state.isDarkMode()" [class.text-slate-500]="!state.isDarkMode()">Waste:</span>
+          <strong class="font-mono text-rose-500 font-bold text-sm">{{ currentSheet.wastePercent }}%</strong>
         </div>
 
-        <div class="px-3 py-1 bg-neutral-800/80 border border-neutral-700/60 rounded-lg flex items-center gap-1.5">
-          <span class="text-neutral-400">Yield:</span>
-          <strong class="font-mono text-amber-400 font-bold text-sm">{{ currentSheet.itemCount }} pcs / sheet</strong>
+        <div 
+          class="px-3 py-1 rounded-lg flex items-center gap-1.5 border"
+          [class.bg-neutral-800/80]="state.isDarkMode()"
+          [class.border-neutral-700/60]="state.isDarkMode()"
+          [class.bg-slate-100]="!state.isDarkMode()"
+          [class.border-slate-200]="!state.isDarkMode()"
+        >
+          <span [class.text-neutral-400]="state.isDarkMode()" [class.text-slate-500]="!state.isDarkMode()">Yield:</span>
+          <strong 
+            class="font-mono font-bold text-sm"
+            [class.text-[#7995f5]]="state.isDarkMode()"
+            [class.text-[#3850a2]]="!state.isDarkMode()"
+          >{{ currentSheet.itemCount }} pcs / sheet</strong>
         </div>
 
-        <div class="px-3 py-1 bg-neutral-800/80 border border-neutral-700/60 rounded-lg flex items-center gap-1.5">
-          <span class="text-neutral-400">Total Sheets:</span>
-          <strong class="font-mono text-neutral-100 font-bold text-sm">{{ sol.sheetsRequired }}</strong>
+        <div 
+          class="px-3 py-1 rounded-lg flex items-center gap-1.5 border"
+          [class.bg-neutral-800/80]="state.isDarkMode()"
+          [class.border-neutral-700/60]="state.isDarkMode()"
+          [class.bg-slate-100]="!state.isDarkMode()"
+          [class.border-slate-200]="!state.isDarkMode()"
+        >
+          <span [class.text-neutral-400]="state.isDarkMode()" [class.text-slate-500]="!state.isDarkMode()">Total Sheets:</span>
+          <strong 
+            class="font-mono font-bold text-sm"
+            [class.text-neutral-100]="state.isDarkMode()"
+            [class.text-slate-800]="!state.isDarkMode()"
+          >{{ sol.sheetsRequired }}</strong>
         </div>
 
         <button
           id="btn_nest_export_ai"
           (click)="state.downloadAI(state.selectedSheetIndex())"
-          class="flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold text-neutral-950 bg-amber-400 hover:bg-amber-300 rounded-lg shadow-md transition-all active:scale-95 cursor-pointer ml-2"
+          class="flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold text-white bg-[#3850a2] hover:bg-[#4865c2] rounded-lg shadow-md shadow-[#3850a2]/30 transition-all active:scale-95 cursor-pointer ml-2"
           title="Export Active Sheet to Zünd Cut Center (.ai) with 3 layers: crease, cut, reg"
         >
           <mat-icon class="text-sm font-bold">content_cut</mat-icon>
@@ -96,7 +168,9 @@
     tabindex="0"
     (click)="deselectAll()"
     (keydown.escape)="deselectAll()"
-    class="flex-1 w-full h-full cad-grid-dark relative overflow-auto p-8 flex items-center justify-center focus:outline-hidden"
+    [class.cad-grid-dark]="state.isDarkMode()"
+    [class.cad-grid-light]="!state.isDarkMode()"
+    class="flex-1 w-full h-full relative overflow-auto p-8 flex items-center justify-center focus:outline-hidden"
   >
     @if (state.activeNestingSolution(); as sol) {
       @let currentSheet = sol.sheets[state.selectedSheetIndex()] || sol.sheets[0];
@@ -106,21 +180,31 @@
 
       <!-- Cardboard Sheet Bed (Interactive Viewport) -->
       <div 
-        class="relative bg-neutral-900 border-2 border-neutral-600 shadow-2xl transition-all"
+        class="relative border-2 shadow-2xl transition-all"
+        [class.bg-neutral-900]="state.isDarkMode()"
+        [class.border-neutral-600]="state.isDarkMode()"
+        [class.bg-white]="!state.isDarkMode()"
+        [class.border-slate-300]="!state.isDarkMode()"
         [style.width.px]="cfg.sheetWidth * 0.42"
         [style.height.px]="cfg.sheetHeight * 0.42"
       >
         <!-- Sheet Header Tag -->
-        <div class="absolute -top-6 left-0 flex items-center gap-2 text-[11px] font-mono text-neutral-400">
-          <span class="font-semibold text-neutral-200">{{ sheetPreset.name }}</span>
+        <div 
+          class="absolute -top-6 left-0 flex items-center gap-2 text-[11px] font-mono"
+          [class.text-neutral-400]="state.isDarkMode()"
+          [class.text-slate-600]="!state.isDarkMode()"
+        >
+          <span class="font-semibold" [class.text-neutral-200]="state.isDarkMode()" [class.text-slate-800]="!state.isDarkMode()">{{ sheetPreset.name }}</span>
           <span>({{ cfg.sheetWidth.toFixed(0) }} × {{ cfg.sheetHeight.toFixed(0) }} mm)</span>
-          <span class="text-neutral-600">•</span>
-          <span class="text-amber-400">{{ state.activeMaterial().name }}</span>
+          <span [class.text-neutral-600]="state.isDarkMode()" [class.text-slate-400]="!state.isDarkMode()">•</span>
+          <span [class.text-[#7995f5]]="state.isDarkMode()" [class.text-[#3850a2]]="!state.isDarkMode()">{{ state.activeMaterial().name }}</span>
         </div>
 
         <!-- Margin Boundary Guide -->
         <div 
-          class="absolute border border-dashed border-neutral-700 pointer-events-none"
+          class="absolute border border-dashed pointer-events-none"
+          [class.border-neutral-700]="state.isDarkMode()"
+          [class.border-slate-300]="!state.isDarkMode()"
           [style.left.px]="cfg.marginEdge * 0.42"
           [style.top.px]="cfg.marginEdge * 0.42"
           [style.right.px]="cfg.marginEdge * 0.42"
@@ -145,13 +229,17 @@
         <!-- Reusable Offcut Areas (Salvageable Board Remnants) -->
         @for (offcut of currentSheet.offcuts; track offcut.id) {
           <div 
-            class="absolute bg-emerald-500/10 border border-emerald-500/40 rounded-sm flex items-center justify-center text-[10px] font-mono text-emerald-400 pointer-events-none z-5"
+            class="absolute bg-emerald-500/10 border border-emerald-500/40 rounded-sm flex items-center justify-center text-[10px] font-mono text-emerald-500 pointer-events-none z-5"
             [style.left.px]="offcut.x * 0.42"
             [style.top.px]="offcut.y * 0.42"
             [style.width.px]="offcut.width * 0.42"
             [style.height.px]="offcut.height * 0.42"
           >
-            <div class="bg-neutral-950/80 px-1.5 py-0.5 rounded border border-emerald-500/30 text-center">
+            <div 
+              class="px-1.5 py-0.5 rounded border border-emerald-500/30 text-center"
+              [class.bg-neutral-950/80]="state.isDarkMode()"
+              [class.bg-white/90]="!state.isDarkMode()"
+            >
               <div>♻ Offcut Remnant</div>
               <div>{{ offcut.width.toFixed(0) }} × {{ offcut.height.toFixed(0) }} mm</div>
             </div>
@@ -163,12 +251,15 @@
           <div
             (mousedown)="selectPiece(piece, $event)"
             [class.ring-2]="selectedPiece()?.id === piece.id"
-            [class.ring-amber-400]="selectedPiece()?.id === piece.id && !piece.colliding"
+            [class.ring-[#3850a2]]="selectedPiece()?.id === piece.id && !piece.colliding"
             [class.ring-rose-500]="piece.colliding"
             [class.bg-rose-950/30]="piece.colliding"
-            [class.bg-neutral-800/80]="!piece.colliding && selectedPiece()?.id !== piece.id"
-            [class.bg-amber-950/20]="selectedPiece()?.id === piece.id && !piece.colliding"
-            class="absolute border border-neutral-600 rounded-sm cursor-move shadow-md transition-shadow hover:shadow-xl hover:border-amber-400/80 flex flex-col items-center justify-center overflow-hidden z-10"
+            [class.bg-neutral-800/80]="!piece.colliding && selectedPiece()?.id !== piece.id && state.isDarkMode()"
+            [class.bg-slate-100/90]="!piece.colliding && selectedPiece()?.id !== piece.id && !state.isDarkMode()"
+            [class.bg-[#3850a2]/20]="selectedPiece()?.id === piece.id && !piece.colliding"
+            [class.border-neutral-600]="state.isDarkMode()"
+            [class.border-slate-300]="!state.isDarkMode()"
+            class="absolute border rounded-sm cursor-move shadow-md transition-shadow hover:shadow-xl hover:border-[#3850a2]/80 flex flex-col items-center justify-center overflow-hidden z-10"
             [style.left.px]="piece.x * 0.42"
             [style.top.px]="piece.y * 0.42"
             [style.width.px]="piece.width * 0.42"
@@ -184,14 +275,22 @@
                 @if (line.type === 'CUT') {
                   <line [attr.x1]="line.p1.x" [attr.y1]="line.p1.y" [attr.x2]="line.p2.x" [attr.y2]="line.p2.y" stroke="#ef4444" stroke-width="2"/>
                 } @else if (line.type === 'CREASE') {
-                  <line [attr.x1]="line.p1.x" [attr.y1]="line.p1.y" [attr.x2]="line.p2.x" [attr.y2]="line.p2.y" stroke="#3b82f6" stroke-width="1.5" stroke-dasharray="4,4"/>
+                  <line [attr.x1]="line.p1.x" [attr.y1]="line.p1.y" [attr.x2]="line.p2.x" [attr.y2]="line.p2.y" stroke="#eab308" stroke-width="1.5" stroke-dasharray="4,4"/>
                 }
               }
             </svg>
 
             <!-- Piece Index & Rotation Badge -->
             <div class="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-              <span class="text-[11px] font-mono font-bold px-1.5 py-0.5 rounded bg-black/70 text-neutral-100 border border-neutral-700">
+              <span 
+                class="text-[11px] font-mono font-bold px-1.5 py-0.5 rounded border"
+                [class.bg-black/70]="state.isDarkMode()"
+                [class.text-neutral-100]="state.isDarkMode()"
+                [class.border-neutral-700]="state.isDarkMode()"
+                [class.bg-white/90]="!state.isDarkMode()"
+                [class.text-slate-800]="!state.isDarkMode()"
+                [class.border-slate-300]="!state.isDarkMode()"
+              >
                 #{{ piece.pieceIndex }} ({{ piece.rotation }}°)
               </span>
               @if (piece.colliding) {
@@ -202,7 +301,7 @@
             </div>
 
             @if (piece.isLocked) {
-              <mat-icon class="absolute top-1 right-1 text-xs text-amber-400 scale-75">lock</mat-icon>
+              <mat-icon class="absolute top-1 right-1 text-xs scale-75" [class.text-[#7995f5]]="state.isDarkMode()" [class.text-[#3850a2]]="!state.isDarkMode()">lock</mat-icon>
             }
           </div>
         }
@@ -212,20 +311,40 @@
 
   <!-- Selected Piece Floating Inspector Toolbar -->
   @if (selectedPiece(); as piece) {
-    <div class="absolute bottom-6 left-1/2 -translate-x-1/2 z-30 flex items-center gap-3 p-2 bg-neutral-900/95 backdrop-blur-md border border-neutral-700 rounded-xl shadow-2xl text-xs">
-      <div class="flex items-center gap-1.5 px-2 font-mono text-neutral-300">
-        <span class="text-amber-400 font-bold">Piece #{{ piece.pieceIndex }}</span>
-        <span class="text-neutral-500">|</span>
+    <div 
+      class="absolute bottom-6 left-1/2 -translate-x-1/2 z-30 flex items-center gap-3 p-2 backdrop-blur-md border rounded-xl shadow-2xl text-xs transition-colors"
+      [class.bg-neutral-900/95]="state.isDarkMode()"
+      [class.border-neutral-700]="state.isDarkMode()"
+      [class.bg-white/95]="!state.isDarkMode()"
+      [class.border-slate-200]="!state.isDarkMode()"
+    >
+      <div 
+        class="flex items-center gap-1.5 px-2 font-mono"
+        [class.text-neutral-300]="state.isDarkMode()"
+        [class.text-slate-700]="!state.isDarkMode()"
+      >
+        <span [class.text-[#7995f5]]="state.isDarkMode()" [class.text-[#3850a2]]="!state.isDarkMode()" class="font-bold">Piece #{{ piece.pieceIndex }}</span>
+        <span [class.text-neutral-500]="state.isDarkMode()" [class.text-slate-300]="!state.isDarkMode()">|</span>
         <span>X: {{ piece.x }}mm</span>
         <span>Y: {{ piece.y }}mm</span>
       </div>
 
-      <div class="h-4 w-px bg-neutral-800"></div>
+      <div 
+        class="h-4 w-px"
+        [class.bg-neutral-800]="state.isDarkMode()"
+        [class.bg-slate-200]="!state.isDarkMode()"
+      ></div>
 
       <!-- Rotate 90 deg -->
       <button
         (click)="rotateSelectedPiece(90)"
-        class="flex items-center gap-1 px-2.5 py-1 bg-neutral-800 hover:bg-neutral-700 text-neutral-200 rounded-md transition-colors"
+        class="flex items-center gap-1 px-2.5 py-1 rounded-md transition-colors cursor-pointer"
+        [class.bg-neutral-800]="state.isDarkMode()"
+        [class.hover:bg-neutral-700]="state.isDarkMode()"
+        [class.text-neutral-200]="state.isDarkMode()"
+        [class.bg-slate-100]="!state.isDarkMode()"
+        [class.hover:bg-slate-200]="!state.isDarkMode()"
+        [class.text-slate-700]="!state.isDarkMode()"
       >
         <mat-icon class="text-sm">rotate_right</mat-icon>
         <span>Rotate 90°</span>
@@ -234,7 +353,13 @@
       <!-- Rotate 180 deg -->
       <button
         (click)="rotateSelectedPiece(180)"
-        class="flex items-center gap-1 px-2.5 py-1 bg-neutral-800 hover:bg-neutral-700 text-neutral-200 rounded-md transition-colors"
+        class="flex items-center gap-1 px-2.5 py-1 rounded-md transition-colors cursor-pointer"
+        [class.bg-neutral-800]="state.isDarkMode()"
+        [class.hover:bg-neutral-700]="state.isDarkMode()"
+        [class.text-neutral-200]="state.isDarkMode()"
+        [class.bg-slate-100]="!state.isDarkMode()"
+        [class.hover:bg-slate-200]="!state.isDarkMode()"
+        [class.text-slate-700]="!state.isDarkMode()"
       >
         <mat-icon class="text-sm">sync</mat-icon>
         <span>180°</span>
@@ -243,8 +368,15 @@
       <!-- Lock Toggle -->
       <button
         (click)="toggleLockSelectedPiece()"
-        [class.text-amber-400]="piece.isLocked"
-        class="flex items-center gap-1 px-2.5 py-1 bg-neutral-800 hover:bg-neutral-700 text-neutral-200 rounded-md transition-colors"
+        [class.text-[#7995f5]]="piece.isLocked && state.isDarkMode()"
+        [class.text-[#3850a2]]="piece.isLocked && !state.isDarkMode()"
+        class="flex items-center gap-1 px-2.5 py-1 rounded-md transition-colors cursor-pointer"
+        [class.bg-neutral-800]="state.isDarkMode()"
+        [class.hover:bg-neutral-700]="state.isDarkMode()"
+        [class.text-neutral-200]="state.isDarkMode() && !piece.isLocked"
+        [class.bg-slate-100]="!state.isDarkMode()"
+        [class.hover:bg-slate-200]="!state.isDarkMode()"
+        [class.text-slate-700]="!state.isDarkMode() && !piece.isLocked"
       >
         <mat-icon class="text-sm">{{ piece.isLocked ? 'lock' : 'lock_open' }}</mat-icon>
         <span>{{ piece.isLocked ? 'Locked' : 'Lock' }}</span>
@@ -252,7 +384,13 @@
 
       <button
         (click)="deselectAll()"
-        class="p-1 text-neutral-400 hover:text-white rounded hover:bg-neutral-800"
+        class="p-1 rounded cursor-pointer"
+        [class.text-neutral-400]="state.isDarkMode()"
+        [class.hover:text-white]="state.isDarkMode()"
+        [class.hover:bg-neutral-800]="state.isDarkMode()"
+        [class.text-slate-400]="!state.isDarkMode()"
+        [class.hover:text-slate-900]="!state.isDarkMode()"
+        [class.hover:bg-slate-100]="!state.isDarkMode()"
       >
         <mat-icon class="text-sm">close</mat-icon>
       </button>
@@ -262,16 +400,37 @@
   <!-- Multi-Solution Comparison Modal -->
   @if (showCompareModal()) {
     <div class="absolute inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-6">
-      <div class="bg-neutral-900 border border-neutral-700 rounded-2xl p-6 shadow-2xl max-w-2xl w-full">
+      <div 
+        class="border rounded-2xl p-6 shadow-2xl max-w-2xl w-full"
+        [class.bg-neutral-900]="state.isDarkMode()"
+        [class.border-neutral-700]="state.isDarkMode()"
+        [class.bg-white]="!state.isDarkMode()"
+        [class.border-slate-200]="!state.isDarkMode()"
+      >
         <div class="flex items-center justify-between mb-4">
           <div>
-            <h2 class="text-base font-bold text-neutral-100 flex items-center gap-2">
-              <mat-icon class="text-amber-400">compare_arrows</mat-icon>
+            <h2 
+              class="text-base font-bold flex items-center gap-2"
+              [class.text-neutral-100]="state.isDarkMode()"
+              [class.text-slate-900]="!state.isDarkMode()"
+            >
+              <mat-icon [class.text-[#7995f5]]="state.isDarkMode()" [class.text-[#3850a2]]="!state.isDarkMode()">compare_arrows</mat-icon>
               <span>Nesting Optimization Solutions</span>
             </h2>
-            <p class="text-xs text-neutral-400">Compare nesting algorithm strategies for maximum yield and minimum waste.</p>
+            <p 
+              class="text-xs"
+              [class.text-neutral-400]="state.isDarkMode()"
+              [class.text-slate-500]="!state.isDarkMode()"
+            >Compare nesting algorithm strategies for maximum yield and minimum waste.</p>
           </div>
-          <button (click)="showCompareModal.set(false)" class="text-neutral-400 hover:text-white">
+          <button 
+            (click)="showCompareModal.set(false)" 
+            class="cursor-pointer"
+            [class.text-neutral-400]="state.isDarkMode()"
+            [class.hover:text-white]="state.isDarkMode()"
+            [class.text-slate-400]="!state.isDarkMode()"
+            [class.hover:text-slate-900]="!state.isDarkMode()"
+          >
             <mat-icon>close</mat-icon>
           </button>
         </div>
@@ -284,41 +443,67 @@
               (click)="applySolution(idx)"
               (keydown.enter)="applySolution(idx)"
               (keydown.space)="applySolution(idx)"
-              [class.border-amber-400]="state.activeNestingSolutionIndex() === idx"
-              [class.bg-amber-950/20]="state.activeNestingSolutionIndex() === idx"
-              [class.border-neutral-800]="state.activeNestingSolutionIndex() !== idx"
-              class="p-4 bg-neutral-950 border rounded-xl hover:border-neutral-600 cursor-pointer transition-all flex items-center justify-between focus:outline-hidden focus:border-amber-400"
+              [class.border-[#3850a2]]="state.activeNestingSolutionIndex() === idx"
+              [class.bg-[#3850a2]/15]="state.activeNestingSolutionIndex() === idx && state.isDarkMode()"
+              [class.bg-[#3850a2]/10]="state.activeNestingSolutionIndex() === idx && !state.isDarkMode()"
+              [class.border-neutral-800]="state.activeNestingSolutionIndex() !== idx && state.isDarkMode()"
+              [class.bg-neutral-950]="state.activeNestingSolutionIndex() !== idx && state.isDarkMode()"
+              [class.hover:border-neutral-600]="state.activeNestingSolutionIndex() !== idx && state.isDarkMode()"
+              [class.border-slate-200]="state.activeNestingSolutionIndex() !== idx && !state.isDarkMode()"
+              [class.bg-slate-50]="state.activeNestingSolutionIndex() !== idx && !state.isDarkMode()"
+              [class.hover:border-slate-300]="state.activeNestingSolutionIndex() !== idx && !state.isDarkMode()"
+              class="p-4 border rounded-xl cursor-pointer transition-all flex items-center justify-between focus:outline-hidden focus:border-[#3850a2]"
             >
               <div>
                 <div class="flex items-center gap-2 mb-1">
-                  <h3 class="text-sm font-semibold text-neutral-200">{{ sol.name }}</h3>
+                  <h3 
+                    class="text-sm font-semibold"
+                    [class.text-neutral-200]="state.isDarkMode()"
+                    [class.text-slate-900]="!state.isDarkMode()"
+                  >{{ sol.name }}</h3>
                   @if (sol.recommended) {
-                    <span class="px-2 py-0.5 text-[10px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 rounded-full">
+                    <span class="px-2 py-0.5 text-[10px] font-bold bg-emerald-500/20 text-emerald-500 border border-emerald-500/30 rounded-full">
                       RECOMMENDED
                     </span>
                   }
                 </div>
-                <p class="text-xs text-neutral-400 font-mono">{{ sol.algorithmName }}</p>
+                <p 
+                  class="text-xs font-mono"
+                  [class.text-neutral-400]="state.isDarkMode()"
+                  [class.text-slate-500]="!state.isDarkMode()"
+                >{{ sol.algorithmName }}</p>
               </div>
 
               <div class="flex items-center gap-6 text-right">
                 <div>
-                  <div class="text-xs text-neutral-400">Utilization</div>
-                  <div class="text-base font-mono font-bold text-emerald-400">{{ sol.overallUtilization }}%</div>
+                  <div class="text-xs" [class.text-neutral-400]="state.isDarkMode()" [class.text-slate-500]="!state.isDarkMode()">Utilization</div>
+                  <div class="text-base font-mono font-bold text-emerald-500">{{ sol.overallUtilization }}%</div>
                 </div>
 
                 <div>
-                  <div class="text-xs text-neutral-400">Yield</div>
-                  <div class="text-base font-mono font-bold text-neutral-100">{{ sol.piecesPerSheet }} pcs/sheet</div>
+                  <div class="text-xs" [class.text-neutral-400]="state.isDarkMode()" [class.text-slate-500]="!state.isDarkMode()">Yield</div>
+                  <div 
+                    class="text-base font-mono font-bold"
+                    [class.text-neutral-100]="state.isDarkMode()"
+                    [class.text-slate-900]="!state.isDarkMode()"
+                  >{{ sol.piecesPerSheet }} pcs/sheet</div>
                 </div>
 
                 <div>
-                  <div class="text-xs text-neutral-400">Sheets Req.</div>
-                  <div class="text-base font-mono font-bold text-amber-400">{{ sol.sheetsRequired }}</div>
+                  <div class="text-xs" [class.text-neutral-400]="state.isDarkMode()" [class.text-slate-500]="!state.isDarkMode()">Sheets Req.</div>
+                  <div 
+                    class="text-base font-mono font-bold"
+                    [class.text-[#7995f5]]="state.isDarkMode()"
+                    [class.text-[#3850a2]]="!state.isDarkMode()"
+                  >{{ sol.sheetsRequired }}</div>
                 </div>
 
                 <button
-                  class="px-3 py-1.5 text-xs font-semibold rounded-lg bg-neutral-800 hover:bg-amber-400 hover:text-neutral-950 text-neutral-200 transition-colors"
+                  class="px-3 py-1.5 text-xs font-semibold rounded-lg group-hover:bg-[#3850a2] group-hover:text-white transition-colors"
+                  [class.bg-neutral-800]="state.isDarkMode()"
+                  [class.text-neutral-200]="state.isDarkMode()"
+                  [class.bg-slate-200]="!state.isDarkMode()"
+                  [class.text-slate-800]="!state.isDarkMode()"
                 >
                   Apply
                 </button>
@@ -330,7 +515,13 @@
         <div class="flex justify-end">
           <button
             (click)="showCompareModal.set(false)"
-            class="px-4 py-2 text-xs font-medium text-neutral-300 bg-neutral-800 hover:bg-neutral-700 rounded-lg"
+            class="px-4 py-2 text-xs font-medium rounded-lg cursor-pointer"
+            [class.bg-neutral-800]="state.isDarkMode()"
+            [class.hover:bg-neutral-700]="state.isDarkMode()"
+            [class.text-neutral-300]="state.isDarkMode()"
+            [class.bg-slate-100]="!state.isDarkMode()"
+            [class.hover:bg-slate-200]="!state.isDarkMode()"
+            [class.text-slate-700]="!state.isDarkMode()"
           >
             Close
           </button>

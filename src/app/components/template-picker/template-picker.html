@@ -1,30 +1,65 @@
-<div class="w-full h-full bg-neutral-950 p-6 overflow-y-auto">
+<div 
+  class="w-full h-full p-6 overflow-y-auto transition-colors duration-200"
+  [class.bg-neutral-950]="state.isDarkMode()"
+  [class.bg-slate-50]="!state.isDarkMode()"
+>
   <div class="max-w-6xl mx-auto space-y-6">
     <!-- Header Title and Search -->
-    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-neutral-800">
+    <div 
+      class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b"
+      [class.border-neutral-800]="state.isDarkMode()"
+      [class.border-slate-200]="!state.isDarkMode()"
+    >
       <div>
-        <h1 class="text-xl font-bold text-neutral-100 flex items-center gap-2">
-          <mat-icon class="text-amber-400">category</mat-icon>
+        <h1 
+          class="text-xl font-bold flex items-center gap-2"
+          [class.text-neutral-100]="state.isDarkMode()"
+          [class.text-slate-900]="!state.isDarkMode()"
+        >
+          <mat-icon [class.text-[#7995f5]]="state.isDarkMode()" [class.text-[#3850a2]]="!state.isDarkMode()">category</mat-icon>
           <span>Parametric Packaging Template Library</span>
         </h1>
-        <p class="text-xs text-neutral-400 mt-0.5">
+        <p 
+          class="text-xs mt-0.5"
+          [class.text-neutral-400]="state.isDarkMode()"
+          [class.text-slate-500]="!state.isDarkMode()"
+        >
           Standardized industrial packaging templates conforming to FEFCO and ECMA manufacturing standards.
         </p>
       </div>
 
       <!-- Search Input -->
       <div class="relative w-full md:w-80">
-        <mat-icon class="absolute left-3 top-2.5 text-neutral-500 text-sm">search</mat-icon>
+        <mat-icon 
+          class="absolute left-3 top-2.5 text-sm"
+          [class.text-neutral-500]="state.isDarkMode()"
+          [class.text-slate-400]="!state.isDarkMode()"
+        >search</mat-icon>
         <input
           #search
           type="text"
           placeholder="Search by name, code (FEFCO 0201)..."
           [value]="searchQuery()"
           (input)="searchQuery.set(search.value)"
-          class="w-full pl-9 pr-4 py-2 bg-neutral-900 border border-neutral-700 rounded-xl text-xs text-neutral-100 placeholder-neutral-500 focus:outline-hidden focus:border-amber-400"
+          class="w-full pl-9 pr-4 py-2 border rounded-xl text-xs focus:outline-hidden focus:border-[#3850a2] transition-colors"
+          [class.bg-neutral-900]="state.isDarkMode()"
+          [class.border-neutral-700]="state.isDarkMode()"
+          [class.text-neutral-100]="state.isDarkMode()"
+          [class.placeholder-neutral-500]="state.isDarkMode()"
+          [class.bg-white]="!state.isDarkMode()"
+          [class.border-slate-300]="!state.isDarkMode()"
+          [class.text-slate-900]="!state.isDarkMode()"
+          [class.placeholder-slate-400]="!state.isDarkMode()"
         />
         @if (searchQuery()) {
-          <button (click)="searchQuery.set('')" class="absolute right-3 top-2.5 text-neutral-500 hover:text-white">
+          <button 
+            (click)="searchQuery.set('')" 
+            class="absolute right-3 top-2.5 cursor-pointer"
+            [class.text-neutral-500]="state.isDarkMode()"
+            [class.hover:text-white]="state.isDarkMode()"
+            [class.text-slate-400]="!state.isDarkMode()"
+            [class.hover:text-slate-900]="!state.isDarkMode()"
+          >
             <mat-icon class="text-sm">close</mat-icon>
           </button>
         }
@@ -36,12 +71,19 @@
       @for (cat of categories; track cat.id) {
         <button
           (click)="selectedCategory.set(cat.id)"
-          [class.bg-amber-400]="selectedCategory() === cat.id"
-          [class.text-neutral-950]="selectedCategory() === cat.id"
+          [class.bg-[#3850a2]]="selectedCategory() === cat.id"
+          [class.text-white]="selectedCategory() === cat.id"
           [class.font-bold]="selectedCategory() === cat.id"
-          [class.bg-neutral-900]="selectedCategory() !== cat.id"
-          [class.text-neutral-300]="selectedCategory() !== cat.id"
-          class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-neutral-800 hover:border-neutral-700 text-xs font-medium whitespace-nowrap transition-colors"
+          [class.border-[#3850a2]]="selectedCategory() === cat.id"
+          [class.bg-neutral-900]="selectedCategory() !== cat.id && state.isDarkMode()"
+          [class.text-neutral-300]="selectedCategory() !== cat.id && state.isDarkMode()"
+          [class.border-neutral-800]="selectedCategory() !== cat.id && state.isDarkMode()"
+          [class.hover:border-neutral-700]="selectedCategory() !== cat.id && state.isDarkMode()"
+          [class.bg-white]="selectedCategory() !== cat.id && !state.isDarkMode()"
+          [class.text-slate-700]="selectedCategory() !== cat.id && !state.isDarkMode()"
+          [class.border-slate-200]="selectedCategory() !== cat.id && !state.isDarkMode()"
+          [class.hover:border-slate-300]="selectedCategory() !== cat.id && !state.isDarkMode()"
+          class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border text-xs font-medium whitespace-nowrap transition-colors cursor-pointer"
         >
           <mat-icon class="text-sm">{{ cat.icon }}</mat-icon>
           <span>{{ cat.label }}</span>
@@ -58,40 +100,88 @@
           (click)="selectTemplate(tmpl.id)"
           (keydown.enter)="selectTemplate(tmpl.id)"
           (keydown.space)="selectTemplate(tmpl.id)"
-          [class.border-amber-400]="state.activeTemplateId() === tmpl.id"
-          [class.bg-amber-950/10]="state.activeTemplateId() === tmpl.id"
-          [class.border-neutral-800]="state.activeTemplateId() !== tmpl.id"
-          class="group bg-neutral-900 border rounded-2xl p-5 hover:border-neutral-600 hover:bg-neutral-850 cursor-pointer transition-all flex flex-col justify-between focus:outline-hidden focus:border-amber-400"
+          [class.border-[#3850a2]]="state.activeTemplateId() === tmpl.id"
+          [class.bg-[#3850a2]/15]="state.activeTemplateId() === tmpl.id && state.isDarkMode()"
+          [class.bg-[#3850a2]/10]="state.activeTemplateId() === tmpl.id && !state.isDarkMode()"
+          [class.border-neutral-800]="state.activeTemplateId() !== tmpl.id && state.isDarkMode()"
+          [class.bg-neutral-900]="state.activeTemplateId() !== tmpl.id && state.isDarkMode()"
+          [class.hover:border-neutral-600]="state.activeTemplateId() !== tmpl.id && state.isDarkMode()"
+          [class.hover:bg-neutral-850]="state.activeTemplateId() !== tmpl.id && state.isDarkMode()"
+          [class.border-slate-200]="state.activeTemplateId() !== tmpl.id && !state.isDarkMode()"
+          [class.bg-white]="state.activeTemplateId() !== tmpl.id && !state.isDarkMode()"
+          [class.hover:border-slate-300]="state.activeTemplateId() !== tmpl.id && !state.isDarkMode()"
+          [class.hover:bg-slate-50]="state.activeTemplateId() !== tmpl.id && !state.isDarkMode()"
+          class="group border rounded-2xl p-5 cursor-pointer transition-all flex flex-col justify-between shadow-xs hover:shadow-md focus:outline-hidden focus:border-[#3850a2]"
         >
           <div>
             <div class="flex items-start justify-between gap-2 mb-2">
               <div>
-                <span class="text-[10px] font-mono font-semibold px-2 py-0.5 rounded bg-neutral-800 text-neutral-400 border border-neutral-700">
+                <span 
+                  class="text-[10px] font-mono font-semibold px-2 py-0.5 rounded border"
+                  [class.bg-neutral-800]="state.isDarkMode()"
+                  [class.text-neutral-400]="state.isDarkMode()"
+                  [class.border-neutral-700]="state.isDarkMode()"
+                  [class.bg-slate-100]="!state.isDarkMode()"
+                  [class.text-slate-600]="!state.isDarkMode()"
+                  [class.border-slate-200]="!state.isDarkMode()"
+                >
                   {{ tmpl.code }}
                 </span>
-                <h3 class="text-sm font-bold text-neutral-100 mt-1.5 group-hover:text-amber-300 transition-colors">
+                <h3 
+                  class="text-sm font-bold mt-1.5 transition-colors"
+                  [class.text-neutral-100]="state.isDarkMode()"
+                  [class.group-hover:text-[#7995f5]]="state.isDarkMode()"
+                  [class.text-slate-900]="!state.isDarkMode()"
+                  [class.group-hover:text-[#3850a2]]="!state.isDarkMode()"
+                >
                   {{ tmpl.name }}
                 </h3>
               </div>
 
-              <span class="text-[10px] font-mono text-neutral-400 px-2 py-0.5 rounded-full bg-neutral-800">
+              <span 
+                class="text-[10px] font-mono px-2 py-0.5 rounded-full"
+                [class.text-neutral-400]="state.isDarkMode()"
+                [class.bg-neutral-800]="state.isDarkMode()"
+                [class.text-slate-500]="!state.isDarkMode()"
+                [class.bg-slate-100]="!state.isDarkMode()"
+              >
                 {{ tmpl.panelCount }} Panels
               </span>
             </div>
 
-            <p class="text-xs text-neutral-400 line-clamp-3 leading-relaxed mb-4">
+            <p 
+              class="text-xs line-clamp-3 leading-relaxed mb-4"
+              [class.text-neutral-400]="state.isDarkMode()"
+              [class.text-slate-600]="!state.isDarkMode()"
+            >
               {{ tmpl.description }}
             </p>
           </div>
 
-          <div class="pt-3 border-t border-neutral-800 flex items-center justify-between">
-            <span class="text-[11px] text-neutral-400 flex items-center gap-1">
-              <mat-icon class="text-xs scale-75 text-neutral-500">settings</mat-icon>
+          <div 
+            class="pt-3 border-t flex items-center justify-between"
+            [class.border-neutral-800]="state.isDarkMode()"
+            [class.border-slate-100]="!state.isDarkMode()"
+          >
+            <span 
+              class="text-[11px] flex items-center gap-1"
+              [class.text-neutral-400]="state.isDarkMode()"
+              [class.text-slate-500]="!state.isDarkMode()"
+            >
+              <mat-icon 
+                class="text-xs scale-75"
+                [class.text-neutral-500]="state.isDarkMode()"
+                [class.text-slate-400]="!state.isDarkMode()"
+              >settings</mat-icon>
               <span>Parametric: {{ tmpl.paramsList.length }} variables</span>
             </span>
 
             <button
-              class="px-3 py-1.5 text-xs font-semibold rounded-lg bg-neutral-800 group-hover:bg-amber-400 group-hover:text-neutral-950 text-neutral-200 transition-colors flex items-center gap-1"
+              class="px-3 py-1.5 text-xs font-semibold rounded-lg group-hover:bg-[#3850a2] group-hover:text-white transition-colors flex items-center gap-1 cursor-pointer"
+              [class.bg-neutral-800]="state.isDarkMode()"
+              [class.text-neutral-200]="state.isDarkMode()"
+              [class.bg-slate-100]="!state.isDarkMode()"
+              [class.text-slate-700]="!state.isDarkMode()"
             >
               <span>Load Template</span>
               <mat-icon class="text-xs">arrow_forward</mat-icon>

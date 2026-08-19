@@ -171,7 +171,15 @@ export class ExportEngine {
           svg += `    <line x1="${l.p1.x}" y1="${l.p1.y}" x2="${l.p2.x}" y2="${l.p2.y}"/>\n`;
         }
         for (const arc of geometry.arcs.filter(a => a.type === 'CUT')) {
-          svg += `    <circle cx="${arc.center.x}" cy="${arc.center.y}" r="${arc.radius}"/>\n`;
+          const x1 = (arc.center.x + arc.radius * Math.cos(arc.startAngle)).toFixed(3);
+          const y1 = (arc.center.y + arc.radius * Math.sin(arc.startAngle)).toFixed(3);
+          const x2 = (arc.center.x + arc.radius * Math.cos(arc.endAngle)).toFixed(3);
+          const y2 = (arc.center.y + arc.radius * Math.sin(arc.endAngle)).toFixed(3);
+          let diff = arc.endAngle - arc.startAngle;
+          while (diff < 0) diff += 2 * Math.PI;
+          const largeArc = diff > Math.PI ? 1 : 0;
+          const sweep = arc.startAngle > arc.endAngle ? 0 : 1;
+          svg += `    <path d="M ${x1} ${y1} A ${arc.radius.toFixed(3)} ${arc.radius.toFixed(3)} 0 ${largeArc} ${sweep} ${x2} ${y2}"/>\n`;
         }
         svg += `  </g>\n\n`;
       }

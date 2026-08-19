@@ -1,6 +1,21 @@
 @import url('https://fonts.googleapis.com/icon?family=Material+Icons');
 @import "tailwindcss";
 
+@theme {
+  --color-brand: #3850a2;
+  --color-brand-hover: #4865c2;
+  --color-brand-active: #2a3d80;
+  --color-brand-light: #5e7ce2;
+  --color-brand-accent: #7995f5;
+  --color-brand-tint: rgba(56, 80, 162, 0.2);
+}
+
+:root {
+  --brand: #3850a2;
+  --brand-hover: #4865c2;
+  --brand-light: #7995f5;
+}
+
 @layer base {
   * {
     box-sizing: border-box;
@@ -31,6 +46,19 @@
   background: rgba(150, 150, 150, 0.6);
 }
 
+.theme-light ::-webkit-scrollbar-track,
+.light ::-webkit-scrollbar-track {
+  background: rgba(226, 232, 240, 0.6);
+}
+.theme-light ::-webkit-scrollbar-thumb,
+.light ::-webkit-scrollbar-thumb {
+  background: rgba(148, 163, 184, 0.6);
+}
+.theme-light ::-webkit-scrollbar-thumb:hover,
+.light ::-webkit-scrollbar-thumb:hover {
+  background: rgba(100, 116, 139, 0.8);
+}
+
 /* Production line types */
 .line-cut {
   stroke: #ef4444; /* Red cut line */
@@ -40,7 +68,7 @@
 }
 
 .line-crease {
-  stroke: #3b82f6; /* Blue crease/fold */
+  stroke: #eab308; /* Yellow crease/fold */
   stroke-width: 1.2;
   stroke-dasharray: 4, 3;
 }
@@ -52,7 +80,7 @@
 }
 
 .line-bleed {
-  stroke: #f59e0b; /* Amber bleed */
+  stroke: #3850a2; /* Bleed outline */
   stroke-width: 0.8;
   stroke-dasharray: 6, 4;
 }

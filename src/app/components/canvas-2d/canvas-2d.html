@@ -1,13 +1,27 @@
-<div class="relative w-full h-full flex flex-col bg-neutral-950 overflow-hidden select-none">
+<div 
+  class="relative w-full h-full flex flex-col overflow-hidden select-none transition-colors duration-200"
+  [class.bg-neutral-950]="state.isDarkMode()"
+  [class.bg-slate-100]="!state.isDarkMode()"
+>
   <!-- CAD Top Floating Toolbar -->
-  <div class="absolute top-3 left-3 z-20 flex items-center gap-1.5 p-1.5 bg-neutral-900/90 backdrop-blur-md border border-neutral-800 rounded-xl shadow-2xl">
+  <div 
+    class="absolute top-3 left-3 z-20 flex items-center gap-1.5 p-1.5 backdrop-blur-md rounded-xl shadow-xl border transition-colors"
+    [class.bg-neutral-900/90]="state.isDarkMode()"
+    [class.border-neutral-800]="state.isDarkMode()"
+    [class.bg-white/95]="!state.isDarkMode()"
+    [class.border-slate-200]="!state.isDarkMode()"
+  >
     <!-- Tool Modes -->
     <button
       id="tool_select"
       (click)="state.activeTool.set('select')"
-      [class.bg-neutral-800]="state.activeTool() === 'select'"
-      [class.text-amber-400]="state.activeTool() === 'select'"
-      class="flex items-center gap-1 px-2.5 py-1.5 text-xs font-medium text-neutral-300 rounded-lg hover:bg-neutral-800/80 transition-colors"
+      [class.bg-neutral-800]="state.activeTool() === 'select' && state.isDarkMode()"
+      [class.text-[#7995f5]]="state.activeTool() === 'select' && state.isDarkMode()"
+      [class.bg-slate-100]="state.activeTool() === 'select' && !state.isDarkMode()"
+      [class.text-[#3850a2]]="state.activeTool() === 'select' && !state.isDarkMode()"
+      [class.text-neutral-300]="state.activeTool() !== 'select' && state.isDarkMode()"
+      [class.text-slate-600]="state.activeTool() !== 'select' && !state.isDarkMode()"
+      class="flex items-center gap-1 px-2.5 py-1.5 text-xs font-medium rounded-lg hover:bg-neutral-800/80 transition-colors cursor-pointer"
       title="Select & Inspect Tool (V)"
     >
       <mat-icon class="text-base scale-90">near_me</mat-icon>
@@ -17,9 +31,13 @@
     <button
       id="tool_pan"
       (click)="state.activeTool.set('pan')"
-      [class.bg-neutral-800]="state.activeTool() === 'pan'"
-      [class.text-amber-400]="state.activeTool() === 'pan'"
-      class="flex items-center gap-1 px-2.5 py-1.5 text-xs font-medium text-neutral-300 rounded-lg hover:bg-neutral-800/80 transition-colors"
+      [class.bg-neutral-800]="state.activeTool() === 'pan' && state.isDarkMode()"
+      [class.text-[#7995f5]]="state.activeTool() === 'pan' && state.isDarkMode()"
+      [class.bg-slate-100]="state.activeTool() === 'pan' && !state.isDarkMode()"
+      [class.text-[#3850a2]]="state.activeTool() === 'pan' && !state.isDarkMode()"
+      [class.text-neutral-300]="state.activeTool() !== 'pan' && state.isDarkMode()"
+      [class.text-slate-600]="state.activeTool() !== 'pan' && !state.isDarkMode()"
+      class="flex items-center gap-1 px-2.5 py-1.5 text-xs font-medium rounded-lg hover:bg-neutral-800/80 transition-colors cursor-pointer"
       title="Pan Viewport (H / Space+Drag)"
     >
       <mat-icon class="text-base scale-90">pan_tool</mat-icon>
@@ -29,22 +47,34 @@
     <button
       id="tool_measure"
       (click)="state.activeTool.set('measure'); resetMeasurement()"
-      [class.bg-neutral-800]="state.activeTool() === 'measure'"
-      [class.text-amber-400]="state.activeTool() === 'measure'"
-      class="flex items-center gap-1 px-2.5 py-1.5 text-xs font-medium text-neutral-300 rounded-lg hover:bg-neutral-800/80 transition-colors"
+      [class.bg-neutral-800]="state.activeTool() === 'measure' && state.isDarkMode()"
+      [class.text-[#7995f5]]="state.activeTool() === 'measure' && state.isDarkMode()"
+      [class.bg-slate-100]="state.activeTool() === 'measure' && !state.isDarkMode()"
+      [class.text-[#3850a2]]="state.activeTool() === 'measure' && !state.isDarkMode()"
+      [class.text-neutral-300]="state.activeTool() !== 'measure' && state.isDarkMode()"
+      [class.text-slate-600]="state.activeTool() !== 'measure' && !state.isDarkMode()"
+      class="flex items-center gap-1 px-2.5 py-1.5 text-xs font-medium rounded-lg hover:bg-neutral-800/80 transition-colors cursor-pointer"
       title="Point-to-Point Measurement Tape (M)"
     >
       <mat-icon class="text-base scale-90">straighten</mat-icon>
       <span>Measure</span>
     </button>
 
-    <div class="h-4 w-px bg-neutral-800 mx-1"></div>
+    <div 
+      class="h-4 w-px mx-1"
+      [class.bg-neutral-800]="state.isDarkMode()"
+      [class.bg-slate-200]="!state.isDarkMode()"
+    ></div>
 
     <!-- Zoom Controls -->
     <button
       id="btn_zoom_fit"
       (click)="zoomToFit()"
-      class="flex items-center gap-1 px-2 py-1.5 text-xs font-medium text-neutral-300 rounded-lg hover:bg-neutral-800 transition-colors"
+      [class.text-neutral-300]="state.isDarkMode()"
+      [class.hover:bg-neutral-800]="state.isDarkMode()"
+      [class.text-slate-700]="!state.isDarkMode()"
+      [class.hover:bg-slate-100]="!state.isDarkMode()"
+      class="flex items-center gap-1 px-2 py-1.5 text-xs font-medium rounded-lg transition-colors cursor-pointer"
       title="Zoom to Fit Dieline"
     >
       <mat-icon class="text-base scale-90">aspect_ratio</mat-icon>
@@ -54,32 +84,52 @@
     <button
       id="btn_zoom_in"
       (click)="zoomIn()"
-      class="p-1.5 text-neutral-400 hover:text-white hover:bg-neutral-800 rounded-lg transition-colors"
+      [class.text-neutral-400]="state.isDarkMode()"
+      [class.hover:text-white]="state.isDarkMode()"
+      [class.hover:bg-neutral-800]="state.isDarkMode()"
+      [class.text-slate-500]="!state.isDarkMode()"
+      [class.hover:text-slate-900]="!state.isDarkMode()"
+      [class.hover:bg-slate-100]="!state.isDarkMode()"
+      class="p-1.5 rounded-lg transition-colors cursor-pointer"
       title="Zoom In (+)"
     >
       <mat-icon class="text-base">add</mat-icon>
     </button>
 
-    <span class="text-xs font-mono font-medium text-neutral-400 min-w-10 text-center">
+    <span 
+      class="text-xs font-mono font-medium min-w-10 text-center"
+      [class.text-neutral-400]="state.isDarkMode()"
+      [class.text-slate-600]="!state.isDarkMode()"
+    >
       {{ (state.zoom() * 100).toFixed(0) }}%
     </span>
 
     <button
       id="btn_zoom_out"
       (click)="zoomOut()"
-      class="p-1.5 text-neutral-400 hover:text-white hover:bg-neutral-800 rounded-lg transition-colors"
+      [class.text-neutral-400]="state.isDarkMode()"
+      [class.hover:text-white]="state.isDarkMode()"
+      [class.hover:bg-neutral-800]="state.isDarkMode()"
+      [class.text-slate-500]="!state.isDarkMode()"
+      [class.hover:text-slate-900]="!state.isDarkMode()"
+      [class.hover:bg-slate-100]="!state.isDarkMode()"
+      class="p-1.5 rounded-lg transition-colors cursor-pointer"
       title="Zoom Out (-)"
     >
       <mat-icon class="text-base">remove</mat-icon>
     </button>
 
-    <div class="h-4 w-px bg-neutral-800 mx-1"></div>
+    <div 
+      class="h-4 w-px mx-1"
+      [class.bg-neutral-800]="state.isDarkMode()"
+      [class.bg-slate-200]="!state.isDarkMode()"
+    ></div>
 
     <!-- Quick 1-Click Zünd .AI Export -->
     <button
       id="btn_quick_ai"
       (click)="state.downloadAI()"
-      class="flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold text-neutral-950 bg-amber-400 hover:bg-amber-300 rounded-lg shadow-md transition-all active:scale-95 cursor-pointer"
+      class="flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold text-white bg-[#3850a2] hover:bg-[#4865c2] rounded-lg shadow-md shadow-[#3850a2]/30 transition-all active:scale-95 cursor-pointer"
       title="Export Zünd Cut Center (.ai) with 3 layers: crease, cut, reg"
     >
       <mat-icon class="text-base scale-90 font-bold">content_cut</mat-icon>
@@ -90,158 +140,258 @@
     <button
       id="btn_quick_svg"
       (click)="state.downloadSVG()"
-      class="flex items-center gap-1 px-2.5 py-1.5 text-xs font-medium text-neutral-300 bg-neutral-800 hover:bg-neutral-700 hover:text-white rounded-lg transition-colors"
+      [class.bg-neutral-800]="state.isDarkMode()"
+      [class.hover:bg-neutral-700]="state.isDarkMode()"
+      [class.text-neutral-300]="state.isDarkMode()"
+      [class.bg-slate-100]="!state.isDarkMode()"
+      [class.hover:bg-slate-200]="!state.isDarkMode()"
+      [class.text-slate-700]="!state.isDarkMode()"
+      class="flex items-center gap-1 px-2.5 py-1.5 text-xs font-medium rounded-lg transition-colors cursor-pointer"
       title="Export Standard Zünd Production SVG"
     >
-      <mat-icon class="text-base scale-90 text-rose-400">code</mat-icon>
+      <mat-icon class="text-base scale-90 text-rose-500">code</mat-icon>
       <span>SVG</span>
     </button>
 
     <button
       id="btn_quick_dxf"
       (click)="state.downloadDXF()"
-      class="flex items-center gap-1 px-2.5 py-1.5 text-xs font-medium text-neutral-300 bg-neutral-800 hover:bg-neutral-700 hover:text-white rounded-lg transition-colors"
+      [class.bg-neutral-800]="state.isDarkMode()"
+      [class.hover:bg-neutral-700]="state.isDarkMode()"
+      [class.text-neutral-300]="state.isDarkMode()"
+      [class.bg-slate-100]="!state.isDarkMode()"
+      [class.hover:bg-slate-200]="!state.isDarkMode()"
+      [class.text-slate-700]="!state.isDarkMode()"
+      class="flex items-center gap-1 px-2.5 py-1.5 text-xs font-medium rounded-lg transition-colors cursor-pointer"
       title="Export AutoCAD R12 DXF with Layers"
     >
-      <mat-icon class="text-base scale-90 text-blue-400">layers</mat-icon>
+      <mat-icon class="text-base scale-90 text-[#3850a2]">layers</mat-icon>
       <span>DXF</span>
     </button>
 
     <button
       id="btn_quick_pdf"
       (click)="state.downloadPDF()"
-      class="flex items-center gap-1 px-2.5 py-1.5 text-xs font-medium text-neutral-300 bg-neutral-800 hover:bg-neutral-700 hover:text-white rounded-lg transition-colors"
+      [class.bg-neutral-800]="state.isDarkMode()"
+      [class.hover:bg-neutral-700]="state.isDarkMode()"
+      [class.text-neutral-300]="state.isDarkMode()"
+      [class.bg-slate-100]="!state.isDarkMode()"
+      [class.hover:bg-slate-200]="!state.isDarkMode()"
+      [class.text-slate-700]="!state.isDarkMode()"
+      class="flex items-center gap-1 px-2.5 py-1.5 text-xs font-medium rounded-lg transition-colors cursor-pointer"
       title="Export Vector Production PDF Spec"
     >
-      <mat-icon class="text-base scale-90 text-emerald-400">picture_as_pdf</mat-icon>
+      <mat-icon class="text-base scale-90 text-emerald-500">picture_as_pdf</mat-icon>
       <span>PDF</span>
     </button>
   </div>
 
   <!-- CAD Right Layer Legend & Toggle Floating HUD -->
-  <div class="absolute top-3 right-3 z-20 flex flex-col gap-1.5 p-2 bg-neutral-900/90 backdrop-blur-md border border-neutral-800 rounded-xl shadow-2xl text-xs">
-    <div class="text-[10px] font-bold text-neutral-400 uppercase tracking-wider px-1 pb-1 border-b border-neutral-800 flex items-center justify-between">
+  <div 
+    class="absolute top-3 right-3 z-20 flex flex-col gap-1.5 p-2 backdrop-blur-md rounded-xl shadow-xl text-xs border transition-colors"
+    [class.bg-neutral-900/90]="state.isDarkMode()"
+    [class.border-neutral-800]="state.isDarkMode()"
+    [class.bg-white/95]="!state.isDarkMode()"
+    [class.border-slate-200]="!state.isDarkMode()"
+  >
+    <div 
+      class="text-[10px] font-bold uppercase tracking-wider px-1 pb-1 border-b flex items-center justify-between"
+      [class.text-neutral-400]="state.isDarkMode()"
+      [class.border-neutral-800]="state.isDarkMode()"
+      [class.text-slate-600]="!state.isDarkMode()"
+      [class.border-slate-200]="!state.isDarkMode()"
+    >
       <span>Production Layers</span>
-      <mat-icon class="text-xs scale-75 text-neutral-500">tune</mat-icon>
+      <mat-icon class="text-xs scale-75" [class.text-neutral-500]="state.isDarkMode()" [class.text-slate-400]="!state.isDarkMode()">tune</mat-icon>
     </div>
 
     <!-- Cut Layer -->
-    <label class="flex items-center justify-between gap-3 px-1 py-0.5 rounded hover:bg-neutral-800/60 cursor-pointer">
+    <label 
+      class="flex items-center justify-between gap-3 px-1 py-0.5 rounded cursor-pointer transition-colors"
+      [class.hover:bg-neutral-800/60]="state.isDarkMode()"
+      [class.hover:bg-slate-100]="!state.isDarkMode()"
+    >
       <div class="flex items-center gap-2">
         <span class="w-3.5 h-1 bg-rose-500 rounded-sm"></span>
-        <span class="font-mono text-neutral-200">CUT</span>
+        <span class="font-mono font-medium text-xs" [class.text-neutral-200]="state.isDarkMode()" [class.text-slate-800]="!state.isDarkMode()">CUT</span>
       </div>
       <input 
         type="checkbox" 
         [checked]="state.layerVisibility().CUT"
         (change)="state.toggleLayer('CUT')"
-        class="rounded border-neutral-700 bg-neutral-900 text-rose-500 focus:ring-0 focus:ring-offset-0 cursor-pointer"
+        class="rounded text-rose-500 focus:ring-0 focus:ring-offset-0 cursor-pointer"
+        [class.border-neutral-700]="state.isDarkMode()"
+        [class.bg-neutral-900]="state.isDarkMode()"
+        [class.border-slate-300]="!state.isDarkMode()"
+        [class.bg-white]="!state.isDarkMode()"
       />
     </label>
 
     <!-- Crease Layer -->
-    <label class="flex items-center justify-between gap-3 px-1 py-0.5 rounded hover:bg-neutral-800/60 cursor-pointer">
+    <label 
+      class="flex items-center justify-between gap-3 px-1 py-0.5 rounded cursor-pointer transition-colors"
+      [class.hover:bg-neutral-800/60]="state.isDarkMode()"
+      [class.hover:bg-slate-100]="!state.isDarkMode()"
+    >
       <div class="flex items-center gap-2">
-        <span class="w-3.5 h-1 border-b border-dashed border-blue-500"></span>
-        <span class="font-mono text-neutral-200">CREASE</span>
+        <span class="w-3.5 h-1 border-b-2 border-dashed border-yellow-500"></span>
+        <span class="font-mono font-medium text-xs" [class.text-neutral-200]="state.isDarkMode()" [class.text-slate-800]="!state.isDarkMode()">CREASE</span>
       </div>
       <input 
         type="checkbox" 
         [checked]="state.layerVisibility().CREASE"
         (change)="state.toggleLayer('CREASE')"
-        class="rounded border-neutral-700 bg-neutral-900 text-blue-500 focus:ring-0 focus:ring-offset-0 cursor-pointer"
+        class="rounded text-yellow-500 focus:ring-0 focus:ring-offset-0 cursor-pointer"
+        [class.border-neutral-700]="state.isDarkMode()"
+        [class.bg-neutral-900]="state.isDarkMode()"
+        [class.border-slate-300]="!state.isDarkMode()"
+        [class.bg-white]="!state.isDarkMode()"
       />
     </label>
 
     <!-- Perf Layer -->
-    <label class="flex items-center justify-between gap-3 px-1 py-0.5 rounded hover:bg-neutral-800/60 cursor-pointer">
+    <label 
+      class="flex items-center justify-between gap-3 px-1 py-0.5 rounded cursor-pointer transition-colors"
+      [class.hover:bg-neutral-800/60]="state.isDarkMode()"
+      [class.hover:bg-slate-100]="!state.isDarkMode()"
+    >
       <div class="flex items-center gap-2">
         <span class="w-3.5 h-1 border-b border-dotted border-emerald-500"></span>
-        <span class="font-mono text-neutral-200">PERF</span>
+        <span class="font-mono font-medium text-xs" [class.text-neutral-200]="state.isDarkMode()" [class.text-slate-800]="!state.isDarkMode()">PERF</span>
       </div>
       <input 
         type="checkbox" 
         [checked]="state.layerVisibility().PERF"
         (change)="state.toggleLayer('PERF')"
-        class="rounded border-neutral-700 bg-neutral-900 text-emerald-500 focus:ring-0 focus:ring-offset-0 cursor-pointer"
+        class="rounded text-emerald-500 focus:ring-0 focus:ring-offset-0 cursor-pointer"
+        [class.border-neutral-700]="state.isDarkMode()"
+        [class.bg-neutral-900]="state.isDarkMode()"
+        [class.border-slate-300]="!state.isDarkMode()"
+        [class.bg-white]="!state.isDarkMode()"
       />
     </label>
 
     <!-- Reg Layer -->
-    <label class="flex items-center justify-between gap-3 px-1 py-0.5 rounded hover:bg-neutral-800/60 cursor-pointer">
+    <label 
+      class="flex items-center justify-between gap-3 px-1 py-0.5 rounded cursor-pointer transition-colors"
+      [class.hover:bg-neutral-800/60]="state.isDarkMode()"
+      [class.hover:bg-slate-100]="!state.isDarkMode()"
+    >
       <div class="flex items-center gap-2">
-        <span class="w-3.5 h-3.5 rounded-full bg-amber-400 border border-neutral-900 flex items-center justify-center">
-          <span class="w-1.5 h-1.5 rounded-full bg-black"></span>
+        <span class="w-3.5 h-3.5 rounded-full bg-[#3850a2] border border-neutral-900 flex items-center justify-center">
+          <span class="w-1.5 h-1.5 rounded-full bg-white"></span>
         </span>
-        <span class="font-mono text-neutral-200">REG</span>
+        <span class="font-mono font-medium text-xs" [class.text-neutral-200]="state.isDarkMode()" [class.text-slate-800]="!state.isDarkMode()">REG</span>
       </div>
       <input 
         type="checkbox" 
         [checked]="state.layerVisibility().REGISTRATION"
         (change)="state.toggleLayer('REGISTRATION')"
-        class="rounded border-neutral-700 bg-neutral-900 text-amber-500 focus:ring-0 focus:ring-offset-0 cursor-pointer"
+        class="rounded text-[#3850a2] focus:ring-0 focus:ring-offset-0 cursor-pointer"
+        [class.border-neutral-700]="state.isDarkMode()"
+        [class.bg-neutral-900]="state.isDarkMode()"
+        [class.border-slate-300]="!state.isDarkMode()"
+        [class.bg-white]="!state.isDarkMode()"
       />
     </label>
 
     <!-- Bleed Layer -->
-    <label class="flex items-center justify-between gap-3 px-1 py-0.5 rounded hover:bg-neutral-800/60 cursor-pointer">
+    <label 
+      class="flex items-center justify-between gap-3 px-1 py-0.5 rounded cursor-pointer transition-colors"
+      [class.hover:bg-neutral-800/60]="state.isDarkMode()"
+      [class.hover:bg-slate-100]="!state.isDarkMode()"
+    >
       <div class="flex items-center gap-2">
-        <span class="w-3.5 h-1 border-b border-dashed border-amber-500"></span>
-        <span class="font-mono text-neutral-200">BLEED</span>
+        <span class="w-3.5 h-1 border-b border-dashed border-[#3850a2]"></span>
+        <span class="font-mono font-medium text-xs" [class.text-neutral-200]="state.isDarkMode()" [class.text-slate-800]="!state.isDarkMode()">BLEED</span>
       </div>
       <input 
         type="checkbox" 
         [checked]="state.layerVisibility().BLEED"
         (change)="state.toggleLayer('BLEED')"
-        class="rounded border-neutral-700 bg-neutral-900 text-amber-500 focus:ring-0 focus:ring-offset-0 cursor-pointer"
+        class="rounded text-[#3850a2] focus:ring-0 focus:ring-offset-0 cursor-pointer"
+        [class.border-neutral-700]="state.isDarkMode()"
+        [class.bg-neutral-900]="state.isDarkMode()"
+        [class.border-slate-300]="!state.isDarkMode()"
+        [class.bg-white]="!state.isDarkMode()"
       />
     </label>
 
     <!-- Dimensions Layer -->
-    <label class="flex items-center justify-between gap-3 px-1 py-0.5 rounded hover:bg-neutral-800/60 cursor-pointer">
+    <label 
+      class="flex items-center justify-between gap-3 px-1 py-0.5 rounded cursor-pointer transition-colors"
+      [class.hover:bg-neutral-800/60]="state.isDarkMode()"
+      [class.hover:bg-slate-100]="!state.isDarkMode()"
+    >
       <div class="flex items-center gap-2">
         <span class="w-3.5 h-1 bg-neutral-400 rounded-sm"></span>
-        <span class="font-mono text-neutral-200">DIMENSIONS</span>
+        <span class="font-mono font-medium text-xs" [class.text-neutral-200]="state.isDarkMode()" [class.text-slate-800]="!state.isDarkMode()">DIMENSIONS</span>
       </div>
       <input 
         type="checkbox" 
         [checked]="state.layerVisibility().DIMENSIONS"
         (change)="state.toggleLayer('DIMENSIONS')"
-        class="rounded border-neutral-700 bg-neutral-900 text-neutral-400 focus:ring-0 focus:ring-offset-0 cursor-pointer"
+        class="rounded text-neutral-400 focus:ring-0 focus:ring-offset-0 cursor-pointer"
+        [class.border-neutral-700]="state.isDarkMode()"
+        [class.bg-neutral-900]="state.isDarkMode()"
+        [class.border-slate-300]="!state.isDarkMode()"
+        [class.bg-white]="!state.isDarkMode()"
       />
     </label>
 
     <!-- Grid toggle -->
-    <label class="flex items-center justify-between gap-3 px-1 py-0.5 rounded hover:bg-neutral-800/60 cursor-pointer pt-1 border-t border-neutral-800">
+    <label 
+      class="flex items-center justify-between gap-3 px-1 py-0.5 rounded cursor-pointer pt-1 border-t transition-colors"
+      [class.border-neutral-800]="state.isDarkMode()"
+      [class.hover:bg-neutral-800/60]="state.isDarkMode()"
+      [class.border-slate-200]="!state.isDarkMode()"
+      [class.hover:bg-slate-100]="!state.isDarkMode()"
+    >
       <div class="flex items-center gap-2">
-        <mat-icon class="text-xs scale-75 text-neutral-500">grid_4x4</mat-icon>
-        <span class="text-neutral-300">CAD Grid</span>
+        <mat-icon class="text-xs scale-75" [class.text-neutral-500]="state.isDarkMode()" [class.text-slate-400]="!state.isDarkMode()">grid_4x4</mat-icon>
+        <span class="font-medium text-xs" [class.text-neutral-300]="state.isDarkMode()" [class.text-slate-700]="!state.isDarkMode()">CAD Grid</span>
       </div>
       <input 
         type="checkbox" 
         [checked]="state.layerVisibility().GRID"
         (change)="state.toggleLayer('GRID')"
-        class="rounded border-neutral-700 bg-neutral-900 text-amber-500 focus:ring-0 focus:ring-offset-0 cursor-pointer"
+        class="rounded text-[#3850a2] focus:ring-0 focus:ring-offset-0 cursor-pointer"
+        [class.border-neutral-700]="state.isDarkMode()"
+        [class.bg-neutral-900]="state.isDarkMode()"
+        [class.border-slate-300]="!state.isDarkMode()"
+        [class.bg-white]="!state.isDarkMode()"
       />
     </label>
   </div>
 
   <!-- Measurement Overlay Banner if active -->
   @if (state.activeTool() === 'measure' && measuredDistance() !== null) {
-    <div class="absolute bottom-6 left-1/2 -translate-x-1/2 z-30 flex items-center gap-3 px-4 py-2 bg-neutral-900 border border-amber-500/50 rounded-xl shadow-2xl">
-      <mat-icon class="text-amber-400">straighten</mat-icon>
+    <div 
+      class="absolute bottom-10 left-1/2 -translate-x-1/2 z-30 flex items-center gap-3 px-4 py-2 rounded-xl shadow-2xl border transition-colors"
+      [class.bg-neutral-900]="state.isDarkMode()"
+      [class.border-[#3850a2]/60]="state.isDarkMode()"
+      [class.bg-white]="!state.isDarkMode()"
+      [class.border-[#3850a2]]="!state.isDarkMode()"
+    >
+      <mat-icon [class.text-[#7995f5]]="state.isDarkMode()" [class.text-[#3850a2]]="!state.isDarkMode()">straighten</mat-icon>
       <div class="text-xs">
-        <span class="text-neutral-400">Point Distance: </span>
-        <span class="font-mono font-bold text-amber-300 text-sm">{{ state.formatUnit(measuredDistance()!) }}</span>
+        <span [class.text-neutral-400]="state.isDarkMode()" [class.text-slate-600]="!state.isDarkMode()">Point Distance: </span>
+        <span class="font-mono font-bold text-sm" [class.text-[#a4b9ff]]="state.isDarkMode()" [class.text-[#3850a2]]="!state.isDarkMode()">{{ state.formatUnit(measuredDistance()!) }}</span>
         @if (state.unit() === 'in') {
-          <span class="text-neutral-500 ml-1 font-mono">({{ measuredDistance() }} mm)</span>
+          <span class="ml-1 font-mono" [class.text-neutral-500]="state.isDarkMode()" [class.text-slate-400]="!state.isDarkMode()">({{ measuredDistance() }} mm)</span>
         } @else {
-          <span class="text-neutral-500 ml-1 font-mono">({{ (measuredDistance()! / 25.4).toFixed(2) }} in)</span>
+          <span class="ml-1 font-mono" [class.text-neutral-500]="state.isDarkMode()" [class.text-slate-400]="!state.isDarkMode()">({{ (measuredDistance()! / 25.4).toFixed(2) }} in)</span>
         }
       </div>
       <button 
         (click)="resetMeasurement()"
-        class="p-1 text-neutral-400 hover:text-white rounded hover:bg-neutral-800 cursor-pointer"
+        class="p-1 rounded cursor-pointer"
+        [class.text-neutral-400]="state.isDarkMode()"
+        [class.hover:text-white]="state.isDarkMode()"
+        [class.hover:bg-neutral-800]="state.isDarkMode()"
+        [class.text-slate-400]="!state.isDarkMode()"
+        [class.hover:text-slate-900]="!state.isDarkMode()"
+        [class.hover:bg-slate-100]="!state.isDarkMode()"
       >
         <mat-icon class="text-xs scale-75">close</mat-icon>
       </button>
@@ -251,10 +401,20 @@
   <!-- Interactive Inline Dimension Editor Modal -->
   @if (editingDimension()) {
     <div class="absolute inset-0 z-40 bg-black/50 backdrop-blur-xs flex items-center justify-center p-4">
-      <div class="bg-neutral-900 border border-neutral-700 rounded-xl p-5 shadow-2xl max-w-xs w-full">
+      <div 
+        class="rounded-xl p-5 shadow-2xl max-w-xs w-full border"
+        [class.bg-neutral-900]="state.isDarkMode()"
+        [class.border-neutral-700]="state.isDarkMode()"
+        [class.bg-white]="!state.isDarkMode()"
+        [class.border-slate-200]="!state.isDarkMode()"
+      >
         <div class="flex items-center justify-between mb-2">
-          <h3 class="text-sm font-semibold text-neutral-100 flex items-center gap-1.5">
-            <mat-icon class="text-amber-400 text-sm">edit</mat-icon>
+          <h3 
+            class="text-sm font-semibold flex items-center gap-1.5"
+            [class.text-neutral-100]="state.isDarkMode()"
+            [class.text-slate-900]="!state.isDarkMode()"
+          >
+            <mat-icon [class.text-[#7995f5]]="state.isDarkMode()" [class.text-[#3850a2]]="!state.isDarkMode()" class="text-sm">edit</mat-icon>
             <span>Edit Dimension</span>
           </h3>
           <button (click)="cancelDimensionEdit()" class="text-neutral-400 hover:text-white cursor-pointer">
@@ -262,7 +422,7 @@
           </button>
         </div>
 
-        <p class="text-xs text-neutral-400 mb-3 font-medium">
+        <p class="text-xs mb-3 font-medium" [class.text-neutral-400]="state.isDarkMode()" [class.text-slate-600]="!state.isDarkMode()">
           {{ editingDimension()?.label }}
         </p>
 
@@ -276,14 +436,28 @@
               (input)="editingDimValue.set(+dimInput.value)"
               (keyup.enter)="saveDimensionEdit()"
               (keyup.escape)="cancelDimensionEdit()"
-              class="flex-1 px-3 py-2 bg-neutral-950 border border-neutral-700 rounded-lg text-neutral-100 font-mono text-sm focus:outline-hidden focus:border-amber-400"
+              class="flex-1 px-3 py-2 rounded-lg font-mono text-sm focus:outline-hidden focus:border-[#3850a2] border"
+              [class.bg-neutral-950]="state.isDarkMode()"
+              [class.border-neutral-700]="state.isDarkMode()"
+              [class.text-neutral-100]="state.isDarkMode()"
+              [class.bg-white]="!state.isDarkMode()"
+              [class.border-slate-300]="!state.isDarkMode()"
+              [class.text-slate-900]="!state.isDarkMode()"
             />
-            <span class="text-xs font-mono font-bold text-amber-400 bg-neutral-950 px-2 py-2 rounded-lg border border-neutral-800 min-w-10 text-center">
+            <span 
+              class="text-xs font-mono font-bold px-2 py-2 rounded-lg border min-w-10 text-center"
+              [class.text-[#7995f5]]="state.isDarkMode()"
+              [class.bg-neutral-950]="state.isDarkMode()"
+              [class.border-neutral-800]="state.isDarkMode()"
+              [class.text-[#3850a2]]="!state.isDarkMode()"
+              [class.bg-slate-100]="!state.isDarkMode()"
+              [class.border-slate-300]="!state.isDarkMode()"
+            >
               {{ state.unit() }}
             </span>
           </div>
 
-          <div class="text-[10px] text-neutral-500 font-mono px-1">
+          <div class="text-[10px] font-mono px-1" [class.text-neutral-500]="state.isDarkMode()" [class.text-slate-500]="!state.isDarkMode()">
             @if (state.unit() === 'in') {
               <span>Equivalent: <strong>{{ state.fromCurrentUnitToMm(editingDimValue()).toFixed(1) }} mm</strong></span>
             } @else {
@@ -295,13 +469,17 @@
         <div class="flex items-center justify-end gap-2">
           <button
             (click)="cancelDimensionEdit()"
-            class="px-3 py-1.5 text-xs text-neutral-400 hover:bg-neutral-800 rounded-lg cursor-pointer"
+            class="px-3 py-1.5 text-xs rounded-lg cursor-pointer"
+            [class.text-neutral-400]="state.isDarkMode()"
+            [class.hover:bg-neutral-800]="state.isDarkMode()"
+            [class.text-slate-600]="!state.isDarkMode()"
+            [class.hover:bg-slate-100]="!state.isDarkMode()"
           >
             Cancel
           </button>
           <button
             (click)="saveDimensionEdit()"
-            class="px-3 py-1.5 text-xs font-semibold text-neutral-950 bg-amber-400 hover:bg-amber-300 rounded-lg transition-colors cursor-pointer"
+            class="px-3 py-1.5 text-xs font-semibold text-white bg-[#3850a2] hover:bg-[#4865c2] rounded-lg transition-colors cursor-pointer"
           >
             Apply Dimension
           </button>
@@ -315,11 +493,14 @@
     #svgContainer
     (mousedown)="onMouseDown($event)"
     (wheel)="onWheel($event)"
-    [class.cad-grid-dark]="state.layerVisibility().GRID"
+    [class.cad-grid-dark]="state.layerVisibility().GRID && state.isDarkMode()"
+    [class.cad-grid-light]="state.layerVisibility().GRID && !state.isDarkMode()"
+    [class.bg-neutral-950]="!state.layerVisibility().GRID && state.isDarkMode()"
+    [class.bg-slate-50]="!state.layerVisibility().GRID && !state.isDarkMode()"
     [class.cursor-grab]="state.activeTool() === 'pan' && !isPanning()"
     [class.cursor-grabbing]="isPanning()"
     [class.cursor-crosshair]="state.activeTool() === 'measure'"
-    class="flex-1 w-full h-full overflow-hidden relative flex items-center justify-center"
+    class="flex-1 w-full h-full overflow-hidden relative flex items-center justify-center transition-colors duration-200"
   >
     @let geom = state.geometry();
 
@@ -347,7 +528,9 @@
           @for (panel of geom.panels; track panel.id) {
             <polygon
               [attr.points]="panel.polygon | json"
-              class="fill-neutral-900/40 hover:fill-amber-500/10 stroke-none transition-colors"
+              [class.fill-neutral-900/40]="state.isDarkMode()"
+              [class.fill-slate-200/50]="!state.isDarkMode()"
+              class="hover:fill-[#3850a2]/15 stroke-none transition-colors"
             />
           }
         }
@@ -356,27 +539,27 @@
         @if (state.layerVisibility().REGISTRATION) {
           <!-- Top Left Registration Mark -->
           <g class="cursor-pointer" title="Zünd Optical Registration Mark (Layer: reg)">
-            <circle [attr.cx]="geom.bounds.minX - 15" [attr.cy]="geom.bounds.minY - 15" r="3" fill="#000000" stroke="#f59e0b" stroke-width="0.5"/>
-            <line [attr.x1]="geom.bounds.minX - 20" [attr.y1]="geom.bounds.minY - 15" [attr.x2]="geom.bounds.minX - 10" [attr.y2]="geom.bounds.minY - 15" stroke="#f59e0b" stroke-width="0.3"/>
-            <line [attr.x1]="geom.bounds.minX - 15" [attr.y1]="geom.bounds.minY - 20" [attr.x2]="geom.bounds.minX - 15" [attr.y2]="geom.bounds.minY - 10" stroke="#f59e0b" stroke-width="0.3"/>
+            <circle [attr.cx]="geom.bounds.minX - 15" [attr.cy]="geom.bounds.minY - 15" r="3" fill="#000000" stroke="#3850a2" stroke-width="0.5"/>
+            <line [attr.x1]="geom.bounds.minX - 20" [attr.y1]="geom.bounds.minY - 15" [attr.x2]="geom.bounds.minX - 10" [attr.y2]="geom.bounds.minY - 15" stroke="#3850a2" stroke-width="0.3"/>
+            <line [attr.x1]="geom.bounds.minX - 15" [attr.y1]="geom.bounds.minY - 20" [attr.x2]="geom.bounds.minX - 15" [attr.y2]="geom.bounds.minY - 10" stroke="#3850a2" stroke-width="0.3"/>
           </g>
           <!-- Top Right Registration Mark -->
           <g class="cursor-pointer" title="Zünd Optical Registration Mark (Layer: reg)">
-            <circle [attr.cx]="geom.bounds.maxX + 15" [attr.cy]="geom.bounds.minY - 15" r="3" fill="#000000" stroke="#f59e0b" stroke-width="0.5"/>
-            <line [attr.x1]="geom.bounds.maxX + 10" [attr.y1]="geom.bounds.minY - 15" [attr.x2]="geom.bounds.maxX + 20" [attr.y2]="geom.bounds.minY - 15" stroke="#f59e0b" stroke-width="0.3"/>
-            <line [attr.x1]="geom.bounds.maxX + 15" [attr.y1]="geom.bounds.minY - 20" [attr.x2]="geom.bounds.maxX + 15" [attr.y2]="geom.bounds.minY - 10" stroke="#f59e0b" stroke-width="0.3"/>
+            <circle [attr.cx]="geom.bounds.maxX + 15" [attr.cy]="geom.bounds.minY - 15" r="3" fill="#000000" stroke="#3850a2" stroke-width="0.5"/>
+            <line [attr.x1]="geom.bounds.maxX + 10" [attr.y1]="geom.bounds.minY - 15" [attr.x2]="geom.bounds.maxX + 20" [attr.y2]="geom.bounds.minY - 15" stroke="#3850a2" stroke-width="0.3"/>
+            <line [attr.x1]="geom.bounds.maxX + 15" [attr.y1]="geom.bounds.minY - 20" [attr.x2]="geom.bounds.maxX + 15" [attr.y2]="geom.bounds.minY - 10" stroke="#3850a2" stroke-width="0.3"/>
           </g>
           <!-- Bottom Left Registration Mark -->
           <g class="cursor-pointer" title="Zünd Optical Registration Mark (Layer: reg)">
-            <circle [attr.cx]="geom.bounds.minX - 15" [attr.cy]="geom.bounds.maxY + 15" r="3" fill="#000000" stroke="#f59e0b" stroke-width="0.5"/>
-            <line [attr.x1]="geom.bounds.minX - 20" [attr.y1]="geom.bounds.maxY + 15" [attr.x2]="geom.bounds.minX - 10" [attr.y2]="geom.bounds.maxY + 15" stroke="#f59e0b" stroke-width="0.3"/>
-            <line [attr.x1]="geom.bounds.minX - 15" [attr.y1]="geom.bounds.maxY + 10" [attr.x2]="geom.bounds.minX - 15" [attr.y2]="geom.bounds.maxY + 20" stroke="#f59e0b" stroke-width="0.3"/>
+            <circle [attr.cx]="geom.bounds.minX - 15" [attr.cy]="geom.bounds.maxY + 15" r="3" fill="#000000" stroke="#3850a2" stroke-width="0.5"/>
+            <line [attr.x1]="geom.bounds.minX - 20" [attr.y1]="geom.bounds.maxY + 15" [attr.x2]="geom.bounds.minX - 10" [attr.y2]="geom.bounds.maxY + 15" stroke="#3850a2" stroke-width="0.3"/>
+            <line [attr.x1]="geom.bounds.minX - 15" [attr.y1]="geom.bounds.maxY + 10" [attr.x2]="geom.bounds.minX - 15" [attr.y2]="geom.bounds.maxY + 20" stroke="#3850a2" stroke-width="0.3"/>
           </g>
           <!-- Bottom Right Registration Mark -->
           <g class="cursor-pointer" title="Zünd Optical Registration Mark (Layer: reg)">
-            <circle [attr.cx]="geom.bounds.maxX + 15" [attr.cy]="geom.bounds.maxY + 15" r="3" fill="#000000" stroke="#f59e0b" stroke-width="0.5"/>
-            <line [attr.x1]="geom.bounds.maxX + 10" [attr.y1]="geom.bounds.maxY + 15" [attr.x2]="geom.bounds.maxX + 20" [attr.y2]="geom.bounds.maxY + 15" stroke="#f59e0b" stroke-width="0.3"/>
-            <line [attr.x1]="geom.bounds.maxX + 15" [attr.y1]="geom.bounds.maxY + 10" [attr.x2]="geom.bounds.maxX + 15" [attr.y2]="geom.bounds.maxY + 20" stroke="#f59e0b" stroke-width="0.3"/>
+            <circle [attr.cx]="geom.bounds.maxX + 15" [attr.cy]="geom.bounds.maxY + 15" r="3" fill="#000000" stroke="#3850a2" stroke-width="0.5"/>
+            <line [attr.x1]="geom.bounds.maxX + 10" [attr.y1]="geom.bounds.maxY + 15" [attr.x2]="geom.bounds.maxX + 20" [attr.y2]="geom.bounds.maxY + 15" stroke="#3850a2" stroke-width="0.3"/>
+            <line [attr.x1]="geom.bounds.maxX + 15" [attr.y1]="geom.bounds.maxY + 10" [attr.x2]="geom.bounds.maxX + 15" [attr.y2]="geom.bounds.maxY + 20" stroke="#3850a2" stroke-width="0.3"/>
           </g>
         }
 
@@ -404,16 +587,14 @@
                 [attr.y1]="line.p1.y"
                 [attr.x2]="line.p2.x"
                 [attr.y2]="line.p2.y"
-                class="line-crease hover:stroke-blue-400 hover:stroke-[2px] transition-all cursor-pointer"
+                class="line-crease hover:stroke-yellow-300 hover:stroke-[2px] transition-all cursor-pointer"
               />
             }
           }
           @for (arc of geom.arcs; track arc.id) {
             @if (arc.type === 'CREASE') {
-              <circle
-                [attr.cx]="arc.center.x"
-                [attr.cy]="arc.center.y"
-                [attr.r]="arc.radius"
+              <path
+                [attr.d]="getArcPath(arc)"
                 class="line-crease fill-none"
               />
             }
@@ -450,11 +631,9 @@
           }
           @for (arc of geom.arcs; track arc.id) {
             @if (arc.type === 'CUT') {
-              <circle
-                [attr.cx]="arc.center.x"
-                [attr.cy]="arc.center.y"
-                [attr.r]="arc.radius"
-                class="line-cut fill-none"
+              <path
+                [attr.d]="getArcPath(arc)"
+                class="line-cut fill-none hover:stroke-rose-400 hover:stroke-[2.5px] transition-all cursor-pointer"
               />
             }
           }
@@ -464,63 +643,149 @@
         @if (state.layerVisibility().DIMENSIONS) {
           @for (dim of geom.dimensions; track dim.id) {
             <g class="cursor-pointer group" (click)="startEditDimension(dim, $event)">
-              <!-- Extension Lines -->
-              <line
-                [attr.x1]="dim.p1.x"
-                [attr.y1]="dim.p1.y"
-                [attr.x2]="dim.p1.x"
-                [attr.y2]="dim.p1.y + dim.offset"
-                stroke="#52525b"
-                stroke-width="0.75"
-                stroke-dasharray="2, 2"
-              />
-              <line
-                [attr.x1]="dim.p2.x"
-                [attr.y1]="dim.p2.y"
-                [attr.x2]="dim.p2.x"
-                [attr.y2]="dim.p2.y + dim.offset"
-                stroke="#52525b"
-                stroke-width="0.75"
-                stroke-dasharray="2, 2"
-              />
-              <!-- Main Dimension Line -->
-              <line
-                [attr.x1]="dim.p1.x"
-                [attr.y1]="dim.p1.y + dim.offset"
-                [attr.x2]="dim.p2.x"
-                [attr.y2]="dim.p2.y + dim.offset"
-                stroke="#a1a1aa"
-                stroke-width="1"
-                class="group-hover:stroke-amber-400 transition-colors"
-              />
-              <!-- End Arrow Ticks -->
-              <circle [attr.cx]="dim.p1.x" [attr.cy]="dim.p1.y + dim.offset" r="2" fill="#a1a1aa" class="group-hover:fill-amber-400" />
-              <circle [attr.cx]="dim.p2.x" [attr.cy]="dim.p2.y + dim.offset" r="2" fill="#a1a1aa" class="group-hover:fill-amber-400" />
-              
-              <!-- Value Label Badge -->
-              <rect
-                [attr.x]="((dim.p1.x + dim.p2.x) / 2) - 40"
-                [attr.y]="((dim.p1.y + dim.p2.y) / 2) + dim.offset - 11"
-                width="80"
-                height="18"
-                rx="4"
-                fill="#18181b"
-                stroke="#3f3f46"
-                stroke-width="0.8"
-                class="group-hover:stroke-amber-400 group-hover:fill-neutral-900 transition-colors"
-              />
-              <text
-                [attr.x]="(dim.p1.x + dim.p2.x) / 2"
-                [attr.y]="((dim.p1.y + dim.p2.y) / 2) + dim.offset + 2"
-                text-anchor="middle"
-                font-family="Fira Code"
-                font-size="9"
-                font-weight="600"
-                fill="#e4e4e7"
-                class="group-hover:fill-amber-300 select-none"
-              >
-                {{ state.formatUnit(dim.value) }}
-              </text>
+              @if (dim.type === 'vertical') {
+                <!-- Vertical Dimension -->
+                <!-- Extension Lines -->
+                <line
+                  [attr.x1]="dim.p1.x"
+                  [attr.y1]="dim.p1.y"
+                  [attr.x2]="dim.p1.x + dim.offset"
+                  [attr.y2]="dim.p1.y"
+                  [attr.stroke]="state.isDarkMode() ? '#52525b' : '#94a3b8'"
+                  stroke-width="0.75"
+                  stroke-dasharray="2, 2"
+                />
+                <line
+                  [attr.x1]="dim.p2.x"
+                  [attr.y1]="dim.p2.y"
+                  [attr.x2]="dim.p2.x + dim.offset"
+                  [attr.y2]="dim.p2.y"
+                  [attr.stroke]="state.isDarkMode() ? '#52525b' : '#94a3b8'"
+                  stroke-width="0.75"
+                  stroke-dasharray="2, 2"
+                />
+                <!-- Main Dimension Line -->
+                <line
+                  [attr.x1]="dim.p1.x + dim.offset"
+                  [attr.y1]="dim.p1.y"
+                  [attr.x2]="dim.p2.x + dim.offset"
+                  [attr.y2]="dim.p2.y"
+                  [attr.stroke]="state.isDarkMode() ? '#a1a1aa' : '#64748b'"
+                  stroke-width="1"
+                  class="group-hover:stroke-[#3850a2] transition-colors"
+                />
+                <!-- End Arrow Ticks -->
+                <circle 
+                  [attr.cx]="dim.p1.x + dim.offset" 
+                  [attr.cy]="dim.p1.y" 
+                  r="2" 
+                  [attr.fill]="state.isDarkMode() ? '#a1a1aa' : '#64748b'" 
+                  class="group-hover:fill-[#3850a2]" 
+                />
+                <circle 
+                  [attr.cx]="dim.p2.x + dim.offset" 
+                  [attr.cy]="dim.p2.y" 
+                  r="2" 
+                  [attr.fill]="state.isDarkMode() ? '#a1a1aa' : '#64748b'" 
+                  class="group-hover:fill-[#3850a2]" 
+                />
+                
+                <!-- Value Label Badge -->
+                <rect
+                  [attr.x]="dim.p1.x + dim.offset - 40"
+                  [attr.y]="((dim.p1.y + dim.p2.y) / 2) - 9"
+                  width="80"
+                  height="18"
+                  rx="4"
+                  [attr.fill]="state.isDarkMode() ? '#18181b' : '#ffffff'"
+                  [attr.stroke]="state.isDarkMode() ? '#3f3f46' : '#cbd5e1'"
+                  stroke-width="0.8"
+                  class="group-hover:stroke-[#3850a2] transition-colors"
+                />
+                <text
+                  [attr.x]="dim.p1.x + dim.offset"
+                  [attr.y]="((dim.p1.y + dim.p2.y) / 2) + 3"
+                  text-anchor="middle"
+                  font-family="Fira Code"
+                  font-size="9"
+                  font-weight="600"
+                  [attr.fill]="state.isDarkMode() ? '#e4e4e7' : '#0f172a'"
+                  class="group-hover:fill-[#3850a2] select-none"
+                >
+                  {{ state.formatUnit(dim.value) }}
+                </text>
+              } @else {
+                <!-- Horizontal Dimension -->
+                <!-- Extension Lines -->
+                <line
+                  [attr.x1]="dim.p1.x"
+                  [attr.y1]="dim.p1.y"
+                  [attr.x2]="dim.p1.x"
+                  [attr.y2]="dim.p1.y + dim.offset"
+                  [attr.stroke]="state.isDarkMode() ? '#52525b' : '#94a3b8'"
+                  stroke-width="0.75"
+                  stroke-dasharray="2, 2"
+                />
+                <line
+                  [attr.x1]="dim.p2.x"
+                  [attr.y1]="dim.p2.y"
+                  [attr.x2]="dim.p2.x"
+                  [attr.y2]="dim.p2.y + dim.offset"
+                  [attr.stroke]="state.isDarkMode() ? '#52525b' : '#94a3b8'"
+                  stroke-width="0.75"
+                  stroke-dasharray="2, 2"
+                />
+                <!-- Main Dimension Line -->
+                <line
+                  [attr.x1]="dim.p1.x"
+                  [attr.y1]="dim.p1.y + dim.offset"
+                  [attr.x2]="dim.p2.x"
+                  [attr.y2]="dim.p2.y + dim.offset"
+                  [attr.stroke]="state.isDarkMode() ? '#a1a1aa' : '#64748b'"
+                  stroke-width="1"
+                  class="group-hover:stroke-[#3850a2] transition-colors"
+                />
+                <!-- End Arrow Ticks -->
+                <circle 
+                  [attr.cx]="dim.p1.x" 
+                  [attr.cy]="dim.p1.y + dim.offset" 
+                  r="2" 
+                  [attr.fill]="state.isDarkMode() ? '#a1a1aa' : '#64748b'" 
+                  class="group-hover:fill-[#3850a2]" 
+                />
+                <circle 
+                  [attr.cx]="dim.p2.x" 
+                  [attr.cy]="dim.p2.y + dim.offset" 
+                  r="2" 
+                  [attr.fill]="state.isDarkMode() ? '#a1a1aa' : '#64748b'" 
+                  class="group-hover:fill-[#3850a2]" 
+                />
+                
+                <!-- Value Label Badge -->
+                <rect
+                  [attr.x]="((dim.p1.x + dim.p2.x) / 2) - 40"
+                  [attr.y]="((dim.p1.y + dim.p2.y) / 2) + dim.offset - 9"
+                  width="80"
+                  height="18"
+                  rx="4"
+                  [attr.fill]="state.isDarkMode() ? '#18181b' : '#ffffff'"
+                  [attr.stroke]="state.isDarkMode() ? '#3f3f46' : '#cbd5e1'"
+                  stroke-width="0.8"
+                  class="group-hover:stroke-[#3850a2] transition-colors"
+                />
+                <text
+                  [attr.x]="(dim.p1.x + dim.p2.x) / 2"
+                  [attr.y]="((dim.p1.y + dim.p2.y) / 2) + dim.offset + 3"
+                  text-anchor="middle"
+                  font-family="Fira Code"
+                  font-size="9"
+                  font-weight="600"
+                  [attr.fill]="state.isDarkMode() ? '#e4e4e7' : '#0f172a'"
+                  class="group-hover:fill-[#3850a2] select-none"
+                >
+                  {{ state.formatUnit(dim.value) }}
+                </text>
+              }
             </g>
           }
         }
@@ -532,39 +797,47 @@
             [attr.y1]="measureStart()!.y"
             [attr.x2]="measureCurrent()!.x"
             [attr.y2]="measureCurrent()!.y"
-            stroke="#fbbf24"
+            stroke="#3850a2"
             stroke-width="1.5"
             stroke-dasharray="3, 3"
           />
-          <circle [attr.cx]="measureStart()!.x" [attr.cy]="measureStart()!.y" r="4" fill="#fbbf24" />
-          <circle [attr.cx]="measureCurrent()!.x" [attr.cy]="measureCurrent()!.y" r="4" fill="#fbbf24" />
+          <circle [attr.cx]="measureStart()!.x" [attr.cy]="measureStart()!.y" r="4" fill="#3850a2" />
+          <circle [attr.cx]="measureCurrent()!.x" [attr.cy]="measureCurrent()!.y" r="4" fill="#3850a2" />
         }
       </svg>
     </div>
   </div>
 
   <!-- CAD Bottom Coordinates & Scale HUD -->
-  <div class="h-7 w-full bg-neutral-900/95 border-t border-neutral-800 px-4 flex items-center justify-between text-[11px] font-mono text-neutral-400 z-20">
+  <div 
+    class="h-7 w-full border-t px-4 flex items-center justify-between text-[11px] font-mono z-20 transition-colors"
+    [class.bg-neutral-900/95]="state.isDarkMode()"
+    [class.border-neutral-800]="state.isDarkMode()"
+    [class.text-neutral-400]="state.isDarkMode()"
+    [class.bg-white/95]="!state.isDarkMode()"
+    [class.border-slate-200]="!state.isDarkMode()"
+    [class.text-slate-600]="!state.isDarkMode()"
+  >
     <div class="flex items-center gap-4">
       <span class="flex items-center gap-1.5">
-        <span class="text-neutral-500">X:</span>
-        <span class="text-neutral-200">{{ state.formatUnit(cursorCoords().x) }}</span>
+        <span [class.text-neutral-500]="state.isDarkMode()" [class.text-slate-400]="!state.isDarkMode()">X:</span>
+        <span [class.text-neutral-200]="state.isDarkMode()" [class.text-slate-900]="!state.isDarkMode()">{{ state.formatUnit(cursorCoords().x) }}</span>
       </span>
       <span class="flex items-center gap-1.5">
-        <span class="text-neutral-500">Y:</span>
-        <span class="text-neutral-200">{{ state.formatUnit(cursorCoords().y) }}</span>
+        <span [class.text-neutral-500]="state.isDarkMode()" [class.text-slate-400]="!state.isDarkMode()">Y:</span>
+        <span [class.text-neutral-200]="state.isDarkMode()" [class.text-slate-900]="!state.isDarkMode()">{{ state.formatUnit(cursorCoords().y) }}</span>
       </span>
-      <span class="text-neutral-700">|</span>
-      <span class="text-neutral-400">
-        Dieline Size: <strong class="text-neutral-200">{{ state.formatUnit(geom.bounds.width) }} × {{ state.formatUnit(geom.bounds.height) }}</strong>
+      <span [class.text-neutral-700]="state.isDarkMode()" [class.text-slate-300]="!state.isDarkMode()">|</span>
+      <span>
+        Dieline Size: <strong [class.text-neutral-200]="state.isDarkMode()" [class.text-slate-900]="!state.isDarkMode()">{{ state.formatUnit(geom.bounds.width) }} × {{ state.formatUnit(geom.bounds.height) }}</strong>
       </span>
     </div>
 
     <div class="flex items-center gap-4">
-      <span class="text-rose-400">Cut: <strong>{{ (geom.totalCutLength / 1000).toFixed(2) }} m</strong></span>
-      <span class="text-blue-400">Crease: <strong>{{ (geom.totalCreaseLength / 1000).toFixed(2) }} m</strong></span>
-      <span class="text-neutral-700">|</span>
-      <span class="text-neutral-400">Board: <strong class="text-amber-400">{{ state.activeMaterial().name }} ({{ state.activeMaterial().thickness }}mm)</strong></span>
+      <span class="text-rose-500 font-semibold">Cut: <strong>{{ (geom.totalCutLength / 1000).toFixed(2) }} m</strong></span>
+      <span class="text-yellow-500 font-semibold">Crease: <strong>{{ (geom.totalCreaseLength / 1000).toFixed(2) }} m</strong></span>
+      <span [class.text-neutral-700]="state.isDarkMode()" [class.text-slate-300]="!state.isDarkMode()">|</span>
+      <span>Board: <strong [class.text-[#7995f5]]="state.isDarkMode()" [class.text-[#3850a2]]="!state.isDarkMode()">{{ state.activeMaterial().name }} ({{ state.activeMaterial().thickness }}mm)</strong></span>
     </div>
   </div>
 </div>

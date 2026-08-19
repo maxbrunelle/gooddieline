@@ -1,13 +1,29 @@
-<div class="w-full h-full bg-neutral-950 p-6 overflow-y-auto">
+<div 
+  class="w-full h-full p-6 overflow-y-auto transition-colors duration-200"
+  [class.bg-neutral-950]="state.isDarkMode()"
+  [class.bg-slate-50]="!state.isDarkMode()"
+>
   <div class="max-w-5xl mx-auto space-y-6">
     <!-- Header with Quick Action Download -->
-    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-neutral-800">
+    <div 
+      class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b"
+      [class.border-neutral-800]="state.isDarkMode()"
+      [class.border-slate-200]="!state.isDarkMode()"
+    >
       <div>
-        <h1 class="text-xl font-bold text-neutral-100 flex items-center gap-2">
-          <mat-icon class="text-amber-400">assessment</mat-icon>
+        <h1 
+          class="text-xl font-bold flex items-center gap-2"
+          [class.text-neutral-100]="state.isDarkMode()"
+          [class.text-slate-900]="!state.isDarkMode()"
+        >
+          <mat-icon [class.text-[#7995f5]]="state.isDarkMode()" [class.text-[#3850a2]]="!state.isDarkMode()">assessment</mat-icon>
           <span>Production Job Ticket & Cost Analytics</span>
         </h1>
-        <p class="text-xs text-neutral-400 mt-0.5">
+        <p 
+          class="text-xs mt-0.5"
+          [class.text-neutral-400]="state.isDarkMode()"
+          [class.text-slate-500]="!state.isDarkMode()"
+        >
           Comprehensive production routing for Zünd Cut Center (ZCC), machine runtime estimation, and pre-flight validation.
         </p>
       </div>
@@ -15,7 +31,7 @@
       <div class="flex items-center gap-2">
         <button
           (click)="state.downloadPDF()"
-          class="flex items-center gap-1.5 px-4 py-2 bg-amber-400 hover:bg-amber-300 text-neutral-950 font-bold text-xs rounded-xl shadow-lg transition-colors"
+          class="flex items-center gap-1.5 px-4 py-2 bg-[#3850a2] hover:bg-[#4865c2] text-white font-bold text-xs rounded-xl shadow-lg transition-colors cursor-pointer"
         >
           <mat-icon class="text-sm">picture_as_pdf</mat-icon>
           <span>Download Job Ticket PDF</span>
@@ -33,122 +49,207 @@
     <!-- Pre-Flight Quality Status Bar -->
     <div 
       [class.border-emerald-500/40]="report.isValidForProduction"
-      [class.bg-emerald-950/20]="report.isValidForProduction"
-      [class.border-amber-500/40]="!report.isValidForProduction"
-      [class.bg-amber-950/20]="!report.isValidForProduction"
+      [class.bg-emerald-950/20]="report.isValidForProduction && state.isDarkMode()"
+      [class.bg-emerald-50]="report.isValidForProduction && !state.isDarkMode()"
+      [class.border-[#3850a2]/60]="!report.isValidForProduction"
+      [class.bg-[#3850a2]/15]="!report.isValidForProduction && state.isDarkMode()"
+      [class.bg-[#3850a2]/10]="!report.isValidForProduction && !state.isDarkMode()"
       class="p-4 border rounded-2xl flex items-center justify-between"
     >
       <div class="flex items-center gap-3">
         <div 
           [class.bg-emerald-500/20]="report.isValidForProduction"
-          [class.text-emerald-400]="report.isValidForProduction"
-          [class.bg-amber-500/20]="!report.isValidForProduction"
-          [class.text-amber-400]="!report.isValidForProduction"
+          [class.text-emerald-500]="report.isValidForProduction"
+          [class.bg-[#3850a2]/30]="!report.isValidForProduction"
+          [class.text-[#7995f5]]="!report.isValidForProduction && state.isDarkMode()"
+          [class.text-[#3850a2]]="!report.isValidForProduction && !state.isDarkMode()"
           class="p-2 rounded-xl"
         >
-          <mat-icon>{{ report.isValidForProduction ? 'verified' : 'warning' }}</mat-icon>
+          <mat-icon>{{ report.isValidForProduction ? 'verified' : 'info' }}</mat-icon>
         </div>
         <div>
-          <h2 class="text-sm font-bold text-neutral-100">
-            {{ report.isValidForProduction ? 'Pre-Flight Validation PASSED — Ready for Production' : 'Pre-Flight Warnings Detected' }}
+          <h2 
+            class="text-sm font-bold"
+            [class.text-neutral-100]="state.isDarkMode()"
+            [class.text-slate-900]="!state.isDarkMode()"
+          >
+            {{ report.isValidForProduction ? 'Pre-Flight Validation PASSED — Ready for Production' : 'Pre-Flight Advisories Detected' }}
           </h2>
-          <p class="text-xs text-neutral-400">
+          <p 
+            class="text-xs"
+            [class.text-neutral-400]="state.isDarkMode()"
+            [class.text-slate-600]="!state.isDarkMode()"
+          >
             {{ report.passedChecksCount }} / {{ report.totalChecksCount }} automated geometry, thickness, and nesting audits passed.
           </p>
         </div>
       </div>
 
       <div class="flex items-center gap-2 text-xs font-mono">
-        <span class="text-emerald-400 font-bold">{{ report.passedChecksCount }} Passed</span>
-        <span class="text-neutral-600">•</span>
-        <span class="text-amber-400 font-bold">{{ report.errors.length }} Alerts</span>
+        <span class="text-emerald-500 font-bold">{{ report.passedChecksCount }} Passed</span>
+        <span [class.text-neutral-600]="state.isDarkMode()" [class.text-slate-300]="!state.isDarkMode()">•</span>
+        <span 
+          class="font-bold"
+          [class.text-[#7995f5]]="state.isDarkMode()"
+          [class.text-[#3850a2]]="!state.isDarkMode()"
+        >{{ report.errors.length }} Alerts</span>
       </div>
     </div>
 
     <!-- 4-Column KPI Production Cards -->
     <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
-      <div class="bg-neutral-900 border border-neutral-800 p-4 rounded-2xl">
-        <div class="text-xs text-neutral-400 mb-1">Order Quantity</div>
-        <div class="text-2xl font-bold font-mono text-neutral-100">{{ proj.orderQuantity }} <span class="text-xs text-neutral-500">units</span></div>
-        <div class="text-[11px] text-neutral-500 mt-1 font-mono">Yield: {{ sol?.piecesPerSheet || 1 }} / sheet</div>
+      <div 
+        class="border p-4 rounded-2xl shadow-xs"
+        [class.bg-neutral-900]="state.isDarkMode()"
+        [class.border-neutral-800]="state.isDarkMode()"
+        [class.bg-white]="!state.isDarkMode()"
+        [class.border-slate-200]="!state.isDarkMode()"
+      >
+        <div class="text-xs mb-1" [class.text-neutral-400]="state.isDarkMode()" [class.text-slate-500]="!state.isDarkMode()">Order Quantity</div>
+        <div class="text-2xl font-bold font-mono" [class.text-neutral-100]="state.isDarkMode()" [class.text-slate-900]="!state.isDarkMode()">{{ proj.orderQuantity }} <span class="text-xs" [class.text-neutral-500]="state.isDarkMode()" [class.text-slate-400]="!state.isDarkMode()">units</span></div>
+        <div class="text-[11px] mt-1 font-mono" [class.text-neutral-500]="state.isDarkMode()" [class.text-slate-400]="!state.isDarkMode()">Yield: {{ sol?.piecesPerSheet || 1 }} / sheet</div>
       </div>
 
-      <div class="bg-neutral-900 border border-neutral-800 p-4 rounded-2xl">
-        <div class="text-xs text-neutral-400 mb-1">Raw Sheets Required</div>
-        <div class="text-2xl font-bold font-mono text-amber-400">{{ sol?.sheetsRequired || 1 }} <span class="text-xs text-neutral-500">sheets</span></div>
-        <div class="text-[11px] text-emerald-400 mt-1 font-mono">{{ sol?.overallUtilization || 78 }}% Utilization</div>
+      <div 
+        class="border p-4 rounded-2xl shadow-xs"
+        [class.bg-neutral-900]="state.isDarkMode()"
+        [class.border-neutral-800]="state.isDarkMode()"
+        [class.bg-white]="!state.isDarkMode()"
+        [class.border-slate-200]="!state.isDarkMode()"
+      >
+        <div class="text-xs mb-1" [class.text-neutral-400]="state.isDarkMode()" [class.text-slate-500]="!state.isDarkMode()">Raw Sheets Required</div>
+        <div class="text-2xl font-bold font-mono" [class.text-[#7995f5]]="state.isDarkMode()" [class.text-[#3850a2]]="!state.isDarkMode()">{{ sol?.sheetsRequired || 1 }} <span class="text-xs" [class.text-neutral-500]="state.isDarkMode()" [class.text-slate-400]="!state.isDarkMode()">sheets</span></div>
+        <div class="text-[11px] text-emerald-500 mt-1 font-mono font-medium">{{ sol?.overallUtilization || 78 }}% Utilization</div>
       </div>
 
-      <div class="bg-neutral-900 border border-neutral-800 p-4 rounded-2xl">
-        <div class="text-xs text-neutral-400 mb-1">Total Estimated Run Time</div>
-        <div class="text-2xl font-bold font-mono text-neutral-100">{{ timeAndCost.totalJobMinutes }} <span class="text-xs text-neutral-500">min</span></div>
-        <div class="text-[11px] text-neutral-500 mt-1 font-mono">{{ timeAndCost.totalMinutesPerSheet }} min / sheet</div>
+      <div 
+        class="border p-4 rounded-2xl shadow-xs"
+        [class.bg-neutral-900]="state.isDarkMode()"
+        [class.border-neutral-800]="state.isDarkMode()"
+        [class.bg-white]="!state.isDarkMode()"
+        [class.border-slate-200]="!state.isDarkMode()"
+      >
+        <div class="text-xs mb-1" [class.text-neutral-400]="state.isDarkMode()" [class.text-slate-500]="!state.isDarkMode()">Total Estimated Run Time</div>
+        <div class="text-2xl font-bold font-mono" [class.text-neutral-100]="state.isDarkMode()" [class.text-slate-900]="!state.isDarkMode()">{{ timeAndCost.totalJobMinutes }} <span class="text-xs" [class.text-neutral-500]="state.isDarkMode()" [class.text-slate-400]="!state.isDarkMode()">min</span></div>
+        <div class="text-[11px] mt-1 font-mono" [class.text-neutral-500]="state.isDarkMode()" [class.text-slate-400]="!state.isDarkMode()">{{ timeAndCost.totalMinutesPerSheet }} min / sheet</div>
       </div>
 
-      <div class="bg-neutral-900 border border-neutral-800 p-4 rounded-2xl">
-        <div class="text-xs text-neutral-400 mb-1">Estimated Unit Cost</div>
-        <div class="text-2xl font-bold font-mono text-emerald-400">${{ timeAndCost.costPerPiece }} <span class="text-xs text-neutral-500">/ box</span></div>
-        <div class="text-[11px] text-neutral-500 mt-1 font-mono">Job Total: ${{ timeAndCost.totalJobCost }}</div>
+      <div 
+        class="border p-4 rounded-2xl shadow-xs"
+        [class.bg-neutral-900]="state.isDarkMode()"
+        [class.border-neutral-800]="state.isDarkMode()"
+        [class.bg-white]="!state.isDarkMode()"
+        [class.border-slate-200]="!state.isDarkMode()"
+      >
+        <div class="text-xs mb-1" [class.text-neutral-400]="state.isDarkMode()" [class.text-slate-500]="!state.isDarkMode()">Estimated Unit Cost</div>
+        <div class="text-2xl font-bold font-mono text-emerald-500">${{ timeAndCost.costPerPiece }} <span class="text-xs" [class.text-neutral-500]="state.isDarkMode()" [class.text-slate-400]="!state.isDarkMode()">/ box</span></div>
+        <div class="text-[11px] mt-1 font-mono" [class.text-neutral-500]="state.isDarkMode()" [class.text-slate-400]="!state.isDarkMode()">Job Total: ${{ timeAndCost.totalJobCost }}</div>
       </div>
     </div>
 
     <!-- Two Column Deep Dive: Zünd Tooling & Detailed Cost -->
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
       <!-- Zünd Tooling & Routing Table -->
-      <div class="bg-neutral-900 border border-neutral-800 p-5 rounded-2xl space-y-4">
-        <h2 class="text-sm font-bold text-neutral-100 flex items-center gap-2">
-          <mat-icon class="text-rose-400">precision_manufacturing</mat-icon>
+      <div 
+        class="border p-5 rounded-2xl space-y-4 shadow-xs"
+        [class.bg-neutral-900]="state.isDarkMode()"
+        [class.border-neutral-800]="state.isDarkMode()"
+        [class.bg-white]="!state.isDarkMode()"
+        [class.border-slate-200]="!state.isDarkMode()"
+      >
+        <h2 
+          class="text-sm font-bold flex items-center gap-2"
+          [class.text-neutral-100]="state.isDarkMode()"
+          [class.text-slate-900]="!state.isDarkMode()"
+        >
+          <mat-icon class="text-rose-500">precision_manufacturing</mat-icon>
           <span>Zünd Cut Center Tooling Setup</span>
         </h2>
 
         <div class="space-y-2.5 text-xs font-mono">
-          <div class="p-3 bg-neutral-950 rounded-xl border border-neutral-800 flex items-center justify-between">
+          <div 
+            class="p-3 rounded-xl border flex items-center justify-between"
+            [class.bg-neutral-950]="state.isDarkMode()"
+            [class.border-neutral-800]="state.isDarkMode()"
+            [class.bg-slate-50]="!state.isDarkMode()"
+            [class.border-slate-200]="!state.isDarkMode()"
+          >
             <div>
-              <span class="text-rose-400 font-bold">PASS 1: THRU-CUT (Layer: CUT)</span>
-              <div class="text-neutral-400 text-[11px] mt-0.5">{{ mat.recommendedKnife }} • {{ mat.zundModule }} Module</div>
+              <span class="text-rose-500 font-bold">PASS 1: THRU-CUT (Layer: CUT)</span>
+              <div class="text-[11px] mt-0.5" [class.text-neutral-400]="state.isDarkMode()" [class.text-slate-500]="!state.isDarkMode()">{{ mat.recommendedKnife }} • {{ mat.zundModule }} Module</div>
             </div>
-            <span class="text-neutral-200">{{ (geom.totalCutLength / 1000).toFixed(2) }} m/unit</span>
+            <span [class.text-neutral-200]="state.isDarkMode()" [class.text-slate-800]="!state.isDarkMode()" class="font-bold">{{ (geom.totalCutLength / 1000).toFixed(2) }} m/unit</span>
           </div>
 
-          <div class="p-3 bg-neutral-950 rounded-xl border border-neutral-800 flex items-center justify-between">
+          <div 
+            class="p-3 rounded-xl border flex items-center justify-between"
+            [class.bg-neutral-950]="state.isDarkMode()"
+            [class.border-neutral-800]="state.isDarkMode()"
+            [class.bg-slate-50]="!state.isDarkMode()"
+            [class.border-slate-200]="!state.isDarkMode()"
+          >
             <div>
-              <span class="text-blue-400 font-bold">PASS 2: CREASE WHEEL (Layer: CREASE)</span>
-              <div class="text-neutral-400 text-[11px] mt-0.5">{{ mat.recommendedCreaseWheel }}</div>
+              <span class="text-amber-500 font-bold">PASS 2: CREASE WHEEL (Layer: CREASE)</span>
+              <div class="text-[11px] mt-0.5" [class.text-neutral-400]="state.isDarkMode()" [class.text-slate-500]="!state.isDarkMode()">{{ mat.recommendedCreaseWheel }}</div>
             </div>
-            <span class="text-neutral-200">{{ (geom.totalCreaseLength / 1000).toFixed(2) }} m/unit</span>
+            <span [class.text-neutral-200]="state.isDarkMode()" [class.text-slate-800]="!state.isDarkMode()" class="font-bold">{{ (geom.totalCreaseLength / 1000).toFixed(2) }} m/unit</span>
           </div>
 
-          <div class="p-3 bg-neutral-950 rounded-xl border border-neutral-800 flex items-center justify-between">
+          <div 
+            class="p-3 rounded-xl border flex items-center justify-between"
+            [class.bg-neutral-950]="state.isDarkMode()"
+            [class.border-neutral-800]="state.isDarkMode()"
+            [class.bg-slate-50]="!state.isDarkMode()"
+            [class.border-slate-200]="!state.isDarkMode()"
+          >
             <div>
-              <span class="text-amber-400 font-bold">OPTICAL REGISTRATION (ICC CAMERA)</span>
-              <div class="text-neutral-400 text-[11px] mt-0.5">4x 6mm Crosshair Targets per Sheet</div>
+              <span class="font-bold" [class.text-[#7995f5]]="state.isDarkMode()" [class.text-[#3850a2]]="!state.isDarkMode()">OPTICAL REGISTRATION (ICC CAMERA)</span>
+              <div class="text-[11px] mt-0.5" [class.text-neutral-400]="state.isDarkMode()" [class.text-slate-500]="!state.isDarkMode()">4x 6mm Crosshair Targets per Sheet</div>
             </div>
-            <span class="text-neutral-200">Enabled</span>
+            <span [class.text-neutral-200]="state.isDarkMode()" [class.text-slate-800]="!state.isDarkMode()" class="font-bold">Enabled</span>
           </div>
         </div>
       </div>
 
       <!-- Financial Cost Breakdown -->
-      <div class="bg-neutral-900 border border-neutral-800 p-5 rounded-2xl space-y-4">
-        <h2 class="text-sm font-bold text-neutral-100 flex items-center gap-2">
-          <mat-icon class="text-emerald-400">attach_money</mat-icon>
+      <div 
+        class="border p-5 rounded-2xl space-y-4 shadow-xs"
+        [class.bg-neutral-900]="state.isDarkMode()"
+        [class.border-neutral-800]="state.isDarkMode()"
+        [class.bg-white]="!state.isDarkMode()"
+        [class.border-slate-200]="!state.isDarkMode()"
+      >
+        <h2 
+          class="text-sm font-bold flex items-center gap-2"
+          [class.text-neutral-100]="state.isDarkMode()"
+          [class.text-slate-900]="!state.isDarkMode()"
+        >
+          <mat-icon class="text-emerald-500">attach_money</mat-icon>
           <span>Financial Cost Breakdown</span>
         </h2>
 
         <div class="space-y-3 text-xs">
-          <div class="flex justify-between py-2 border-b border-neutral-800 font-mono">
-            <span class="text-neutral-400">Raw Board Material ({{ sol?.sheetsRequired }} Sheets):</span>
-            <span class="text-neutral-100 font-bold">${{ timeAndCost.totalMaterialCost }}</span>
+          <div 
+            class="flex justify-between py-2 border-b font-mono"
+            [class.border-neutral-800]="state.isDarkMode()"
+            [class.border-slate-200]="!state.isDarkMode()"
+          >
+            <span [class.text-neutral-400]="state.isDarkMode()" [class.text-slate-500]="!state.isDarkMode()">Raw Board Material ({{ sol?.sheetsRequired }} Sheets):</span>
+            <span [class.text-neutral-100]="state.isDarkMode()" [class.text-slate-900]="!state.isDarkMode()" class="font-bold">${{ timeAndCost.totalMaterialCost }}</span>
           </div>
 
-          <div class="flex justify-between py-2 border-b border-neutral-800 font-mono">
-            <span class="text-neutral-400">Zünd Machine Runtime Cost:</span>
-            <span class="text-neutral-100 font-bold">${{ timeAndCost.machineCost }}</span>
+          <div 
+            class="flex justify-between py-2 border-b font-mono"
+            [class.border-neutral-800]="state.isDarkMode()"
+            [class.border-slate-200]="!state.isDarkMode()"
+          >
+            <span [class.text-neutral-400]="state.isDarkMode()" [class.text-slate-500]="!state.isDarkMode()">Zünd Machine Runtime Cost:</span>
+            <span [class.text-neutral-100]="state.isDarkMode()" [class.text-slate-900]="!state.isDarkMode()" class="font-bold">${{ timeAndCost.machineCost }}</span>
           </div>
 
           <div class="flex justify-between py-2 font-mono text-sm">
-            <span class="text-neutral-200 font-bold">Total Job Cost:</span>
-            <span class="text-emerald-400 font-bold">${{ timeAndCost.totalJobCost }}</span>
+            <span [class.text-neutral-200]="state.isDarkMode()" [class.text-slate-800]="!state.isDarkMode()" class="font-bold">Total Job Cost:</span>
+            <span class="text-emerald-500 font-bold">${{ timeAndCost.totalJobCost }}</span>
           </div>
         </div>
       </div>

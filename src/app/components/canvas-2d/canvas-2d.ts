@@ -9,7 +9,7 @@ import {
   viewChild 
 } from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
-import { DimensionAnnotation } from '../../core/models/dieline.models';
+import { ArcSegment, DimensionAnnotation } from '../../core/models/dieline.models';
 import { DielineStateService } from '../../core/services/dieline-state.service';
 
 @Component({
@@ -169,5 +169,19 @@ export class Canvas2D {
     const py = this.state.panOffset().y;
 
     return `translate(${px}px, ${py}px) scale(${z})`;
+  }
+
+  getArcPath(arc: ArcSegment): string {
+    const x1 = arc.center.x + arc.radius * Math.cos(arc.startAngle);
+    const y1 = arc.center.y + arc.radius * Math.sin(arc.startAngle);
+    const x2 = arc.center.x + arc.radius * Math.cos(arc.endAngle);
+    const y2 = arc.center.y + arc.radius * Math.sin(arc.endAngle);
+
+    let diff = arc.endAngle - arc.startAngle;
+    while (diff < 0) diff += 2 * Math.PI;
+    const largeArc = diff > Math.PI ? 1 : 0;
+    const sweep = arc.startAngle > arc.endAngle ? 0 : 1;
+
+    return `M ${x1.toFixed(3)} ${y1.toFixed(3)} A ${arc.radius.toFixed(3)} ${arc.radius.toFixed(3)} 0 ${largeArc} ${sweep} ${x2.toFixed(3)} ${y2.toFixed(3)}`;
   }
 }
