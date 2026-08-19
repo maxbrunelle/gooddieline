@@ -36,17 +36,48 @@ function resolveIndexPath() {
   const appPath = app.getAppPath();
   const candidates = [
     path.join(appPath, 'dist/app/browser/index.html'),
+    path.join(appPath, 'dist/app/browser/index.csr.html'),
     path.join(appPath, 'dist/browser/index.html'),
+    path.join(appPath, 'dist/browser/index.csr.html'),
     path.join(appPath, 'dist/index.html'),
+    path.join(appPath, 'dist/app/index.html'),
     path.join(__dirname, '../dist/app/browser/index.html'),
+    path.join(__dirname, '../dist/app/browser/index.csr.html'),
     path.join(__dirname, '../dist/browser/index.html'),
-    path.join(__dirname, '../dist/index.html')
+    path.join(__dirname, '../dist/index.html'),
+    path.join(__dirname, 'dist/app/browser/index.html')
   ];
 
   for (const candidate of candidates) {
     if (fs.existsSync(candidate)) {
       return candidate;
     }
+  }
+
+  // Search recursively inside appPath for any index.html
+  function findIndexRecursive(dir, depth = 0) {
+    if (depth > 4 || !fs.existsSync(dir)) return null;
+    try {
+      const entries = fs.readdirSync(dir, { withFileTypes: true });
+      for (const entry of entries) {
+        const fullPath = path.join(dir, entry.name);
+        if (!entry.isDirectory() && (entry.name === 'index.html' || entry.name === 'index.csr.html')) {
+          return fullPath;
+        }
+        if (entry.isDirectory() && entry.name !== 'node_modules' && entry.name !== '.git') {
+          const found = findIndexRecursive(fullPath, depth + 1);
+          if (found) return found;
+        }
+      }
+    } catch {
+      // Ignore read errors
+    }
+    return null;
+  }
+
+  const recursiveMatch = findIndexRecursive(appPath) || findIndexRecursive(path.join(__dirname, '..'));
+  if (recursiveMatch) {
+    return recursiveMatch;
   }
 
   // Default fallback
