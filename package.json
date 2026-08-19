@@ -1,6 +1,7 @@
 {
   "name": "ai-studio-angular-app",
-  "version": "0.0.0",
+  "version": "1.0.0",
+  "main": "electron/main.js",
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
@@ -9,7 +10,44 @@
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
     "lint": "ng lint",
-    "serve:ssr:app": "node dist/app/server/server.mjs"
+    "serve:ssr:app": "node dist/app/server/server.mjs",
+    "electron:dev": "ng build --base-href ./ && electron .",
+    "electron:build": "ng build --base-href ./ && electron-builder",
+    "electron:build:win": "ng build --base-href ./ && electron-builder --win --x64",
+    "electron:build:mac": "ng build --base-href ./ && electron-builder --mac",
+    "electron:build:linux": "ng build --base-href ./ && electron-builder --linux"
+  },
+  "build": {
+    "appId": "com.dielineforge.cad",
+    "productName": "DielineForge",
+    "files": [
+      "dist/app/browser/**/*",
+      "electron/**/*"
+    ],
+    "directories": {
+      "output": "dist-electron"
+    },
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        },
+        {
+          "target": "portable",
+          "arch": [
+            "x64"
+          ]
+        }
+      ]
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true
+    }
   },
   "private": true,
   "dependencies": {
@@ -41,6 +79,8 @@
     "@types/three": "^0.185.4",
     "angular-eslint": "21.1.0",
     "cross-env": "^10.1.0",
+    "electron": "^43.4.0",
+    "electron-builder": "^26.15.3",
     "eslint": "^9.39.1",
     "jsdom": "^27.0.0",
     "postcss": "^8.5.3",
