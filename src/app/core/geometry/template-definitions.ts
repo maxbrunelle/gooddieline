@@ -13,8 +13,8 @@ export const TEMPLATE_DEFINITIONS: TemplateDefinition[] = [
       length: 300,
       width: 200,
       height: 150,
-      glueFlap: 25.4,
-      slotWidth: 4,
+      glueFlap: 31.75,
+      slotWidth: 6.35,
       bleed: 3,
       safety: 5,
       tuckOffset: 0
@@ -23,8 +23,8 @@ export const TEMPLATE_DEFINITIONS: TemplateDefinition[] = [
       { key: 'length', label: 'Box Length (L)', category: 'primary', value: 300, min: 50, max: 1500, step: 5, unit: 'mm', description: 'Longer dimension of box opening' },
       { key: 'width', label: 'Box Width (W)', category: 'primary', value: 200, min: 50, max: 1200, step: 5, unit: 'mm', description: 'Shorter dimension of box opening' },
       { key: 'height', label: 'Box Depth / Height (H)', category: 'primary', value: 150, min: 40, max: 1200, step: 5, unit: 'mm', description: 'Internal height from base to top opening' },
-      { key: 'glueFlap', label: 'Manufacturer Glue Flap', category: 'flaps', value: 25.4, min: 10, max: 80, step: 0.1, unit: 'mm', description: 'Side seam glue joint width' },
-      { key: 'slotWidth', label: 'Slot Cutting Clearance', category: 'advanced', value: 4, min: 2, max: 10, step: 0.5, unit: 'mm', description: 'Slot gap between adjacent folding flaps' },
+      { key: 'glueFlap', label: 'Manufacturer Glue Flap', category: 'flaps', value: 31.75, min: 10, max: 80, step: 0.1, unit: 'mm', description: 'Side seam glue joint width (1.25" / 31.75 mm)' },
+      { key: 'slotWidth', label: 'Slot Clearance (0.25")', category: 'advanced', value: 6.35, min: 1, max: 25, step: 0.25, unit: 'mm', description: 'Slot distance between adjacent folding flaps (0.25" / 6.35 mm)' },
       { key: 'bleed', label: 'Print Bleed Margin', category: 'advanced', value: 3, min: 0, max: 15, step: 0.5, unit: 'mm', description: 'Artwork bleed boundary extension' },
       { key: 'safety', label: 'Inner Safety Margin', category: 'advanced', value: 5, min: 2, max: 20, step: 0.5, unit: 'mm', description: 'Safe artwork printing clearance' }
     ]

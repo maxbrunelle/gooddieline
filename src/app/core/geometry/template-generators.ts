@@ -279,121 +279,154 @@ function generateRSC(gb: GeometryBuilder, p: Record<string, number>): void {
   const L = p['length'] || 300;
   const W = p['width'] || 200;
   const H = p['height'] || 150;
-  const G = p['glueFlap'] !== undefined ? p['glueFlap'] : 25.4;
+  const G = p['glueFlap'] !== undefined ? p['glueFlap'] : 31.75;
   const flapH = W / 2; // Standard top and bottom flaps meet in center
-  const slotW = p['slotWidth'] || 4;
-  const halfSlot = slotW / 2;
 
-  const x0 = 0;
-  const x1 = G;
-  const x2 = x1 + L;
-  const x3 = x2 + W;
-  const x4 = x3 + L;
-  const x5 = x4 + W;
+  // Distances between flaps must be 0.25" (6.35 mm), and at the beginning/end add 0.125" (3.175 mm)
+  const slotW = p['slotWidth'] !== undefined ? p['slotWidth'] : 6.35;
+  const endInset = slotW / 2; // 0.125" = 3.175 mm
 
-  const y0 = 0;
-  const y1 = flapH;
-  const y2 = y1 + H;
-  const y3 = y2 + flapH;
+  // Panel X coordinate boundaries (Left to Right: Panel 1 [L], Panel 2 [W], Panel 3 [L], Panel 4 [W], Glue Flap [G])
+  const x0 = 0;              // Left edge of Panel 1 body
+  const x1 = L;              // Crease between Panel 1 and Panel 2
+  const x2 = L + W;          // Crease between Panel 2 and Panel 3
+  const x3 = 2 * L + W;      // Crease between Panel 3 and Panel 4
+  const x4 = 2 * L + 2 * W;  // Crease between Panel 4 and Glue Flap
+  const x5 = x4 + G;         // Outer edge of Glue Flap
 
-  // Outer Cut perimeter
-  // Glue flap left
-  gb.addLine({ x: x0 + 5, y: y1 }, { x: x0, y: y1 + 10 }, 'CUT');
-  gb.addLine({ x: x0, y: y1 + 10 }, { x: x0, y: y2 - 10 }, 'CUT');
-  gb.addLine({ x: x0, y: y2 - 10 }, { x: x0 + 5, y: y2 }, 'CUT');
+  // Panel Y coordinate boundaries
+  const y0 = 0;              // Outer edge of top flaps
+  const y1 = flapH;          // Horizontal crease line (Top flaps to body panels)
+  const y2 = y1 + H;         // Horizontal crease line (Body panels to bottom flaps)
+  const y3 = y2 + flapH;     // Outer edge of bottom flaps
 
-  // Top Flaps cuts and slots
-  gb.addLine({ x: x0 + 5, y: y1 }, { x: x1, y: y1 }, 'CUT');
-  
-  // Flap 1 (L) - from x1 to x2 - halfSlot
-  gb.addLine({ x: x1, y: y1 }, { x: x1, y: y0 }, 'CUT');
-  gb.addLine({ x: x1, y: y0 }, { x: x2 - halfSlot, y: y0 }, 'CUT');
-  gb.addLine({ x: x2 - halfSlot, y: y0 }, { x: x2 - halfSlot, y: y1 }, 'CUT');
+  // Glue Flap chamfer / taper (tapered symmetrically at top and bottom as in reference image)
+  const chamferY = Math.min(G * 0.45, H * 0.2, 14);
 
-  // Slot 1 (centered at x2)
-  gb.addLine({ x: x2 - halfSlot, y: y1 }, { x: x2 + halfSlot, y: y1 }, 'CUT');
+  // -------------------------------------------------------------
+  // TOP FLAPS & SLOTS (Left to Right)
+  // -------------------------------------------------------------
+  // Beginning step at left of Flap 1 (0.125" inset from x0)
+  gb.addLine({ x: x0, y: y1 }, { x: x0 + endInset, y: y1 }, 'CUT');
 
-  // Flap 2 (W) - from x2 + halfSlot to x3 - halfSlot
-  gb.addLine({ x: x2 + halfSlot, y: y1 }, { x: x2 + halfSlot, y: y0 }, 'CUT');
-  gb.addLine({ x: x2 + halfSlot, y: y0 }, { x: x3 - halfSlot, y: y0 }, 'CUT');
-  gb.addLine({ x: x3 - halfSlot, y: y0 }, { x: x3 - halfSlot, y: y1 }, 'CUT');
+  // Flap 1 (L) Top: from x0 + endInset to x1 - endInset
+  gb.addLine({ x: x0 + endInset, y: y1 }, { x: x0 + endInset, y: y0 }, 'CUT');
+  gb.addLine({ x: x0 + endInset, y: y0 }, { x: x1 - endInset, y: y0 }, 'CUT');
+  gb.addLine({ x: x1 - endInset, y: y0 }, { x: x1 - endInset, y: y1 }, 'CUT');
 
-  // Slot 2 (centered at x3)
-  gb.addLine({ x: x3 - halfSlot, y: y1 }, { x: x3 + halfSlot, y: y1 }, 'CUT');
+  // Slot 1 (centered at x1, gap = 0.25")
+  gb.addLine({ x: x1 - endInset, y: y1 }, { x: x1 + endInset, y: y1 }, 'CUT');
 
-  // Flap 3 (L) - from x3 + halfSlot to x4 - halfSlot
-  gb.addLine({ x: x3 + halfSlot, y: y1 }, { x: x3 + halfSlot, y: y0 }, 'CUT');
-  gb.addLine({ x: x3 + halfSlot, y: y0 }, { x: x4 - halfSlot, y: y0 }, 'CUT');
-  gb.addLine({ x: x4 - halfSlot, y: y0 }, { x: x4 - halfSlot, y: y1 }, 'CUT');
+  // Flap 2 (W) Top: from x1 + endInset to x2 - endInset
+  gb.addLine({ x: x1 + endInset, y: y1 }, { x: x1 + endInset, y: y0 }, 'CUT');
+  gb.addLine({ x: x1 + endInset, y: y0 }, { x: x2 - endInset, y: y0 }, 'CUT');
+  gb.addLine({ x: x2 - endInset, y: y0 }, { x: x2 - endInset, y: y1 }, 'CUT');
 
-  // Slot 3 (centered at x4)
-  gb.addLine({ x: x4 - halfSlot, y: y1 }, { x: x4 + halfSlot, y: y1 }, 'CUT');
+  // Slot 2 (centered at x2, gap = 0.25")
+  gb.addLine({ x: x2 - endInset, y: y1 }, { x: x2 + endInset, y: y1 }, 'CUT');
 
-  // Flap 4 (W) - from x4 + halfSlot to x5
-  gb.addLine({ x: x4 + halfSlot, y: y1 }, { x: x4 + halfSlot, y: y0 }, 'CUT');
-  gb.addLine({ x: x4 + halfSlot, y: y0 }, { x: x5, y: y0 }, 'CUT');
-  gb.addLine({ x: x5, y: y0 }, { x: x5, y: y1 }, 'CUT');
+  // Flap 3 (L) Top: from x2 + endInset to x3 - endInset
+  gb.addLine({ x: x2 + endInset, y: y1 }, { x: x2 + endInset, y: y0 }, 'CUT');
+  gb.addLine({ x: x2 + endInset, y: y0 }, { x: x3 - endInset, y: y0 }, 'CUT');
+  gb.addLine({ x: x3 - endInset, y: y0 }, { x: x3 - endInset, y: y1 }, 'CUT');
 
-  // Right edge
-  gb.addLine({ x: x5, y: y1 }, { x: x5, y: y2 }, 'CUT');
+  // Slot 3 (centered at x3, gap = 0.25")
+  gb.addLine({ x: x3 - endInset, y: y1 }, { x: x3 + endInset, y: y1 }, 'CUT');
 
-  // Bottom Flaps
-  // Flap 4 bottom - from x5 to x4 + halfSlot
-  gb.addLine({ x: x5, y: y2 }, { x: x5, y: y3 }, 'CUT');
-  gb.addLine({ x: x5, y: y3 }, { x: x4 + halfSlot, y: y3 }, 'CUT');
-  gb.addLine({ x: x4 + halfSlot, y: y3 }, { x: x4 + halfSlot, y: y2 }, 'CUT');
+  // Flap 4 (W) Top: from x3 + endInset to x4 - endInset
+  gb.addLine({ x: x3 + endInset, y: y1 }, { x: x3 + endInset, y: y0 }, 'CUT');
+  gb.addLine({ x: x3 + endInset, y: y0 }, { x: x4 - endInset, y: y0 }, 'CUT');
+  gb.addLine({ x: x4 - endInset, y: y0 }, { x: x4 - endInset, y: y1 }, 'CUT');
 
-  // Bottom Slot 3 (centered at x4)
-  gb.addLine({ x: x4 + halfSlot, y: y2 }, { x: x4 - halfSlot, y: y2 }, 'CUT');
+  // End step before Glue Flap (0.125" inset from x4 - endInset to x4)
+  gb.addLine({ x: x4 - endInset, y: y1 }, { x: x4, y: y1 }, 'CUT');
 
-  // Flap 3 bottom - from x4 - halfSlot to x3 + halfSlot
-  gb.addLine({ x: x4 - halfSlot, y: y2 }, { x: x4 - halfSlot, y: y3 }, 'CUT');
-  gb.addLine({ x: x4 - halfSlot, y: y3 }, { x: x3 + halfSlot, y: y3 }, 'CUT');
-  gb.addLine({ x: x3 + halfSlot, y: y3 }, { x: x3 + halfSlot, y: y2 }, 'CUT');
+  // -------------------------------------------------------------
+  // GLUE FLAP (Right side of Panel 4, as in image)
+  // -------------------------------------------------------------
+  gb.addLine({ x: x4, y: y1 }, { x: x5, y: y1 + chamferY }, 'CUT');
+  gb.addLine({ x: x5, y: y1 + chamferY }, { x: x5, y: y2 - chamferY }, 'CUT');
+  gb.addLine({ x: x5, y: y2 - chamferY }, { x: x4, y: y2 }, 'CUT');
 
-  // Bottom Slot 2 (centered at x3)
-  gb.addLine({ x: x3 + halfSlot, y: y2 }, { x: x3 - halfSlot, y: y2 }, 'CUT');
+  // -------------------------------------------------------------
+  // BOTTOM FLAPS & SLOTS (Right to Left)
+  // -------------------------------------------------------------
+  // End step before Glue Flap at bottom
+  gb.addLine({ x: x4, y: y2 }, { x: x4 - endInset, y: y2 }, 'CUT');
 
-  // Flap 2 bottom - from x3 - halfSlot to x2 + halfSlot
-  gb.addLine({ x: x3 - halfSlot, y: y2 }, { x: x3 - halfSlot, y: y3 }, 'CUT');
-  gb.addLine({ x: x3 - halfSlot, y: y3 }, { x: x2 + halfSlot, y: y3 }, 'CUT');
-  gb.addLine({ x: x2 + halfSlot, y: y3 }, { x: x2 + halfSlot, y: y2 }, 'CUT');
+  // Flap 4 (W) Bottom: from x4 - endInset to x3 + endInset
+  gb.addLine({ x: x4 - endInset, y: y2 }, { x: x4 - endInset, y: y3 }, 'CUT');
+  gb.addLine({ x: x4 - endInset, y: y3 }, { x: x3 + endInset, y: y3 }, 'CUT');
+  gb.addLine({ x: x3 + endInset, y: y3 }, { x: x3 + endInset, y: y2 }, 'CUT');
 
-  // Bottom Slot 1 (centered at x2)
-  gb.addLine({ x: x2 + halfSlot, y: y2 }, { x: x2 - halfSlot, y: y2 }, 'CUT');
+  // Bottom Slot 3 (centered at x3, gap = 0.25")
+  gb.addLine({ x: x3 + endInset, y: y2 }, { x: x3 - endInset, y: y2 }, 'CUT');
 
-  // Flap 1 bottom - from x2 - halfSlot to x1
-  gb.addLine({ x: x2 - halfSlot, y: y2 }, { x: x2 - halfSlot, y: y3 }, 'CUT');
-  gb.addLine({ x: x2 - halfSlot, y: y3 }, { x: x1, y: y3 }, 'CUT');
-  gb.addLine({ x: x1, y: y3 }, { x: x1, y: y2 }, 'CUT');
-  gb.addLine({ x: x1, y: y2 }, { x: x0 + 5, y: y2 }, 'CUT');
+  // Flap 3 (L) Bottom: from x3 - endInset to x2 + endInset
+  gb.addLine({ x: x3 - endInset, y: y2 }, { x: x3 - endInset, y: y3 }, 'CUT');
+  gb.addLine({ x: x3 - endInset, y: y3 }, { x: x2 + endInset, y: y3 }, 'CUT');
+  gb.addLine({ x: x2 + endInset, y: y3 }, { x: x2 + endInset, y: y2 }, 'CUT');
 
-  // Horizontal Crease Lines
-  gb.addLine({ x: x1, y: y1 }, { x: x5, y: y1 }, 'CREASE', 'Top Crease');
-  gb.addLine({ x: x1, y: y2 }, { x: x5, y: y2 }, 'CREASE', 'Bottom Crease');
+  // Bottom Slot 2 (centered at x2, gap = 0.25")
+  gb.addLine({ x: x2 + endInset, y: y2 }, { x: x2 - endInset, y: y2 }, 'CUT');
 
-  // Vertical Crease Lines
-  gb.addLine({ x: x1, y: y1 }, { x: x1, y: y2 }, 'CREASE', 'Glue Crease');
-  gb.addLine({ x: x2, y: y1 }, { x: x2, y: y2 }, 'CREASE', 'Panel 1-2 Crease');
-  gb.addLine({ x: x3, y: y1 }, { x: x3, y: y2 }, 'CREASE', 'Panel 2-3 Crease');
-  gb.addLine({ x: x4, y: y1 }, { x: x4, y: y2 }, 'CREASE', 'Panel 3-4 Crease');
+  // Flap 2 (W) Bottom: from x2 - endInset to x1 + endInset
+  gb.addLine({ x: x2 - endInset, y: y2 }, { x: x2 - endInset, y: y3 }, 'CUT');
+  gb.addLine({ x: x2 - endInset, y: y3 }, { x: x1 + endInset, y: y3 }, 'CUT');
+  gb.addLine({ x: x1 + endInset, y: y3 }, { x: x1 + endInset, y: y2 }, 'CUT');
+
+  // Bottom Slot 1 (centered at x1, gap = 0.25")
+  gb.addLine({ x: x1 + endInset, y: y2 }, { x: x1 - endInset, y: y2 }, 'CUT');
+
+  // Flap 1 (L) Bottom: from x1 - endInset to x0 + endInset
+  gb.addLine({ x: x1 - endInset, y: y2 }, { x: x1 - endInset, y: y3 }, 'CUT');
+  gb.addLine({ x: x1 - endInset, y: y3 }, { x: x0 + endInset, y: y3 }, 'CUT');
+  gb.addLine({ x: x0 + endInset, y: y3 }, { x: x0 + endInset, y: y2 }, 'CUT');
+
+  // Beginning step at left of Flap 1 at bottom
+  gb.addLine({ x: x0 + endInset, y: y2 }, { x: x0, y: y2 }, 'CUT');
+
+  // Far left vertical cut (Left edge of Panel 1 body)
+  gb.addLine({ x: x0, y: y2 }, { x: x0, y: y1 }, 'CUT');
+
+  // -------------------------------------------------------------
+  // CREASE LINES
+  // -------------------------------------------------------------
+  // Horizontal Top Creases (along each flap hinge)
+  gb.addLine({ x: x0 + endInset, y: y1 }, { x: x1 - endInset, y: y1 }, 'CREASE', 'Flap 1 Top Crease');
+  gb.addLine({ x: x1 + endInset, y: y1 }, { x: x2 - endInset, y: y1 }, 'CREASE', 'Flap 2 Top Crease');
+  gb.addLine({ x: x2 + endInset, y: y1 }, { x: x3 - endInset, y: y1 }, 'CREASE', 'Flap 3 Top Crease');
+  gb.addLine({ x: x3 + endInset, y: y1 }, { x: x4 - endInset, y: y1 }, 'CREASE', 'Flap 4 Top Crease');
+
+  // Horizontal Bottom Creases (along each flap hinge)
+  gb.addLine({ x: x0 + endInset, y: y2 }, { x: x1 - endInset, y: y2 }, 'CREASE', 'Flap 1 Bottom Crease');
+  gb.addLine({ x: x1 + endInset, y: y2 }, { x: x2 - endInset, y: y2 }, 'CREASE', 'Flap 2 Bottom Crease');
+  gb.addLine({ x: x2 + endInset, y: y2 }, { x: x3 - endInset, y: y2 }, 'CREASE', 'Flap 3 Bottom Crease');
+  gb.addLine({ x: x3 + endInset, y: y2 }, { x: x4 - endInset, y: y2 }, 'CREASE', 'Flap 4 Bottom Crease');
+
+  // Vertical Creases
+  gb.addLine({ x: x1, y: y1 }, { x: x1, y: y2 }, 'CREASE', 'Panel 1-2 Crease');
+  gb.addLine({ x: x2, y: y1 }, { x: x2, y: y2 }, 'CREASE', 'Panel 2-3 Crease');
+  gb.addLine({ x: x3, y: y1 }, { x: x3, y: y2 }, 'CREASE', 'Panel 3-4 Crease');
+  gb.addLine({ x: x4, y: y1 }, { x: x4, y: y2 }, 'CREASE', 'Glue Flap Crease');
 
   // Bleed Box Outline
   const bleed = p['bleed'] || 3;
   gb.addRect(x0 - bleed, y0 - bleed, (x5 - x0) + 2 * bleed, (y3 - y0) + 2 * bleed, 'BLEED');
 
   // Driving Dimensions
-  gb.addDimension({ x: x1, y: y1 }, { x: x2, y: y1 }, L, `Length (L): ${L} mm`, -35, 'horizontal', 'length');
-  gb.addDimension({ x: x2, y: y1 }, { x: x3, y: y1 }, W, `Width (W): ${W} mm`, -20, 'horizontal', 'width');
-  gb.addDimension({ x: x1, y: y1 }, { x: x1, y: y2 }, H, `Height (H): ${H} mm`, -35, 'vertical', 'height');
-  gb.addDimension({ x: x0, y: y1 }, { x: x1, y: y1 }, G, `Glue: ${G} mm`, -15, 'horizontal', 'glueFlap');
+  gb.addDimension({ x: x0, y: y1 }, { x: x1, y: y1 }, L, `Length (L): ${L} mm`, -35, 'horizontal', 'length');
+  gb.addDimension({ x: x1, y: y1 }, { x: x2, y: y1 }, W, `Width (W): ${W} mm`, -20, 'horizontal', 'width');
+  gb.addDimension({ x: x0, y: y1 }, { x: x0, y: y2 }, H, `Height (H): ${H} mm`, -35, 'vertical', 'height');
+  gb.addDimension({ x: x4, y: y1 }, { x: x5, y: y1 }, G, `Glue Tab: ${G} mm`, -15, 'horizontal', 'glueFlap');
+  gb.addDimension({ x: x1 - endInset, y: y0 }, { x: x1 + endInset, y: y0 }, slotW, `Slot: ${slotW} mm (0.25")`, -20, 'horizontal', 'slotWidth');
 
-  // Panels for 3D
-  gb.addPanel('Front Panel', [{ x: x1, y: y1 }, { x: x2, y: y1 }, { x: x2, y: y2 }, { x: x1, y: y2 }]);
-  gb.addPanel('Side Panel 1', [{ x: x2, y: y1 }, { x: x3, y: y1 }, { x: x3, y: y2 }, { x: x2, y: y2 }]);
-  gb.addPanel('Back Panel', [{ x: x3, y: y1 }, { x: x4, y: y1 }, { x: x4, y: y2 }, { x: x3, y: y2 }]);
-  gb.addPanel('Side Panel 2', [{ x: x4, y: y1 }, { x: x5, y: y1 }, { x: x5, y: y2 }, { x: x4, y: y2 }]);
-  gb.addPanel('Glue Tab', [{ x: x0, y: y1 + 10 }, { x: x1, y: y1 }, { x: x1, y: y2 }, { x: x0, y: y2 - 10 }]);
+  // Panels for 3D & Nesting
+  gb.addPanel('Front Panel (L)', [{ x: x0, y: y1 }, { x: x1, y: y1 }, { x: x1, y: y2 }, { x: x0, y: y2 }]);
+  gb.addPanel('Side Panel 1 (W)', [{ x: x1, y: y1 }, { x: x2, y: y1 }, { x: x2, y: y2 }, { x: x1, y: y2 }]);
+  gb.addPanel('Back Panel (L)', [{ x: x2, y: y1 }, { x: x3, y: y1 }, { x: x3, y: y2 }, { x: x2, y: y2 }]);
+  gb.addPanel('Side Panel 2 (W)', [{ x: x3, y: y1 }, { x: x4, y: y1 }, { x: x4, y: y2 }, { x: x3, y: y2 }]);
+  gb.addPanel('Glue Tab', [{ x: x4, y: y1 }, { x: x5, y: y1 + chamferY }, { x: x5, y: y2 - chamferY }, { x: x4, y: y2 }]);
 }
 
 // 2. Mailer Box (Roll End Tuck Top - FEFCO 0427)

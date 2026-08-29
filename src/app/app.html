@@ -27,18 +27,18 @@
         title="Click to customize brand & logo in Settings"
       >
         @if (state.customLogo()) {
-          <div class="h-9 max-w-48 px-2 flex items-center justify-center rounded-lg overflow-hidden">
+          <div class="h-10 max-w-56 px-2 flex items-center justify-center rounded-lg overflow-hidden">
             <img 
               [src]="state.customLogo()" 
               alt="Brand Logo" 
-              class="h-8 w-auto object-contain max-h-8" 
+              class="h-9 w-auto object-contain max-h-9" 
               referrerpolicy="no-referrer"
             />
           </div>
         } @else {
-          <div class="flex items-center justify-center gap-2 px-2.5 py-1.5 rounded-xl bg-[#3850a2]/15 border border-[#3850a2]/30 shadow-xs">
-            <mat-icon class="text-lg text-[#3850a2]" [class.text-[#7995f5]]="state.isDarkMode()">architecture</mat-icon>
-            <span class="text-xs font-black tracking-wider" [class.text-neutral-100]="state.isDarkMode()" [class.text-slate-900]="!state.isDarkMode()">
+          <div class="flex items-center justify-center gap-2 px-3 py-1.5 rounded-xl bg-[#3850a2]/15 border border-[#3850a2]/30 shadow-xs">
+            <mat-icon class="text-xl text-[#3850a2]" [class.text-[#7995f5]]="state.isDarkMode()">architecture</mat-icon>
+            <span class="text-sm font-black tracking-wider" [class.text-neutral-100]="state.isDarkMode()" [class.text-slate-900]="!state.isDarkMode()">
               {{ state.brandName() }}
             </span>
           </div>

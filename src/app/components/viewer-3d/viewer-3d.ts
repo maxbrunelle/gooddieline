@@ -307,9 +307,10 @@ export class Viewer3D implements AfterViewInit, OnDestroy {
     const L = p['length'] || 300;
     const W = p['width'] || 200;
     const H = p['height'] || 150;
-    const G = p['glueFlap'] || 35;
+    const G = p['glueFlap'] !== undefined ? p['glueFlap'] : 31.75;
     const flapH = W / 2;
     const angle = (Math.PI / 2) * f;
+    const slotGap = 6.35; // 0.25"
 
     // Center offset to keep 3D box centered in scene
     const root = new THREE.Group();
@@ -321,32 +322,23 @@ export class Viewer3D implements AfterViewInit, OnDestroy {
     const p1 = this.createPanel(L, H, color);
     root.add(p1);
 
-    // Panel 1 Top Flap (L × flapH) - hinges at Y = H/2
+    // Panel 1 Top Flap (L - slotGap × flapH) - hinges at Y = H/2
     const p1TopPivot = new THREE.Group();
     p1TopPivot.position.set(0, H / 2, 0);
     root.add(p1TopPivot);
-    const p1Top = this.createPanel(L - 2, flapH, color);
+    const p1Top = this.createPanel(Math.max(10, L - slotGap), flapH, color);
     p1Top.position.set(0, flapH / 2, 0);
     p1TopPivot.add(p1Top);
     p1TopPivot.rotation.x = -angle * 0.98;
 
-    // Panel 1 Bottom Flap (L × flapH) - hinges at Y = -H/2
+    // Panel 1 Bottom Flap (L - slotGap × flapH) - hinges at Y = -H/2
     const p1BotPivot = new THREE.Group();
     p1BotPivot.position.set(0, -H / 2, 0);
     root.add(p1BotPivot);
-    const p1Bot = this.createPanel(L - 2, flapH, color);
+    const p1Bot = this.createPanel(Math.max(10, L - slotGap), flapH, color);
     p1Bot.position.set(0, -flapH / 2, 0);
     p1BotPivot.add(p1Bot);
     p1BotPivot.rotation.x = angle * 0.98;
-
-    // Glue Tab (G × H) - hinges at X = -L/2
-    const gluePivot = new THREE.Group();
-    gluePivot.position.set(-L / 2, 0, 0);
-    root.add(gluePivot);
-    const gluePanel = this.createPanel(G, H - 4, color);
-    gluePanel.position.set(-G / 2, 0, 0);
-    gluePivot.add(gluePanel);
-    gluePivot.rotation.y = -angle;
 
     // Panel 2 (Side 1: W × H) - hinges at X = L/2
     const p2Pivot = new THREE.Group();
@@ -357,20 +349,20 @@ export class Viewer3D implements AfterViewInit, OnDestroy {
     p2Pivot.add(p2);
     p2Pivot.rotation.y = angle;
 
-    // Panel 2 Top Flap (W × flapH)
+    // Panel 2 Top Flap (W - slotGap × flapH)
     const p2TopPivot = new THREE.Group();
     p2TopPivot.position.set(W / 2, H / 2, 0);
     p2Pivot.add(p2TopPivot);
-    const p2Top = this.createPanel(W - 2, flapH, color);
+    const p2Top = this.createPanel(Math.max(10, W - slotGap), flapH, color);
     p2Top.position.set(0, flapH / 2, 0);
     p2TopPivot.add(p2Top);
     p2TopPivot.rotation.x = -angle * 1.0;
 
-    // Panel 2 Bottom Flap (W × flapH)
+    // Panel 2 Bottom Flap (W - slotGap × flapH)
     const p2BotPivot = new THREE.Group();
     p2BotPivot.position.set(W / 2, -H / 2, 0);
     p2Pivot.add(p2BotPivot);
-    const p2Bot = this.createPanel(W - 2, flapH, color);
+    const p2Bot = this.createPanel(Math.max(10, W - slotGap), flapH, color);
     p2Bot.position.set(0, -flapH / 2, 0);
     p2BotPivot.add(p2Bot);
     p2BotPivot.rotation.x = angle * 1.0;
@@ -384,20 +376,20 @@ export class Viewer3D implements AfterViewInit, OnDestroy {
     p3Pivot.add(p3);
     p3Pivot.rotation.y = angle;
 
-    // Panel 3 Top Flap (L × flapH)
+    // Panel 3 Top Flap (L - slotGap × flapH)
     const p3TopPivot = new THREE.Group();
     p3TopPivot.position.set(L / 2, H / 2, 0);
     p3Pivot.add(p3TopPivot);
-    const p3Top = this.createPanel(L - 2, flapH, color);
+    const p3Top = this.createPanel(Math.max(10, L - slotGap), flapH, color);
     p3Top.position.set(0, flapH / 2, 0);
     p3TopPivot.add(p3Top);
     p3TopPivot.rotation.x = -angle * 0.98;
 
-    // Panel 3 Bottom Flap (L × flapH)
+    // Panel 3 Bottom Flap (L - slotGap × flapH)
     const p3BotPivot = new THREE.Group();
     p3BotPivot.position.set(L / 2, -H / 2, 0);
     p3Pivot.add(p3BotPivot);
-    const p3Bot = this.createPanel(L - 2, flapH, color);
+    const p3Bot = this.createPanel(Math.max(10, L - slotGap), flapH, color);
     p3Bot.position.set(0, -flapH / 2, 0);
     p3BotPivot.add(p3Bot);
     p3BotPivot.rotation.x = angle * 0.98;
@@ -411,23 +403,32 @@ export class Viewer3D implements AfterViewInit, OnDestroy {
     p4Pivot.add(p4);
     p4Pivot.rotation.y = angle;
 
-    // Panel 4 Top Flap (W × flapH)
+    // Panel 4 Top Flap (W - slotGap × flapH)
     const p4TopPivot = new THREE.Group();
     p4TopPivot.position.set(W / 2, H / 2, 0);
     p4Pivot.add(p4TopPivot);
-    const p4Top = this.createPanel(W - 2, flapH, color);
+    const p4Top = this.createPanel(Math.max(10, W - slotGap), flapH, color);
     p4Top.position.set(0, flapH / 2, 0);
     p4TopPivot.add(p4Top);
     p4TopPivot.rotation.x = -angle * 1.0;
 
-    // Panel 4 Bottom Flap (W × flapH)
+    // Panel 4 Bottom Flap (W - slotGap × flapH)
     const p4BotPivot = new THREE.Group();
     p4BotPivot.position.set(W / 2, -H / 2, 0);
     p4Pivot.add(p4BotPivot);
-    const p4Bot = this.createPanel(W - 2, flapH, color);
+    const p4Bot = this.createPanel(Math.max(10, W - slotGap), flapH, color);
     p4Bot.position.set(0, -flapH / 2, 0);
     p4BotPivot.add(p4Bot);
     p4BotPivot.rotation.x = angle * 1.0;
+
+    // Glue Tab (G × H) - attached to right edge of Panel 4 (X = W)
+    const gluePivot = new THREE.Group();
+    gluePivot.position.set(W, 0, 0);
+    p4Pivot.add(gluePivot);
+    const gluePanel = this.createPanel(G, H - 4, color);
+    gluePanel.position.set(G / 2, 0, 0);
+    gluePivot.add(gluePanel);
+    gluePivot.rotation.y = angle;
   }
 
   // 2. Roll End Tuck Top Mailer (RETT / FEFCO 0427)

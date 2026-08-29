@@ -27,6 +27,10 @@ export class TemplatePicker {
     { id: 'display', label: 'Telescoping & Sets', icon: 'dashboard_customize' }
   ];
 
+  isTemplateAvailable(id: string): boolean {
+    return id === 'rsc_carton';
+  }
+
   filteredTemplates(): TemplateDefinition[] {
     const q = this.searchQuery().toLowerCase().trim();
     const cat = this.selectedCategory();
@@ -42,6 +46,9 @@ export class TemplatePicker {
   }
 
   selectTemplate(templateId: string): void {
+    if (!this.isTemplateAvailable(templateId)) {
+      return;
+    }
     this.state.selectTemplate(templateId);
     this.state.activeTab.set('editor_2d');
   }
