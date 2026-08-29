@@ -147,6 +147,89 @@
       </div>
     </div>
 
+    <!-- Inside vs Outside Dimensions & Packaging Envelope Specification -->
+    @let metrics = state.dimensionMetrics();
+    <div 
+      class="border p-5 rounded-2xl space-y-4 shadow-xs"
+      [class.bg-neutral-900]="state.isDarkMode()"
+      [class.border-neutral-800]="state.isDarkMode()"
+      [class.bg-white]="!state.isDarkMode()"
+      [class.border-slate-200]="!state.isDarkMode()"
+    >
+      <div class="flex items-center justify-between">
+        <h2 
+          class="text-sm font-bold flex items-center gap-2"
+          [class.text-neutral-100]="state.isDarkMode()"
+          [class.text-slate-900]="!state.isDarkMode()"
+        >
+          <mat-icon [class.text-[#7995f5]]="state.isDarkMode()" [class.text-[#3850a2]]="!state.isDarkMode()">straighten</mat-icon>
+          <span>Inside vs. Outside Packaging Footprint</span>
+        </h2>
+        <span 
+          class="text-xs font-mono font-semibold px-2.5 py-1 rounded-lg"
+          [class.bg-[#3850a2]/20]="state.isDarkMode()"
+          [class.text-[#7995f5]]="state.isDarkMode()"
+          [class.bg-[#3850a2]/10]="!state.isDarkMode()"
+          [class.text-[#3850a2]]="!state.isDarkMode()"
+        >
+          Active Mode: {{ state.dimensionMode() === 'inside' ? 'Inside (ID)' : 'Outside (OD)' }}
+        </span>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs font-mono">
+        <!-- Inside Spec -->
+        <div 
+          class="p-3.5 rounded-xl border space-y-1.5"
+          [class.bg-neutral-950]="state.isDarkMode()"
+          [class.border-neutral-800]="state.isDarkMode()"
+          [class.bg-slate-50]="!state.isDarkMode()"
+          [class.border-slate-200]="!state.isDarkMode()"
+        >
+          <div class="text-[10px] font-bold uppercase tracking-wider text-[#7995f5]">Inside Dimensions (ID)</div>
+          <div class="text-sm font-bold" [class.text-neutral-100]="state.isDarkMode()" [class.text-slate-900]="!state.isDarkMode()">
+            {{ state.formatUnit(metrics.insideL) }} × {{ state.formatUnit(metrics.insideW) }} × {{ state.formatUnit(metrics.insideH) }}
+          </div>
+          <div class="text-[11px]" [class.text-neutral-400]="state.isDarkMode()" [class.text-slate-600]="!state.isDarkMode()">
+            Usable Volume: <strong>{{ metrics.usableVolumeLiters }} L</strong> ({{ metrics.usableVolumeCuIn }} in³)
+          </div>
+        </div>
+
+        <!-- Outside Spec -->
+        <div 
+          class="p-3.5 rounded-xl border space-y-1.5"
+          [class.bg-neutral-950]="state.isDarkMode()"
+          [class.border-neutral-800]="state.isDarkMode()"
+          [class.bg-slate-50]="!state.isDarkMode()"
+          [class.border-slate-200]="!state.isDarkMode()"
+        >
+          <div class="text-[10px] font-bold uppercase tracking-wider text-amber-500">Outside Dimensions (OD)</div>
+          <div class="text-sm font-bold" [class.text-neutral-100]="state.isDarkMode()" [class.text-slate-900]="!state.isDarkMode()">
+            {{ state.formatUnit(metrics.outsideL) }} × {{ state.formatUnit(metrics.outsideW) }} × {{ state.formatUnit(metrics.outsideH) }}
+          </div>
+          <div class="text-[11px]" [class.text-neutral-400]="state.isDarkMode()" [class.text-slate-600]="!state.isDarkMode()">
+            Shipping Cube: <strong>{{ metrics.shippingCubeM3 }} m³</strong> ({{ metrics.shippingCubeCuFt }} ft³)
+          </div>
+        </div>
+
+        <!-- Caliper Compensation -->
+        <div 
+          class="p-3.5 rounded-xl border space-y-1.5"
+          [class.bg-neutral-950]="state.isDarkMode()"
+          [class.border-neutral-800]="state.isDarkMode()"
+          [class.bg-slate-50]="!state.isDarkMode()"
+          [class.border-slate-200]="!state.isDarkMode()"
+        >
+          <div class="text-[10px] font-bold uppercase tracking-wider text-emerald-500">Board Caliper Allowance</div>
+          <div class="text-sm font-bold" [class.text-neutral-100]="state.isDarkMode()" [class.text-slate-900]="!state.isDarkMode()">
+            +{{ state.formatUnit(metrics.deltaL) }} (L/W) • +{{ state.formatUnit(metrics.deltaH) }} (H)
+          </div>
+          <div class="text-[11px]" [class.text-neutral-400]="state.isDarkMode()" [class.text-slate-600]="!state.isDarkMode()">
+            {{ mat.name }} (t = {{ mat.thickness }} mm)
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- Two Column Deep Dive: Zünd Tooling & Detailed Cost -->
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
       <!-- Zünd Tooling & Routing Table -->

@@ -49,7 +49,11 @@
     "nsis": {
       "oneClick": false,
       "allowToChangeInstallationDirectory": true,
-      "createDesktopShortcut": true
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "DielineForge",
+      "runAfterFinish": true,
+      "perMachine": false
     }
   },
   "private": true,

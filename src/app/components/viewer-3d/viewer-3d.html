@@ -52,13 +52,68 @@
       [class.bg-slate-200]="!state.isDarkMode()"
     ></div>
 
+    <button
+      id="viewer3d_dim_mode_toggle"
+      (click)="state.setDimensionMode(state.dimensionMode() === 'inside' ? 'outside' : 'inside', true)"
+      class="flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-mono font-semibold rounded-lg transition-colors cursor-pointer"
+      [class.bg-[#3850a2]/30]="state.isDarkMode()"
+      [class.text-[#7995f5]]="state.isDarkMode()"
+      [class.hover:bg-[#3850a2]/50]="state.isDarkMode()"
+      [class.bg-[#3850a2]/15]="!state.isDarkMode()"
+      [class.text-[#3850a2]]="!state.isDarkMode()"
+      [class.hover:bg-[#3850a2]/25]="!state.isDarkMode()"
+      title="Toggle between Inside (ID) and Outside (OD) dimension modes"
+    >
+      <mat-icon class="text-xs">sync_alt</mat-icon>
+      <span>{{ state.dimensionMode() === 'inside' ? 'Inside (ID)' : 'Outside (OD)' }}</span>
+    </button>
+
+    <div 
+      class="h-4 w-px mx-1"
+      [class.bg-neutral-800]="state.isDarkMode()"
+      [class.bg-slate-200]="!state.isDarkMode()"
+    ></div>
+
     <span 
       class="text-xs font-mono"
       [class.text-neutral-400]="state.isDarkMode()"
       [class.text-slate-600]="!state.isDarkMode()"
     >
-      {{ state.activeMaterial().name }}
+      {{ state.activeMaterial().name }} ({{ state.activeMaterial().thickness }}mm)
     </span>
+  </div>
+
+  <!-- Top Right 3D Volume & Dimension HUD -->
+  @let metrics = state.dimensionMetrics();
+  <div 
+    class="absolute top-4 right-4 z-20 flex flex-col gap-1 p-2.5 backdrop-blur-md border rounded-xl shadow-xl text-xs font-mono transition-colors"
+    [class.bg-neutral-900/90]="state.isDarkMode()"
+    [class.border-neutral-800]="state.isDarkMode()"
+    [class.bg-white/95]="!state.isDarkMode()"
+    [class.border-slate-200]="!state.isDarkMode()"
+  >
+    <div class="flex items-center justify-between gap-3 text-[10px] uppercase font-bold tracking-wider pb-1 border-b" [class.border-neutral-800]="state.isDarkMode()" [class.border-slate-200]="!state.isDarkMode()">
+      <span [class.text-neutral-400]="state.isDarkMode()" [class.text-slate-500]="!state.isDarkMode()">3D Volumetrics</span>
+      <span class="text-emerald-500 font-bold">{{ metrics.caliper }}mm Caliper</span>
+    </div>
+    <div class="flex items-center justify-between gap-3">
+      <span [class.text-neutral-400]="state.isDarkMode()" [class.text-slate-500]="!state.isDarkMode()">Inside (ID):</span>
+      <span class="font-bold" [class.text-neutral-200]="state.isDarkMode()" [class.text-slate-800]="!state.isDarkMode()">
+        {{ state.formatUnit(metrics.insideL) }} × {{ state.formatUnit(metrics.insideW) }} × {{ state.formatUnit(metrics.insideH) }}
+      </span>
+    </div>
+    <div class="flex items-center justify-between gap-3">
+      <span [class.text-neutral-400]="state.isDarkMode()" [class.text-slate-500]="!state.isDarkMode()">Outside (OD):</span>
+      <span class="font-bold" [class.text-neutral-200]="state.isDarkMode()" [class.text-slate-800]="!state.isDarkMode()">
+        {{ state.formatUnit(metrics.outsideL) }} × {{ state.formatUnit(metrics.outsideW) }} × {{ state.formatUnit(metrics.outsideH) }}
+      </span>
+    </div>
+    <div class="flex items-center justify-between gap-3 pt-1 border-t text-[11px]" [class.border-neutral-800/80]="state.isDarkMode()" [class.border-slate-200]="!state.isDarkMode()">
+      <span [class.text-neutral-400]="state.isDarkMode()" [class.text-slate-500]="!state.isDarkMode()">Capacity:</span>
+      <span class="font-bold" [class.text-[#7995f5]]="state.isDarkMode()" [class.text-[#3850a2]]="!state.isDarkMode()">
+        {{ metrics.usableVolumeLiters }} L ({{ metrics.usableVolumeCuIn }} in³)
+      </span>
+    </div>
   </div>
 
   <!-- Bottom Floating Interactive Fold Slider -->

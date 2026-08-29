@@ -29,6 +29,7 @@ const DEFAULT_PROJECT: ProjectData = {
   notes: 'High yield Zünd cut layout on 48x96 in B-flute. Standard FEFCO 0201 Regular Slotted Carton with 25.4mm glue tab.',
   templateId: 'rsc_carton',
   params: { ...TEMPLATE_DEFINITIONS[0].defaultParams },
+  dimensionMode: 'inside',
   materialId: 'mat_bflute_30',
   sheetId: 'sheet_48x96',
   nestingConfig: {
@@ -58,6 +59,7 @@ export class DielineStateService {
   // Navigation & UI State
   activeTab = signal<WorkspaceTab>('editor_2d');
   unit = signal<'mm' | 'in' | 'cm'>('mm');
+  dimensionMode = signal<'inside' | 'outside'>('inside');
   isDarkMode = signal<boolean>(true);
   customLogo = signal<string | null>(null);
   brandName = signal<string>('DIELINEFORGE');
@@ -140,6 +142,7 @@ export class DielineStateService {
     const prefs = this.storage.loadPreferences();
     if (prefs) {
       if (prefs.unit) this.unit.set(prefs.unit);
+      if (prefs.dimensionMode) this.dimensionMode.set(prefs.dimensionMode);
       if (prefs.isDarkMode !== undefined) this.isDarkMode.set(prefs.isDarkMode);
       if (prefs.foldPercentage !== undefined) this.foldPercentage.set(prefs.foldPercentage);
       if (prefs.autoRotate3D !== undefined) this.autoRotate3D.set(prefs.autoRotate3D);
@@ -170,6 +173,7 @@ export class DielineStateService {
     if (savedProj && savedProj.templateId && savedProj.params) {
       this.project.set(savedProj);
       this.activeTemplateId.set(savedProj.templateId);
+      if (savedProj.dimensionMode) this.dimensionMode.set(savedProj.dimensionMode);
       if (savedProj.materialId) this.activeMaterialId.set(savedProj.materialId);
       if (savedProj.sheetId) this.activeSheetId.set(savedProj.sheetId);
       this.lastSavedTimestamp.set('Loaded from Browser Storage');
@@ -214,6 +218,7 @@ export class DielineStateService {
   saveWorkspacePreferences(): void {
     const prefs: WorkspacePreferences = {
       unit: this.unit(),
+      dimensionMode: this.dimensionMode(),
       isDarkMode: this.isDarkMode(),
       foldPercentage: this.foldPercentage(),
       autoRotate3D: this.autoRotate3D(),
@@ -246,12 +251,87 @@ export class DielineStateService {
     const params = this.project().params;
     const mat = this.activeMaterial();
     const t = mat ? mat.thickness : (params['caliper'] || 2.5);
-    return generateDielineGeometry(tId, {
-      ...params,
+    const mode = this.dimensionMode();
+    return generateDielineGeometry(
+      tId, 
+      {
+        ...params,
+        caliper: t,
+        thickness: t,
+        materialThickness: t
+      },
+      mode
+    );
+  });
+
+  dimensionMetrics = computed(() => {
+    const params = this.project().params;
+    const mode = this.dimensionMode();
+    const mat = this.activeMaterial();
+    const t = mat ? mat.thickness : (params['caliper'] || 2.5);
+    const templateId = this.activeTemplateId();
+    
+    const rawL = params['length'] !== undefined ? params['length'] : 300;
+    const rawW = params['width'] !== undefined ? params['width'] : 200;
+    const rawH = params['height'] !== undefined ? params['height'] : 150;
+
+    const heightFactor = (templateId === 'roll_end_tray' || templateId === 'open_tray_4corner') ? 2 : 4;
+    const deltaL = 2 * t;
+    const deltaW = 2 * t;
+    const deltaH = heightFactor * t;
+
+    let insideL: number;
+    let insideW: number;
+    let insideH: number;
+    let outsideL: number;
+    let outsideW: number;
+    let outsideH: number;
+
+    if (mode === 'inside') {
+      insideL = rawL;
+      insideW = rawW;
+      insideH = rawH;
+      outsideL = Number((rawL + deltaL).toFixed(2));
+      outsideW = Number((rawW + deltaW).toFixed(2));
+      outsideH = Number((rawH + deltaH).toFixed(2));
+    } else {
+      outsideL = rawL;
+      outsideW = rawW;
+      outsideH = rawH;
+      insideL = Math.max(10, Number((rawL - deltaL).toFixed(2)));
+      insideW = Math.max(10, Number((rawW - deltaW).toFixed(2)));
+      insideH = Math.max(10, Number((rawH - deltaH).toFixed(2)));
+    }
+
+    // Usable Volume Calculations
+    const usableVolumeLiters = Number(((insideL * insideW * insideH) / 1000000).toFixed(2));
+    const usableVolumeCuIn = Number(((insideL / 25.4) * (insideW / 25.4) * (insideH / 25.4)).toFixed(1));
+
+    // Shipping Cube Calculations
+    const shippingCubeM3 = Number(((outsideL * outsideW * outsideH) / 1000000000).toFixed(4));
+    const shippingCubeCuFt = Number(((outsideL / 304.8) * (outsideW / 304.8) * (outsideH / 304.8)).toFixed(2));
+
+    return {
+      mode,
+      rawL,
+      rawW,
+      rawH,
+      insideL,
+      insideW,
+      insideH,
+      outsideL,
+      outsideW,
+      outsideH,
+      deltaL,
+      deltaW,
+      deltaH,
       caliper: t,
-      thickness: t,
-      materialThickness: t
-    });
+      fluteName: mat?.name || 'Board Material',
+      usableVolumeLiters,
+      usableVolumeCuIn,
+      shippingCubeM3,
+      shippingCubeCuFt
+    };
   });
 
   activeNestingSolution = computed<NestingSolution | null>(() => {
@@ -278,6 +358,50 @@ export class DielineStateService {
   });
 
   // Actions & Mutators
+  setDimensionMode(mode: 'inside' | 'outside', convertValues = false): void {
+    if (this.dimensionMode() === mode) return;
+    
+    this.dimensionMode.set(mode);
+    
+    if (convertValues) {
+      const params = { ...this.project().params };
+      const mat = this.activeMaterial();
+      const t = mat ? mat.thickness : (params['caliper'] || 2.5);
+      const templateId = this.activeTemplateId();
+      const heightFactor = (templateId === 'roll_end_tray' || templateId === 'open_tray_4corner') ? 2 : 4;
+
+      if (mode === 'outside') {
+        // Converting from Inside input to Outside input (add clearances)
+        if (params['length'] !== undefined) params['length'] = Number((params['length'] + 2 * t).toFixed(1));
+        if (params['width'] !== undefined) params['width'] = Number((params['width'] + 2 * t).toFixed(1));
+        if (params['height'] !== undefined) params['height'] = Number((params['height'] + heightFactor * t).toFixed(1));
+      } else {
+        // Converting from Outside input to Inside input (deduct clearances)
+        if (params['length'] !== undefined) params['length'] = Math.max(10, Number((params['length'] - 2 * t).toFixed(1)));
+        if (params['width'] !== undefined) params['width'] = Math.max(10, Number((params['width'] - 2 * t).toFixed(1)));
+        if (params['height'] !== undefined) params['height'] = Math.max(10, Number((params['height'] - heightFactor * t).toFixed(1)));
+      }
+
+      this.project.update(p => ({
+        ...p,
+        dimensionMode: mode,
+        params,
+        modifiedDate: new Date().toISOString().split('T')[0]
+      }));
+    } else {
+      this.project.update(p => ({
+        ...p,
+        dimensionMode: mode,
+        modifiedDate: new Date().toISOString().split('T')[0]
+      }));
+    }
+
+    this.saveWorkspacePreferences();
+    this.pushHistoryState(`Dimension Mode: ${mode === 'inside' ? 'Inside (ID)' : 'Outside (OD)'}`);
+    this.recalculateNesting();
+    this.autoSave();
+  }
+
   selectTemplate(templateId: string): void {
     const t = this.templates().find(x => x.id === templateId);
     if (!t) return;

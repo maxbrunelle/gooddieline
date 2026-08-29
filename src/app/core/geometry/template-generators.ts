@@ -221,13 +221,32 @@ export class GeometryBuilder {
 // Parametric Generator Registry
 export function generateDielineGeometry(
   templateId: string, 
-  params: Record<string, number>
+  params: Record<string, number>,
+  dimensionMode: 'inside' | 'outside' = 'inside'
 ): DielineGeometry {
   resetGeometryIdCounter();
   const gb = new GeometryBuilder();
 
   const t = params['caliper'] || params['thickness'] || params['materialThickness'] || 2.5;
-  const p = { ...params, caliper: t, thickness: t, materialThickness: t };
+  
+  // Outside vs Inside Dimension compensation:
+  // If user inputs Outside Dimensions (OD), deduct material thickness to find effective score/panel dimensions
+  const adjustedParams: Record<string, number> = { ...params, caliper: t, thickness: t, materialThickness: t };
+  if (dimensionMode === 'outside') {
+    if (params['length'] !== undefined) {
+      adjustedParams['length'] = Math.max(10, params['length'] - 2 * t);
+    }
+    if (params['width'] !== undefined) {
+      adjustedParams['width'] = Math.max(10, params['width'] - 2 * t);
+    }
+    if (params['height'] !== undefined) {
+      const heightDeduction = (templateId === 'roll_end_tray' || templateId === 'open_tray_4corner') ? 2 * t : 4 * t;
+      adjustedParams['height'] = Math.max(10, params['height'] - heightDeduction);
+    }
+  }
+
+  // Pass dimension mode tag to generator helpers
+  const p = { ...adjustedParams, _dimMode: dimensionMode === 'outside' ? 1 : 0 };
 
   switch (templateId) {
     case 'rsc_carton':

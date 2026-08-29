@@ -30,6 +30,7 @@ export interface ProjectData {
   // Active template configuration
   templateId: string;
   params: Record<string, number>;
+  dimensionMode?: 'inside' | 'outside';
   
   // Active material
   materialId: string;
@@ -65,6 +66,7 @@ export interface WorkspacePreferences {
   foldPercentage: number;
   autoRotate3D: boolean;
   activeTab: string;
+  dimensionMode?: 'inside' | 'outside';
 }
 
 export interface ExportOptions {

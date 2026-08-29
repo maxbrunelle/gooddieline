@@ -761,7 +761,23 @@
       </span>
     </div>
 
-    <div class="flex items-center gap-4">
+    <div class="flex items-center gap-3">
+      <button
+        id="canvas_dim_mode_toggle"
+        (click)="state.setDimensionMode(state.dimensionMode() === 'inside' ? 'outside' : 'inside', true)"
+        class="px-2 py-0.5 rounded text-[10px] font-mono font-bold flex items-center gap-1 cursor-pointer transition-colors"
+        [class.bg-[#3850a2]/30]="state.isDarkMode()"
+        [class.text-[#7995f5]]="state.isDarkMode()"
+        [class.hover:bg-[#3850a2]/50]="state.isDarkMode()"
+        [class.bg-[#3850a2]/15]="!state.isDarkMode()"
+        [class.text-[#3850a2]]="!state.isDarkMode()"
+        [class.hover:bg-[#3850a2]/25]="!state.isDarkMode()"
+        title="Click to toggle between Inside (ID) and Outside (OD) dimension modes"
+      >
+        <mat-icon class="text-xs">sync_alt</mat-icon>
+        <span>Mode: {{ state.dimensionMode() === 'inside' ? 'Inside (ID)' : 'Outside (OD)' }}</span>
+      </button>
+      <span [class.text-neutral-700]="state.isDarkMode()" [class.text-slate-300]="!state.isDarkMode()">|</span>
       <span class="text-rose-500 font-semibold">Cut: <strong>{{ (geom.totalCutLength / 1000).toFixed(2) }} m</strong></span>
       <span class="text-yellow-500 font-semibold">Crease: <strong>{{ (geom.totalCreaseLength / 1000).toFixed(2) }} m</strong></span>
       <span [class.text-neutral-700]="state.isDarkMode()" [class.text-slate-300]="!state.isDarkMode()">|</span>

@@ -305,10 +305,73 @@
           [class.text-neutral-300]="state.isDarkMode()"
           [class.text-slate-700]="!state.isDarkMode()"
         >
-          <span>Dimensions</span>
+          <div class="flex items-center gap-1.5">
+            <mat-icon class="text-xs">straighten</mat-icon>
+            <span>Dimensions</span>
+          </div>
           <span class="font-mono text-[10px] font-semibold text-neutral-500" [class.text-slate-400]="!state.isDarkMode()">
             {{ state.unit() }}
           </span>
+        </div>
+
+        <!-- Inside vs. Outside Dimensions Mode Toggle -->
+        <div class="space-y-1.5">
+          <div class="flex items-center justify-between text-[11px]">
+            <span 
+              class="font-medium"
+              [class.text-neutral-300]="state.isDarkMode()"
+              [class.text-slate-600]="!state.isDarkMode()"
+            >
+              Dimension Mode
+            </span>
+            <span 
+              class="text-[10px] font-mono font-semibold px-1.5 py-0.5 rounded"
+              [class.bg-[#3850a2]/20]="state.isDarkMode()"
+              [class.text-[#7995f5]]="state.isDarkMode()"
+              [class.bg-[#3850a2]/10]="!state.isDarkMode()"
+              [class.text-[#3850a2]]="!state.isDarkMode()"
+            >
+              {{ state.dimensionMode() === 'inside' ? 'Internal Usable (ID)' : 'Outer Footprint (OD)' }}
+            </span>
+          </div>
+
+          <div 
+            class="grid grid-cols-2 p-0.5 rounded-lg border text-xs font-medium"
+            [class.bg-neutral-950]="state.isDarkMode()"
+            [class.border-neutral-800]="state.isDarkMode()"
+            [class.bg-slate-100]="!state.isDarkMode()"
+            [class.border-slate-200]="!state.isDarkMode()"
+          >
+            <button
+              id="dim_mode_inside"
+              (click)="state.setDimensionMode('inside', true)"
+              [class.bg-[#3850a2]]="state.dimensionMode() === 'inside'"
+              [class.text-white]="state.dimensionMode() === 'inside'"
+              [class.shadow-xs]="state.dimensionMode() === 'inside'"
+              [class.text-neutral-400]="state.dimensionMode() !== 'inside' && state.isDarkMode()"
+              [class.text-slate-600]="state.dimensionMode() !== 'inside' && !state.isDarkMode()"
+              class="py-1.5 px-2 rounded-md transition-all flex items-center justify-center gap-1.5 cursor-pointer text-center"
+              title="Inside Dimensions (ID): Enter internal cavity size for product packaging"
+            >
+              <mat-icon class="text-xs">aspect_ratio</mat-icon>
+              <span>Inside (ID)</span>
+            </button>
+
+            <button
+              id="dim_mode_outside"
+              (click)="state.setDimensionMode('outside', true)"
+              [class.bg-[#3850a2]]="state.dimensionMode() === 'outside'"
+              [class.text-white]="state.dimensionMode() === 'outside'"
+              [class.shadow-xs]="state.dimensionMode() === 'outside'"
+              [class.text-neutral-400]="state.dimensionMode() !== 'outside' && state.isDarkMode()"
+              [class.text-slate-600]="state.dimensionMode() !== 'outside' && !state.isDarkMode()"
+              class="py-1.5 px-2 rounded-md transition-all flex items-center justify-center gap-1.5 cursor-pointer text-center"
+              title="Outside Dimensions (OD): Enter external shipping size to account for material thickness"
+            >
+              <mat-icon class="text-xs">select_all</mat-icon>
+              <span>Outside (OD)</span>
+            </button>
+          </div>
         </div>
 
         @for (param of state.activeTemplate().paramsList; track param.key) {
@@ -322,10 +385,23 @@
             <div class="flex items-center justify-between text-xs">
               <label 
                 [for]="'param-input-' + param.key" 
-                class="font-medium"
+                class="font-medium flex items-center gap-1"
                 [class.text-neutral-300]="state.isDarkMode()"
                 [class.text-slate-700]="!state.isDarkMode()"
-              >{{ param.label }}</label>
+              >
+                <span>{{ param.label }}</span>
+                @if (param.key === 'length' || param.key === 'width' || param.key === 'height') {
+                  <span 
+                    class="text-[9px] font-mono px-1 py-0.2 rounded"
+                    [class.bg-neutral-800]="state.isDarkMode()"
+                    [class.text-neutral-400]="state.isDarkMode()"
+                    [class.bg-slate-200]="!state.isDarkMode()"
+                    [class.text-slate-600]="!state.isDarkMode()"
+                  >
+                    {{ state.dimensionMode() === 'inside' ? 'ID' : 'OD' }}
+                  </span>
+                }
+              </label>
               <div class="flex items-center gap-1">
                 <input
                   #numInput
@@ -364,26 +440,71 @@
           </div>
         }
 
-        <!-- Active Box Envelope Summary -->
-        @if (state.project().params['length'] && state.project().params['width']) {
-          <div 
-            class="p-2.5 rounded-lg border text-[11px] font-mono space-y-0.5"
-            [class.bg-neutral-950/60]="state.isDarkMode()"
-            [class.border-neutral-800]="state.isDarkMode()"
-            [class.text-neutral-400]="state.isDarkMode()"
-            [class.bg-slate-50]="!state.isDarkMode()"
-            [class.border-slate-200]="!state.isDarkMode()"
-            [class.text-slate-600]="!state.isDarkMode()"
-          >
-            <div class="text-[10px] font-medium" [class.text-neutral-500]="state.isDarkMode()" [class.text-slate-400]="!state.isDarkMode()">Dimensions (L × W × D)</div>
-            <div class="text-xs font-bold" [class.text-[#7995f5]]="state.isDarkMode()" [class.text-[#3850a2]]="!state.isDarkMode()">
-              {{ state.formatUnit(state.project().params['length']) }} × {{ state.formatUnit(state.project().params['width']) }}
-              @if (state.project().params['height']) {
-                × {{ state.formatUnit(state.project().params['height']) }}
-              }
+        <!-- Active Box Envelope & Inside vs. Outside Comparison Card -->
+        @let metrics = state.dimensionMetrics();
+        <div 
+          class="p-3 rounded-xl border text-[11px] font-mono space-y-2"
+          [class.bg-neutral-950/70]="state.isDarkMode()"
+          [class.border-neutral-800]="state.isDarkMode()"
+          [class.text-neutral-300]="state.isDarkMode()"
+          [class.bg-slate-50]="!state.isDarkMode()"
+          [class.border-slate-200]="!state.isDarkMode()"
+          [class.text-slate-700]="!state.isDarkMode()"
+        >
+          <div class="flex items-center justify-between pb-1.5 border-b" [class.border-neutral-800]="state.isDarkMode()" [class.border-slate-200]="!state.isDarkMode()">
+            <span class="font-bold text-[10px] uppercase tracking-wider flex items-center gap-1">
+              <mat-icon class="text-xs" [class.text-[#7995f5]]="state.isDarkMode()" [class.text-[#3850a2]]="!state.isDarkMode()">sync_alt</mat-icon>
+              <span>Envelope & Volume Spec</span>
+            </span>
+            <span 
+              class="text-[9px] px-1.5 py-0.2 rounded font-semibold"
+              [class.bg-emerald-500/20]="state.isDarkMode()"
+              [class.text-emerald-400]="state.isDarkMode()"
+              [class.bg-emerald-100]="!state.isDarkMode()"
+              [class.text-emerald-800]="!state.isDarkMode()"
+            >
+              {{ metrics.caliper }}mm ({{ metrics.fluteName }})
+            </span>
+          </div>
+
+          <!-- Inside (ID) Breakdown -->
+          <div class="flex items-center justify-between text-xs">
+            <span class="flex items-center gap-1" [class.text-neutral-400]="state.isDarkMode()" [class.text-slate-500]="!state.isDarkMode()">
+              <span class="w-1.5 h-1.5 rounded-full bg-[#3850a2]"></span>
+              <span>Inside (ID):</span>
+            </span>
+            <span class="font-bold" [class.text-neutral-100]="state.isDarkMode()" [class.text-slate-900]="!state.isDarkMode()">
+              {{ state.formatUnit(metrics.insideL) }} × {{ state.formatUnit(metrics.insideW) }} × {{ state.formatUnit(metrics.insideH) }}
+            </span>
+          </div>
+
+          <!-- Outside (OD) Breakdown -->
+          <div class="flex items-center justify-between text-xs">
+            <span class="flex items-center gap-1" [class.text-neutral-400]="state.isDarkMode()" [class.text-slate-500]="!state.isDarkMode()">
+              <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
+              <span>Outside (OD):</span>
+            </span>
+            <span class="font-bold" [class.text-neutral-100]="state.isDarkMode()" [class.text-slate-900]="!state.isDarkMode()">
+              {{ state.formatUnit(metrics.outsideL) }} × {{ state.formatUnit(metrics.outsideW) }} × {{ state.formatUnit(metrics.outsideH) }}
+            </span>
+          </div>
+
+          <!-- Volumetric & Shipping Cube Stats -->
+          <div class="grid grid-cols-2 gap-2 pt-1 border-t text-[10px]" [class.border-neutral-800/80]="state.isDarkMode()" [class.border-slate-200]="!state.isDarkMode()">
+            <div>
+              <div [class.text-neutral-500]="state.isDarkMode()" [class.text-slate-400]="!state.isDarkMode()">Usable Capacity</div>
+              <div class="font-bold" [class.text-neutral-200]="state.isDarkMode()" [class.text-slate-800]="!state.isDarkMode()">
+                {{ metrics.usableVolumeLiters }} L ({{ metrics.usableVolumeCuIn }} in³)
+              </div>
+            </div>
+            <div class="text-right">
+              <div [class.text-neutral-500]="state.isDarkMode()" [class.text-slate-400]="!state.isDarkMode()">Shipping Cube</div>
+              <div class="font-bold" [class.text-neutral-200]="state.isDarkMode()" [class.text-slate-800]="!state.isDarkMode()">
+                {{ metrics.shippingCubeM3 }} m³ ({{ metrics.shippingCubeCuFt }} ft³)
+              </div>
             </div>
           </div>
-        }
+        </div>
       </div>
 
       <!-- Section 3: Material & Tooling Configuration -->

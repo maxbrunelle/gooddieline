@@ -20,16 +20,23 @@ let mainWindow = null;
 // Ensure single instance on Windows
 const gotTheLock = app.requestSingleInstanceLock();
 if (!gotTheLock) {
+  // If another instance exists, exit cleanly
   app.quit();
 } else {
-  app.on('second-instance', () => {
+  app.on('second-instance', (event, commandLine, workingDirectory) => {
     if (mainWindow) {
       if (mainWindow.isMinimized()) mainWindow.restore();
       mainWindow.focus();
     }
   });
 
-  app.whenReady().then(createWindow);
+  app.whenReady().then(() => {
+    try {
+      createWindow();
+    } catch (err) {
+      dialog.showErrorBox('Initialization Error', String(err && err.stack ? err.stack : err));
+    }
+  });
 }
 
 function isValidAppHtml(filePath) {
