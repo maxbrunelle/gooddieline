@@ -4,15 +4,36 @@ const fs = require('fs');
 
 function findIndexHtml() {
   const possiblePaths = [
+    path.join(__dirname, 'dist', 'app', 'browser', 'index.csr.html'),
+    path.join(__dirname, 'dist', 'browser', 'index.csr.html'),
+    path.join(__dirname, 'dist', 'dielineforge', 'browser', 'index.csr.html'),
     path.join(__dirname, 'dist', 'app', 'browser', 'index.html'),
     path.join(__dirname, 'dist', 'browser', 'index.html'),
     path.join(__dirname, 'dist', 'dielineforge', 'browser', 'index.html'),
     path.join(__dirname, 'dist', 'index.html')
   ];
+
   for (const p of possiblePaths) {
     if (fs.existsSync(p)) {
-      return p;
+      try {
+        const content = fs.readFileSync(p, 'utf8');
+        // If it is a cookie check / redirect script, skip it
+        if (content.includes('Cookie check') || content.includes('verifyCanSetCookies')) {
+          continue;
+        }
+        if (content.includes('<app-root') || content.includes('main')) {
+          return p;
+        }
+      } catch (e) {
+        return p;
+      }
     }
+  }
+
+  // Direct fallback
+  const csrPath = path.join(__dirname, 'dist', 'app', 'browser', 'index.csr.html');
+  if (fs.existsSync(csrPath)) {
+    return csrPath;
   }
   return path.join(__dirname, 'dist', 'app', 'browser', 'index.html');
 }

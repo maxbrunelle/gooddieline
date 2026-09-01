@@ -8,6 +8,7 @@
     "start": "ng serve --port=3000 --host=0.0.0.0 --allowed-hosts=true",
     "dev": "ng serve --port=3000 --host=0.0.0.0 --allowed-hosts=true",
     "build": "ng build",
+    "postbuild": "node -e \"const fs=require('fs'),path=require('path');const dirs=['dist/app/browser','dist/browser','dist/dielineforge/browser'];dirs.forEach(d=>{const csr=path.join(d,'index.csr.html'),idx=path.join(d,'index.html');if(fs.existsSync(csr)){fs.copyFileSync(csr,idx);console.log('Synchronized client entrypoint to '+idx);}});\"",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
     "lint": "ng lint",
