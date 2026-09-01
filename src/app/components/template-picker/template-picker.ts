@@ -18,17 +18,12 @@ export class TemplatePicker {
 
   categories: { id: TemplateCategory | 'all'; label: string; icon: string }[] = [
     { id: 'all', label: 'All Templates', icon: 'apps' },
-    { id: 'shipping', label: 'Shipping & RSC', icon: 'local_shipping' },
-    { id: 'mailer', label: 'Mailers & Tuck Top', icon: 'markunread_mailbox' },
-    { id: 'folding_carton', label: 'Folding Cartons', icon: 'inventory_2' },
-    { id: 'tray', label: 'Trays & Rollovers', icon: 'table_restaurant' },
-    { id: 'sleeve', label: 'Sleeves & Wraps', icon: 'view_carousel' },
-    { id: 'novelty', label: 'Novelty & Pillow', icon: 'card_giftcard' },
-    { id: 'display', label: 'Telescoping & Sets', icon: 'dashboard_customize' }
+    { id: 'shipping', label: 'FEFCO 0201 (RSC)', icon: 'local_shipping' },
+    { id: 'mailer', label: 'FEFCO 0427 (Mailer)', icon: 'markunread_mailbox' }
   ];
 
   isTemplateAvailable(id: string): boolean {
-    return id === 'rsc_carton';
+    return Boolean(id);
   }
 
   filteredTemplates(): TemplateDefinition[] {

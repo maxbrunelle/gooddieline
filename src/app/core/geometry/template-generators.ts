@@ -448,340 +448,480 @@ function generateRSC(gb: GeometryBuilder, p: Record<string, number>): void {
   gb.addPanel('Glue Tab', [{ x: x4, y: y1 }, { x: x5, y: y1 + chamferY }, { x: x5, y: y2 - chamferY }, { x: x4, y: y2 }]);
 }
 
-// 2. Mailer Box (Roll End Tuck Top - FEFCO 0427)
 // 2. Mailer Box (Roll End Tuck Front / FEFCO 0427)
 function generateMailerBox(gb: GeometryBuilder, p: Record<string, number>): void {
-  const L = p['length'] || 202; // Base Width / Length (horizontal)
-  const W = p['width'] || 315;  // Base Length / Height (vertical)
-  const D = p['height'] || 62;  // Depth / Wall Height
+  const L = p['length'] || 220; // Base Width / Horizontal (220 mm)
+  const W = p['width'] || 300;  // Base Length / Vertical (300 mm)
+  const D = p['height'] || 80;  // Depth / Wall Height (80 mm)
   const t = p['caliper'] || 2.5; // Board thickness for double crease gap
-  const tuck = p['tuckFlap'] || Math.max(35, Math.min(D * 0.85, 75)); // Right closure flap
-  const frontFlap = p['frontFlap'] || Math.max(25, Math.min(D * 0.75, 45)); // Left front fold flap
-  const cornerFlapH = D * 0.94; // Corner tuck flaps height
-  const dustFlapH = Math.max(35, Math.min(D * 0.95, W * 0.45)); // Lid dust flaps height
-  const tabH = 12; // Roll-over locking tab protrusion
-  const tabNub = 2.5; // Side ear/nub on locking tab
+  const tuck = p['tuckFlap'] || 80; // Right closure tuck flap depth (80 mm)
+  const earH = Math.min(55, D * 0.70); // Cherry lock ear protrusion height
+  const dustFlapH = Math.min(75, D * 0.94); // Lid dust flaps height
+  const tabH = 10; // Roll-over locking tab protrusion
+  const tabBevel = 4; // Angled bevel shoulder for locking tabs (matching image 1)
+  const gap = t; // Clearance gap between side wall and corner flaps equal to material thickness
+  const gapR = gap / 2; // Radius of U-notch rounded punch at bottom of gap
 
   // Horizontal Coordinates
-  const x_front_flap = -D - frontFlap;
-  const x_front_wall = -D;
-  const x0 = 0;             // Base Left (Crease between Front Wall and Base)
-  const x1 = L;             // Base Right (Crease between Base and Rear Wall)
-  const x2 = L + D;         // Lid Left (Crease between Rear Wall and Lid)
-  const x3 = 2 * L + D;     // Lid Right (Crease between Lid and Tuck Flap)
-  const x4 = 2 * L + D + tuck; // Far right edge of Tuck Flap
+  const x_front_wall = -D;     // -80 (Left edge of front wall)
+  const x0 = 0;               // 0 (Base left crease)
+  const x1 = L;               // 220 (Base right crease / Rear wall left crease)
+  const x2 = L + D;           // 300 (Rear wall right crease / Lid left crease)
+  const x3 = 2 * L + D;       // 520 (Lid right crease / Tuck flap crease)
+  const x4 = 2 * L + D + tuck; // 600 (Rightmost cut edge of tuck flap)
 
-  // Vertical Coordinates
-  const y0 = 0;             // Base Top Crease
-  const y1 = W;             // Base Bottom Crease
+  // Vertical Coordinates & Progressive Inward Crease Offsets
+  // 1. Base Panel is the widest (y = 0 to y = W)
+  const y_base_top = 0;
+  const y_base_bot = W;
+
+  // 2. Flaps right next to base (Front & Rear corner flaps) are tighter (shifted inward by t)
+  const y_flap_top = t;
+  const y_flap_bot = W - t;
+
+  // 3. Closing Top Lid and Dust Flaps are shifted inward even more (by 2*t) to close cleanly over double side walls
+  const y_lid_top = 2 * t;
+  const y_lid_bot = W - 2 * t;
 
   // Side Wall Vertical Levels (Top)
-  const y_top_c1 = -D;
-  const y_top_c2 = -D - t;
-  const y_top_inner = -2 * D - t;
-  const y_top_tab = y_top_inner - tabH;
+  const y_top_c1 = -D;        // -80 (Crease 1)
+  const y_top_c2 = -D - t;    // -82.5 (Crease 2 roll-over)
+  const y_top_inner = -2 * D - t + 2; // -160.5 (Inner roll-over wall edge)
+  const y_top_tab = y_top_inner - tabH; // -170.5 (Locking tab top)
 
   // Side Wall Vertical Levels (Bottom)
-  const y_bot_c1 = W + D;
-  const y_bot_c2 = W + D + t;
-  const y_bot_inner = W + 2 * D + t;
-  const y_bot_tab = y_bot_inner + tabH;
+  const y_bot_c1 = W + D;     // 380 (Crease 1)
+  const y_bot_c2 = W + D + t; // 382.5 (Crease 2 roll-over)
+  const y_bot_inner = W + 2 * D + t - 2; // 460.5 (Inner roll-over wall edge)
+  const y_bot_tab = y_bot_inner + tabH; // 470.5 (Locking tab bottom)
 
-  // Locking Slots Coordinates (2 horizontal slots along top & bottom base creases)
-  const slotLen = Math.min(42, Math.max(28, L * 0.20));
-  const slotH = Math.max(3.5, t * 1.5);
-  const s1_cx = L * 0.28;
-  const s2_cx = L * 0.72;
+  // Locking Slots Coordinates (2 sharp rectangular slots along top & bottom base creases)
+  // Depth compensates for material thickness + 1 extra layer of thickness (2 * caliper) for overlapping flaps
+  const slotLen = 36;
+  const slotH = 2 * t; // 2 layers of material thickness compensation
+  const s1_cx = L * 0.28; // ~61.6 mm
+  const s2_cx = L * 0.72; // ~158.4 mm
   const s1_x0 = s1_cx - slotLen / 2;
   const s1_x1 = s1_cx + slotLen / 2;
   const s2_x0 = s2_cx - slotLen / 2;
   const s2_x1 = s2_cx + slotLen / 2;
 
   // ----------------------------------------------------
-  // 1. CENTRAL BASE PANEL & RECTANGULAR LOCKING SLOTS
+  // 1. CENTRAL BASE PANEL & RECTANGULAR LOCKING SLOTS (LARGEST SPAN)
   // ----------------------------------------------------
   gb.addPanel('Base Panel', [
-    { x: x0, y: y0 },
-    { x: x1, y: y0 },
-    { x: x1, y: y1 },
-    { x: x0, y: y1 }
+    { x: x0, y: y_base_top },
+    { x: x1, y: y_base_top },
+    { x: x1, y: y_base_bot },
+    { x: x0, y: y_base_bot }
   ]);
 
-  // Vertical Creases for Base
-  gb.addLine({ x: x0, y: y0 }, { x: x0, y: y1 }, 'CREASE', 'Base-Front Crease');
-  gb.addLine({ x: x1, y: y0 }, { x: x1, y: y1 }, 'CREASE', 'Base-Rear Crease');
+  // Vertical Creases for Base (connected to gap bottom punch notches)
+  gb.addLine({ x: x0, y: y_base_top + gapR }, { x: x0, y: y_base_bot - gapR }, 'CREASE', 'Base Left Crease');
+  gb.addLine({ x: x1, y: y_base_top + gapR }, { x: x1, y: y_base_bot - gapR }, 'CREASE', 'Base Right Crease');
 
-  // Top Base Crease & Cutout Slots
-  gb.addLine({ x: x0, y: y0 }, { x: s1_x0, y: y0 }, 'CREASE');
-  gb.addRect(s1_x0, y0, slotLen, slotH, 'CUT');
-  gb.addLine({ x: s1_x1, y: y0 }, { x: s2_x0, y: y0 }, 'CREASE');
-  gb.addRect(s2_x0, y0, slotLen, slotH, 'CUT');
-  gb.addLine({ x: s2_x1, y: y0 }, { x: x1, y: y0 }, 'CREASE');
+  // Top Base Crease segments between slots & clearance gaps
+  gb.addLine({ x: x0 + gapR, y: y_base_top }, { x: s1_x0, y: y_base_top }, 'CREASE');
+  gb.addLine({ x: s1_x1, y: y_base_top }, { x: s2_x0, y: y_base_top }, 'CREASE');
+  gb.addLine({ x: s2_x1, y: y_base_top }, { x: x1 - gapR, y: y_base_top }, 'CREASE');
 
-  // Bottom Base Crease & Cutout Slots
-  gb.addLine({ x: x0, y: y1 }, { x: s1_x0, y: y1 }, 'CREASE');
-  gb.addRect(s1_x0, y1 - slotH, slotLen, slotH, 'CUT');
-  gb.addLine({ x: s1_x1, y: y1 }, { x: s2_x0, y: y1 }, 'CREASE');
-  gb.addRect(s2_x0, y1 - slotH, slotLen, slotH, 'CUT');
-  gb.addLine({ x: s2_x1, y: y1 }, { x: x1, y: y1 }, 'CREASE');
+  // Top Rectangular Slots (Starting from the inside edge of crease y_base_top into the base panel)
+  gb.addRect(s1_x0, y_base_top, slotLen, slotH, 'CUT');
+  gb.addRect(s2_x0, y_base_top, slotLen, slotH, 'CUT');
+
+  // Bottom Base Crease segments between slots & clearance gaps
+  gb.addLine({ x: x0 + gapR, y: y_base_bot }, { x: s1_x0, y: y_base_bot }, 'CREASE');
+  gb.addLine({ x: s1_x1, y: y_base_bot }, { x: s2_x0, y: y_base_bot }, 'CREASE');
+  gb.addLine({ x: s2_x1, y: y_base_bot }, { x: x1 - gapR, y: y_base_bot }, 'CREASE');
+
+  // Bottom Rectangular Slots (Starting from the inside edge of crease y_base_bot into the base panel)
+  gb.addRect(s1_x0, y_base_bot - slotH, slotLen, slotH, 'CUT');
+  gb.addRect(s2_x0, y_base_bot - slotH, slotLen, slotH, 'CUT');
+
+  // Clearance Gap Semicircular Rounded Bottoms (U-Notches at base crease line intersection)
+  gb.addArc({ x: x0, y: y_base_top }, gapR, 0, Math.PI, 'CUT');
+  gb.addArc({ x: x1, y: y_base_top }, gapR, 0, Math.PI, 'CUT');
+  gb.addArc({ x: x0, y: y_base_bot }, gapR, Math.PI, 2 * Math.PI, 'CUT');
+  gb.addArc({ x: x1, y: y_base_bot }, gapR, Math.PI, 2 * Math.PI, 'CUT');
 
   // ----------------------------------------------------
-  // 2. FRONT WALL & FRONT TUCK/ROLL-IN FLAP (LEFT)
+  // 2. FRONT WALL & FRONT CORNER TUCK FLAPS (TIGHTER BY t)
   // ----------------------------------------------------
   gb.addPanel('Front Wall', [
-    { x: x_front_wall, y: y0 },
-    { x: x0, y: y0 },
-    { x: x0, y: y1 },
-    { x: x_front_wall, y: y1 }
+    { x: x_front_wall, y: y_flap_top },
+    { x: x0, y: y_flap_top },
+    { x: x0, y: y_flap_bot },
+    { x: x_front_wall, y: y_flap_bot }
   ]);
 
-  gb.addLine({ x: x_front_wall, y: y0 }, { x: x_front_wall, y: y1 }, 'CREASE', 'Front Flap Crease');
+  // Front Wall Left Perimeter Cut
+  gb.addLine({ x: x_front_wall, y: y_flap_top }, { x: x_front_wall, y: y_flap_bot }, 'CUT');
 
-  // Front Flap Extension
-  gb.addPanel('Front Flap', [
-    { x: x_front_flap, y: y0 },
-    { x: x_front_wall, y: y0 },
-    { x: x_front_wall, y: y1 },
-    { x: x_front_flap, y: y1 }
+  // Front Wall Top Corner Flap (tucks into top side wall) - crease at y = y_flap_top
+  gb.addLine({ x: x_front_wall, y: y_flap_top }, { x: x0 - gapR, y: y_flap_top }, 'CREASE', 'Front Top Corner Flap Crease');
+  gb.addPanel('Front Top Corner Flap', [
+    { x: x_front_wall, y: y_flap_top },
+    { x: x_front_wall, y: -D },
+    { x: x0 - gapR, y: -D },
+    { x: x0 - gapR, y: y_flap_top }
   ]);
-
-  // Front Flap perimeter cuts
-  gb.addLine({ x: x_front_flap, y: y0 }, { x: x_front_flap, y: y1 }, 'CUT');
-  gb.addLine({ x: x_front_flap, y: y0 }, { x: x_front_wall, y: y0 }, 'CUT');
-  gb.addLine({ x: x_front_flap, y: y1 }, { x: x_front_wall, y: y1 }, 'CUT');
-
-  // Front Wall Top Corner Flap (tucks into top side wall)
-  gb.addLine({ x: x_front_wall, y: y0 }, { x: x0, y: y0 }, 'CREASE', 'Front Top Corner Flap Crease');
   gb.addPolyline([
-    { x: x_front_wall, y: y0 },
-    { x: x_front_wall, y: -cornerFlapH },
-    { x: x0, y: -cornerFlapH },
-    { x: x0, y: y0 }
+    { x: x_front_wall, y: y_flap_top },
+    { x: x_front_wall, y: -D },
+    { x: x0 - gapR, y: -D },
+    { x: x0 - gapR, y: y_base_top }
   ], 'CUT');
 
-  // Front Wall Bottom Corner Flap (tucks into bottom side wall)
-  gb.addLine({ x: x_front_wall, y: y1 }, { x: x0, y: y1 }, 'CREASE', 'Front Bottom Corner Flap Crease');
+  // Front Wall Bottom Corner Flap (tucks into bottom side wall) - crease at y = y_flap_bot
+  gb.addLine({ x: x_front_wall, y: y_flap_bot }, { x: x0 - gapR, y: y_flap_bot }, 'CREASE', 'Front Bottom Corner Flap Crease');
+  gb.addPanel('Front Bottom Corner Flap', [
+    { x: x_front_wall, y: y_flap_bot },
+    { x: x_front_wall, y: W + D },
+    { x: x0 - gapR, y: W + D },
+    { x: x0 - gapR, y: y_flap_bot }
+  ]);
   gb.addPolyline([
-    { x: x_front_wall, y: y1 },
-    { x: x_front_wall, y: y1 + cornerFlapH },
-    { x: x0, y: y1 + cornerFlapH },
-    { x: x0, y: y1 }
+    { x: x_front_wall, y: y_flap_bot },
+    { x: x_front_wall, y: W + D },
+    { x: x0 - gapR, y: W + D },
+    { x: x0 - gapR, y: y_base_bot }
   ], 'CUT');
 
   // ----------------------------------------------------
-  // 3. TOP DOUBLE ROLL-OVER SIDE WALL & LOCKING TABS
+  // 3. TOP DOUBLE ROLL-OVER SIDE WALL & LOCKING TABS (MATCHING PICTURES 1 & 2)
   // ----------------------------------------------------
+  const x_inner_left = x0 + gapR + t;
+  const x_inner_right = x1 - gapR - t;
+
   gb.addPanel('Top Outer Side Wall', [
-    { x: x0, y: y_top_c1 },
-    { x: x1, y: y_top_c1 },
-    { x: x1, y: y0 },
-    { x: x0, y: y0 }
+    { x: x0 + gapR, y: y_top_c1 },
+    { x: x1 - gapR, y: y_top_c1 },
+    { x: x1 - gapR, y: y_base_top },
+    { x: x0 + gapR, y: y_base_top }
   ]);
 
-  // Side Wall Vertical Edges (Separation from Corner Flaps with relief chamfers)
-  gb.addLine({ x: x0, y: y0 }, { x: x0, y: y_top_c1 }, 'CUT');
-  gb.addLine({ x: x1, y: y0 }, { x: x1, y: y_top_c1 }, 'CUT');
+  // Outer Side Wall Parallel Knife Cuts (forming clearance gaps with rounded bottom)
+  gb.addLine({ x: x0 + gapR, y: y_base_top }, { x: x0 + gapR, y: y_top_c1 }, 'CUT');
+  gb.addLine({ x: x1 - gapR, y: y_base_top }, { x: x1 - gapR, y: y_top_c1 }, 'CUT');
 
-  // Double Crease at top
-  gb.addLine({ x: x0, y: y_top_c1 }, { x: x1, y: y_top_c1 }, 'CREASE', 'Top Wall Crease 1');
-  gb.addLine({ x: x0, y: y_top_c2 }, { x: x1, y: y_top_c2 }, 'CREASE', 'Top Wall Crease 2 (Roll-Over)');
+  // Double Crease at top: outer crease 1 and inner roll-over crease 2 (tapering inward)
+  gb.addLine({ x: x0 + gapR, y: y_top_c1 }, { x: x1 - gapR, y: y_top_c1 }, 'CREASE', 'Top Wall Crease 1');
+  gb.addLine({ x: x_inner_left, y: y_top_c2 }, { x: x_inner_right, y: y_top_c2 }, 'CREASE', 'Top Wall Crease 2 (Roll-Over)');
 
-  // Top and bottom connecting side cuts between creases
-  gb.addLine({ x: x0, y: y_top_c1 }, { x: x0, y: y_top_c2 }, 'CUT');
-  gb.addLine({ x: x1, y: y_top_c1 }, { x: x1, y: y_top_c2 }, 'CUT');
+  // Angled chamfer cuts between double creases (tapering INWARDS, matching picture 2)
+  gb.addLine({ x: x0 + gapR, y: y_top_c1 }, { x: x_inner_left, y: y_top_c2 }, 'CUT');
+  gb.addLine({ x: x1 - gapR, y: y_top_c1 }, { x: x_inner_right, y: y_top_c2 }, 'CUT');
 
-  // Top Inner Roll-Over Wall
+  // Top Inner Roll-Over Wall (Folding Flap - narrower to tuck inside)
   gb.addPanel('Top Inner Side Wall', [
-    { x: x0 + 4, y: y_top_inner },
-    { x: x1 - 4, y: y_top_inner },
-    { x: x1, y: y_top_c2 },
-    { x: x0, y: y_top_c2 }
+    { x: x_inner_left, y: y_top_inner },
+    { x: x_inner_right, y: y_top_inner },
+    { x: x_inner_right, y: y_top_c2 },
+    { x: x_inner_left, y: y_top_c2 }
   ]);
 
-  // Left & Right tapered edges of Inner Wall
-  gb.addLine({ x: x0, y: y_top_c2 }, { x: x0 + 4, y: y_top_inner }, 'CUT');
-  gb.addLine({ x: x1, y: y_top_c2 }, { x: x1 - 4, y: y_top_inner }, 'CUT');
+  // Straight Left & Right edges of Inner Folding Flap
+  gb.addLine({ x: x_inner_left, y: y_top_c2 }, { x: x_inner_left, y: y_top_inner }, 'CUT');
+  gb.addLine({ x: x_inner_right, y: y_top_c2 }, { x: x_inner_right, y: y_top_inner }, 'CUT');
 
-  // Top Locking Tabs Profile (aligning with base slots s1 and s2)
+  // Top Folding Flap Profile with Chamfered Locking Tabs (matching picture 1)
   gb.addPolyline([
-    { x: x0 + 4, y: y_top_inner },
-    { x: s1_x0 - tabNub, y: y_top_inner },
-    { x: s1_x0 - tabNub, y: y_top_inner - 3 },
-    { x: s1_x0 + 2, y: y_top_tab },
-    { x: s1_x1 - 2, y: y_top_tab },
-    { x: s1_x1 + tabNub, y: y_top_inner - 3 },
-    { x: s1_x1 + tabNub, y: y_top_inner },
-    { x: s2_x0 - tabNub, y: y_top_inner },
-    { x: s2_x0 - tabNub, y: y_top_inner - 3 },
-    { x: s2_x0 + 2, y: y_top_tab },
-    { x: s2_x1 - 2, y: y_top_tab },
-    { x: s2_x1 + tabNub, y: y_top_inner - 3 },
-    { x: s2_x1 + tabNub, y: y_top_inner },
-    { x: x1 - 4, y: y_top_inner }
+    { x: x_inner_left, y: y_top_inner },
+    { x: s1_x0 - tabBevel, y: y_top_inner },
+    { x: s1_x0, y: y_top_tab },
+    { x: s1_x1, y: y_top_tab },
+    { x: s1_x1 + tabBevel, y: y_top_inner },
+    { x: s2_x0 - tabBevel, y: y_top_inner },
+    { x: s2_x0, y: y_top_tab },
+    { x: s2_x1, y: y_top_tab },
+    { x: s2_x1 + tabBevel, y: y_top_inner },
+    { x: x_inner_right, y: y_top_inner }
   ], 'CUT');
 
   // ----------------------------------------------------
-  // 4. BOTTOM DOUBLE ROLL-OVER SIDE WALL & LOCKING TABS
+  // 4. BOTTOM DOUBLE ROLL-OVER SIDE WALL & LOCKING TABS (MATCHING PICTURES 1 & 2)
   // ----------------------------------------------------
   gb.addPanel('Bottom Outer Side Wall', [
-    { x: x0, y: y1 },
-    { x: x1, y: y1 },
-    { x: x1, y: y_bot_c1 },
-    { x: x0, y: y_bot_c1 }
+    { x: x0 + gapR, y: y_base_bot },
+    { x: x1 - gapR, y: y_base_bot },
+    { x: x1 - gapR, y: y_bot_c1 },
+    { x: x0 + gapR, y: y_bot_c1 }
   ]);
 
-  // Side Wall Vertical Cuts
-  gb.addLine({ x: x0, y: y1 }, { x: x0, y: y_bot_c1 }, 'CUT');
-  gb.addLine({ x: x1, y: y1 }, { x: x1, y: y_bot_c1 }, 'CUT');
+  // Outer Side Wall Parallel Knife Cuts
+  gb.addLine({ x: x0 + gapR, y: y_base_bot }, { x: x0 + gapR, y: y_bot_c1 }, 'CUT');
+  gb.addLine({ x: x1 - gapR, y: y_base_bot }, { x: x1 - gapR, y: y_bot_c1 }, 'CUT');
 
-  // Double Crease at bottom
-  gb.addLine({ x: x0, y: y_bot_c1 }, { x: x1, y: y_bot_c1 }, 'CREASE', 'Bottom Wall Crease 1');
-  gb.addLine({ x: x0, y: y_bot_c2 }, { x: x1, y: y_bot_c2 }, 'CREASE', 'Bottom Wall Crease 2 (Roll-Over)');
+  // Double Crease at bottom: outer crease 1 and inner roll-over crease 2 (tapering inward)
+  gb.addLine({ x: x0 + gapR, y: y_bot_c1 }, { x: x1 - gapR, y: y_bot_c1 }, 'CREASE', 'Bottom Wall Crease 1');
+  gb.addLine({ x: x_inner_left, y: y_bot_c2 }, { x: x_inner_right, y: y_bot_c2 }, 'CREASE', 'Bottom Wall Crease 2 (Roll-Over)');
 
-  // Left & right connecting cuts between creases
-  gb.addLine({ x: x0, y: y_bot_c1 }, { x: x0, y: y_bot_c2 }, 'CUT');
-  gb.addLine({ x: x1, y: y_bot_c1 }, { x: x1, y: y_bot_c2 }, 'CUT');
+  // Angled chamfer cuts between double creases (tapering INWARDS, matching picture 2)
+  gb.addLine({ x: x0 + gapR, y: y_bot_c1 }, { x: x_inner_left, y: y_bot_c2 }, 'CUT');
+  gb.addLine({ x: x1 - gapR, y: y_bot_c1 }, { x: x_inner_right, y: y_bot_c2 }, 'CUT');
 
-  // Bottom Inner Roll-Over Wall
+  // Bottom Inner Roll-Over Wall (Folding Flap - narrower to tuck inside)
   gb.addPanel('Bottom Inner Side Wall', [
-    { x: x0, y: y_bot_c2 },
-    { x: x1, y: y_bot_c2 },
-    { x: x1 - 4, y: y_bot_inner },
-    { x: x0 + 4, y: y_bot_inner }
+    { x: x_inner_left, y: y_bot_c2 },
+    { x: x_inner_right, y: y_bot_c2 },
+    { x: x_inner_right, y: y_bot_inner },
+    { x: x_inner_left, y: y_bot_inner }
   ]);
 
-  // Left & Right tapered edges of Inner Wall
-  gb.addLine({ x: x0, y: y_bot_c2 }, { x: x0 + 4, y: y_bot_inner }, 'CUT');
-  gb.addLine({ x: x1, y: y_bot_c2 }, { x: x1 - 4, y: y_bot_inner }, 'CUT');
+  // Straight Left & Right edges of Inner Folding Flap
+  gb.addLine({ x: x_inner_left, y: y_bot_c2 }, { x: x_inner_left, y: y_bot_inner }, 'CUT');
+  gb.addLine({ x: x_inner_right, y: y_bot_c2 }, { x: x_inner_right, y: y_bot_inner }, 'CUT');
 
-  // Bottom Locking Tabs Profile
+  // Bottom Folding Flap Profile with Chamfered Locking Tabs (matching picture 1)
   gb.addPolyline([
-    { x: x0 + 4, y: y_bot_inner },
-    { x: s1_x0 - tabNub, y: y_bot_inner },
-    { x: s1_x0 - tabNub, y: y_bot_inner + 3 },
-    { x: s1_x0 + 2, y: y_bot_tab },
-    { x: s1_x1 - 2, y: y_bot_tab },
-    { x: s1_x1 + tabNub, y: y_bot_inner + 3 },
-    { x: s1_x1 + tabNub, y: y_bot_inner },
-    { x: s2_x0 - tabNub, y: y_bot_inner },
-    { x: s2_x0 - tabNub, y: y_bot_inner + 3 },
-    { x: s2_x0 + 2, y: y_bot_tab },
-    { x: s2_x1 - 2, y: y_bot_tab },
-    { x: s2_x1 + tabNub, y: y_bot_inner + 3 },
-    { x: s2_x1 + tabNub, y: y_bot_inner },
-    { x: x1 - 4, y: y_bot_inner }
+    { x: x_inner_left, y: y_bot_inner },
+    { x: s1_x0 - tabBevel, y: y_bot_inner },
+    { x: s1_x0, y: y_bot_tab },
+    { x: s1_x1, y: y_bot_tab },
+    { x: s1_x1 + tabBevel, y: y_bot_inner },
+    { x: s2_x0 - tabBevel, y: y_bot_inner },
+    { x: s2_x0, y: y_bot_tab },
+    { x: s2_x1, y: y_bot_tab },
+    { x: s2_x1 + tabBevel, y: y_bot_inner },
+    { x: x_inner_right, y: y_bot_inner }
   ], 'CUT');
 
   // ----------------------------------------------------
-  // 5. REAR WALL & REAR CORNER TUCK FLAPS
+  // 5. REAR WALL & REAR CORNER TUCK FLAPS (TIGHTER BY t)
   // ----------------------------------------------------
   gb.addPanel('Rear Wall', [
-    { x: x1, y: y0 },
-    { x: x2, y: y0 },
-    { x: x2, y: y1 },
-    { x: x1, y: y1 }
+    { x: x1, y: y_flap_top },
+    { x: x2, y: y_flap_top },
+    { x: x2, y: y_flap_bot },
+    { x: x1, y: y_flap_bot }
   ]);
 
-  gb.addLine({ x: x2, y: y0 }, { x: x2, y: y1 }, 'CREASE', 'Lid Hinge Crease');
+  gb.addLine({ x: x2, y: y_lid_top }, { x: x2, y: y_lid_bot }, 'CREASE', 'Lid Hinge Crease');
+
+  // Step cuts between rear flap crease (t / W-t) and lid crease (2*t / W-2*t)
+  gb.addLine({ x: x2, y: y_flap_top }, { x: x2, y: y_lid_top }, 'CUT');
+  gb.addLine({ x: x2, y: y_flap_bot }, { x: x2, y: y_lid_bot }, 'CUT');
 
   // Rear Wall Top Corner Flap
-  gb.addLine({ x: x1, y: y0 }, { x: x2, y: y0 }, 'CREASE', 'Rear Top Corner Flap Crease');
+  gb.addLine({ x: x1 + gapR, y: y_flap_top }, { x: x2, y: y_flap_top }, 'CREASE', 'Rear Top Corner Flap Crease');
+  gb.addPanel('Rear Top Corner Flap', [
+    { x: x1 + gapR, y: y_flap_top },
+    { x: x1 + gapR, y: -D },
+    { x: x2, y: -D },
+    { x: x2, y: y_flap_top }
+  ]);
   gb.addPolyline([
-    { x: x1, y: y0 },
-    { x: x1, y: -cornerFlapH },
-    { x: x2, y: -cornerFlapH },
-    { x: x2, y: y0 }
+    { x: x1 + gapR, y: y_base_top },
+    { x: x1 + gapR, y: -D },
+    { x: x2, y: -D },
+    { x: x2, y: y_flap_top }
   ], 'CUT');
 
   // Rear Wall Bottom Corner Flap
-  gb.addLine({ x: x1, y: y1 }, { x: x2, y: y1 }, 'CREASE', 'Rear Bottom Corner Flap Crease');
+  gb.addLine({ x: x1 + gapR, y: y_flap_bot }, { x: x2, y: y_flap_bot }, 'CREASE', 'Rear Bottom Corner Flap Crease');
+  gb.addPanel('Rear Bottom Corner Flap', [
+    { x: x1 + gapR, y: y_flap_bot },
+    { x: x1 + gapR, y: W + D },
+    { x: x2, y: W + D },
+    { x: x2, y: y_flap_bot }
+  ]);
   gb.addPolyline([
-    { x: x1, y: y1 },
-    { x: x1, y: y1 + cornerFlapH },
-    { x: x2, y: y1 + cornerFlapH },
-    { x: x2, y: y1 }
+    { x: x1 + gapR, y: y_base_bot },
+    { x: x1 + gapR, y: W + D },
+    { x: x2, y: W + D },
+    { x: x2, y: y_flap_bot }
   ], 'CUT');
 
   // ----------------------------------------------------
-  // 6. TOP LID & DUST FLAPS (WITH INDUSTRIAL ROUNDED EDGES)
+  // 6. TOP LID & DUST FLAPS (SYMMETRICAL SLOPES & ROUNDED CORNERS - MATCHING PICTURE 1)
   // ----------------------------------------------------
   gb.addPanel('Top Lid', [
-    { x: x2, y: y0 },
-    { x: x3, y: y0 },
-    { x: x3, y: y1 },
-    { x: x2, y: y1 }
+    { x: x2, y: y_lid_top },
+    { x: x3, y: y_lid_top },
+    { x: x3, y: y_lid_bot },
+    { x: x2, y: y_lid_bot }
   ]);
 
-  // Top Dust Flap attached to Lid (with rounded outer corner & relief slope at hinge)
-  gb.addLine({ x: x2, y: y0 }, { x: x3, y: y0 }, 'CREASE', 'Top Dust Flap Crease');
+  const slopeW = Math.min(28, L * 0.15); // Inward chamfer slope on both sides of dust flap
+  const dustTopY = y_lid_top - dustFlapH;
+  const dustBotY = y_lid_bot + dustFlapH;
+
+  // Helper for smooth tangent fillets at trapezoid corners
+  const sampleQuadBezier = (p0: Point2D, p1: Point2D, p2: Point2D, count = 10): Point2D[] => {
+    const pts: Point2D[] = [];
+    for (let i = 0; i <= count; i++) {
+      const t = i / count;
+      const mt = 1 - t;
+      pts.push({
+        x: mt * mt * p0.x + 2 * mt * t * p1.x + t * t * p2.x,
+        y: mt * mt * p0.y + 2 * mt * t * p1.y + t * t * p2.y
+      });
+    }
+    return pts;
+  };
+
+  // Top Dust Flap attached to Lid (Symmetrical trapezoid with smooth rounded corners)
+  gb.addLine({ x: x2, y: y_lid_top }, { x: x3, y: y_lid_top }, 'CREASE', 'Top Dust Flap Crease');
   gb.addPanel('Top Dust Flap', [
-    { x: x2, y: y0 },
-    { x: x2 + 18, y: -dustFlapH },
-    { x: x3 - 22, y: -dustFlapH },
-    { x: x3, y: -dustFlapH + 22 },
-    { x: x3, y: y0 }
+    { x: x2, y: y_lid_top },
+    { x: x2 + slopeW, y: dustTopY },
+    { x: x3 - slopeW, y: dustTopY },
+    { x: x3, y: y_lid_top }
   ]);
 
-  gb.addLine({ x: x2, y: y0 }, { x: x2 + 18, y: -dustFlapH }, 'CUT');
-  gb.addLine({ x: x2 + 18, y: -dustFlapH }, { x: x3 - 22, y: -dustFlapH }, 'CUT');
-  gb.addArc({ x: x3 - 22, y: -dustFlapH + 22 }, 22, -Math.PI / 2, 0, 'CUT');
-  gb.addLine({ x: x3, y: -dustFlapH + 22 }, { x: x3, y: y0 }, 'CUT');
+  const pTopA: Point2D = { x: x2, y: y_lid_top };
+  const pTopB: Point2D = { x: x2 + slopeW, y: dustTopY };
+  const pTopC: Point2D = { x: x3 - slopeW, y: dustTopY };
+  const pTopD: Point2D = { x: x3, y: y_lid_top };
 
-  // Bottom Dust Flap attached to Lid (with rounded outer corner & relief slope at hinge)
-  gb.addLine({ x: x2, y: y1 }, { x: x3, y: y1 }, 'CREASE', 'Bottom Dust Flap Crease');
+  const lenTopAB = Math.hypot(pTopA.x - pTopB.x, pTopA.y - pTopB.y);
+  const lenTopCD = Math.hypot(pTopD.x - pTopC.x, pTopD.y - pTopC.y);
+  const topFillet = Math.min(18, lenTopAB * 0.35, (pTopC.x - pTopB.x) * 0.35);
+
+  const uTopBA: Point2D = { x: (pTopA.x - pTopB.x) / lenTopAB, y: (pTopA.y - pTopB.y) / lenTopAB };
+  const uTopCD: Point2D = { x: (pTopD.x - pTopC.x) / lenTopCD, y: (pTopD.y - pTopC.y) / lenTopCD };
+
+  const tTop1: Point2D = { x: pTopB.x + topFillet * uTopBA.x, y: pTopB.y + topFillet * uTopBA.y };
+  const tTop2: Point2D = { x: pTopB.x + topFillet, y: pTopB.y };
+  const tTop3: Point2D = { x: pTopC.x - topFillet, y: pTopC.y };
+  const tTop4: Point2D = { x: pTopC.x + topFillet * uTopCD.x, y: pTopC.y + topFillet * uTopCD.y };
+
+  const topDustOutline: Point2D[] = [
+    pTopA,
+    tTop1,
+    ...sampleQuadBezier(tTop1, pTopB, tTop2).slice(1),
+    tTop3,
+    ...sampleQuadBezier(tTop3, pTopC, tTop4).slice(1),
+    pTopD
+  ];
+  gb.addPolyline(topDustOutline, 'CUT');
+
+  // Bottom Dust Flap attached to Lid (Symmetrical trapezoid with smooth rounded corners)
+  gb.addLine({ x: x2, y: y_lid_bot }, { x: x3, y: y_lid_bot }, 'CREASE', 'Bottom Dust Flap Crease');
   gb.addPanel('Bottom Dust Flap', [
-    { x: x2, y: y1 },
-    { x: x2 + 18, y: y1 + dustFlapH },
-    { x: x3 - 22, y: y1 + dustFlapH },
-    { x: x3, y: y1 + dustFlapH - 22 },
-    { x: x3, y: y1 }
+    { x: x2, y: y_lid_bot },
+    { x: x2 + slopeW, y: dustBotY },
+    { x: x3 - slopeW, y: dustBotY },
+    { x: x3, y: y_lid_bot }
   ]);
 
-  gb.addLine({ x: x2, y: y1 }, { x: x2 + 18, y: y1 + dustFlapH }, 'CUT');
-  gb.addLine({ x: x2 + 18, y: y1 + dustFlapH }, { x: x3 - 22, y: y1 + dustFlapH }, 'CUT');
-  gb.addArc({ x: x3 - 22, y: y1 + dustFlapH - 22 }, 22, 0, Math.PI / 2, 'CUT');
-  gb.addLine({ x: x3, y: y1 + dustFlapH - 22 }, { x: x3, y: y1 }, 'CUT');
+  const pBotA: Point2D = { x: x2, y: y_lid_bot };
+  const pBotB: Point2D = { x: x2 + slopeW, y: dustBotY };
+  const pBotC: Point2D = { x: x3 - slopeW, y: dustBotY };
+  const pBotD: Point2D = { x: x3, y: y_lid_bot };
+
+  const lenBotAB = Math.hypot(pBotA.x - pBotB.x, pBotA.y - pBotB.y);
+  const lenBotCD = Math.hypot(pBotD.x - pBotC.x, pBotD.y - pBotC.y);
+  const botFillet = Math.min(18, lenBotAB * 0.35, (pBotC.x - pBotB.x) * 0.35);
+
+  const uBotBA: Point2D = { x: (pBotA.x - pBotB.x) / lenBotAB, y: (pBotA.y - pBotB.y) / lenBotAB };
+  const uBotCD: Point2D = { x: (pBotD.x - pBotC.x) / lenBotCD, y: (pBotD.y - pBotC.y) / lenBotCD };
+
+  const tBot1: Point2D = { x: pBotB.x + botFillet * uBotBA.x, y: pBotB.y + botFillet * uBotBA.y };
+  const tBot2: Point2D = { x: pBotB.x + botFillet, y: pBotB.y };
+  const tBot3: Point2D = { x: pBotC.x - botFillet, y: pBotC.y };
+  const tBot4: Point2D = { x: pBotC.x + botFillet * uBotCD.x, y: pBotC.y + botFillet * uBotCD.y };
+
+  const botDustOutline: Point2D[] = [
+    pBotA,
+    tBot1,
+    ...sampleQuadBezier(tBot1, pBotB, tBot2).slice(1),
+    tBot3,
+    ...sampleQuadBezier(tBot3, pBotC, tBot4).slice(1),
+    pBotD
+  ];
+  gb.addPolyline(botDustOutline, 'CUT');
 
   // ----------------------------------------------------
-  // 7. FRONT TUCK-IN CLOSURE FLAP (WITH ROUNDED CORNERS)
+  // 7. FRONT TUCK-IN CLOSURE FLAP & CHERRY LOCK EARS (MATCHING PICTURE 1)
   // ----------------------------------------------------
-  gb.addLine({ x: x3, y: y0 }, { x: x3, y: y1 }, 'CREASE', 'Front Tuck Flap Crease');
+  gb.addLine({ x: x3, y: y_lid_top }, { x: x3, y: y_lid_bot }, 'CREASE', 'Front Tuck Flap Crease');
+  const earOffset = 4; // Inward offset of the ear base relative to x4
+  const earChamfer = 5; // Height/width of the 45-degree chamfer transition
+  const earStemH = 6; // Vertical stem height above/below the crease line
+  const xEar = x4 - earOffset;
+
+  gb.addLine({ x: x3, y: y_lid_top }, { x: xEar, y: y_lid_top }, 'CREASE', 'Tuck Top Crease');
+  gb.addLine({ x: x3, y: y_lid_bot }, { x: xEar, y: y_lid_bot }, 'CREASE', 'Tuck Bottom Crease');
+
   gb.addPanel('Front Tuck Flap', [
-    { x: x3, y: y0 },
-    { x: x4, y: y0 + 26 },
-    { x: x4, y: y1 - 26 },
-    { x: x3, y: y1 }
+    { x: x3, y: y_lid_top },
+    { x: xEar, y: y_lid_top },
+    { x: x4, y: y_lid_top + earChamfer },
+    { x: x4, y: y_lid_bot - earChamfer },
+    { x: xEar, y: y_lid_bot },
+    { x: x3, y: y_lid_bot }
   ]);
 
-  const tuckR = Math.min(28, tuck * 0.7);
-  // Top Rounded Corner
-  gb.addArc({ x: x4 - tuckR, y: y0 + tuckR }, tuckR, -Math.PI / 2, 0, 'CUT');
-  gb.addLine({ x: x3, y: y0 }, { x: x4 - tuckR, y: y0 }, 'CUT');
-  // Right Vertical Cut
-  gb.addLine({ x: x4, y: y0 + tuckR }, { x: x4, y: y1 - tuckR }, 'CUT');
-  // Bottom Rounded Corner
-  gb.addArc({ x: x4 - tuckR, y: y1 - tuckR }, tuckR, 0, Math.PI / 2, 'CUT');
-  gb.addLine({ x: x4 - tuckR, y: y1 }, { x: x3, y: y1 }, 'CUT');
+  // Top Cherry Lock Ear (Smooth arched tongue profile matching reference)
+  const earTopY = y_lid_top - earH;
+  const earR = Math.min(20, earH * 0.5);
+
+  gb.addLine({ x: x3, y: y_lid_top }, { x: x3, y: earTopY + earR }, 'CUT');
+  gb.addArc({ x: x3 + earR, y: earTopY + earR }, earR, Math.PI, Math.PI * 1.5, 'CUT');
+  
+  // Smooth elliptical sweep down to (xEar, y_lid_top - earStemH)
+  const topEarPoints: Point2D[] = [];
+  const segments = 16;
+  for (let i = 0; i <= segments; i++) {
+    const t = i / segments;
+    const angle = t * (Math.PI / 2);
+    const px = (x3 + earR) + (xEar - (x3 + earR)) * Math.sin(angle);
+    const py = (y_lid_top - earStemH) - (earH - earStemH) * Math.cos(angle);
+    topEarPoints.push({ x: px, y: py });
+  }
+  gb.addPolyline(topEarPoints, 'CUT');
+
+  // Straight vertical lead-in down to the crease intersection
+  gb.addLine({ x: xEar, y: y_lid_top - earStemH }, { x: xEar, y: y_lid_top }, 'CUT');
+
+  // Angled chamfer outward from crease intersection to main tuck flap edge
+  gb.addLine({ x: xEar, y: y_lid_top }, { x: x4, y: y_lid_top + earChamfer }, 'CUT');
+
+  // Right Edge Vertical Cut (Main outer edge)
+  gb.addLine({ x: x4, y: y_lid_top + earChamfer }, { x: x4, y: y_lid_bot - earChamfer }, 'CUT');
+
+  // Angled chamfer inward from main edge to bottom crease intersection
+  gb.addLine({ x: x4, y: y_lid_bot - earChamfer }, { x: xEar, y: y_lid_bot }, 'CUT');
+
+  // Straight vertical lead-in down past the bottom crease intersection
+  gb.addLine({ x: xEar, y: y_lid_bot }, { x: xEar, y: y_lid_bot + earStemH }, 'CUT');
+
+  // Bottom Cherry Lock Ear (Symmetrical arched tongue profile)
+  const earBotY = y_lid_bot + earH;
+
+  const botEarPoints: Point2D[] = [];
+  for (let i = 0; i <= segments; i++) {
+    const t = i / segments;
+    const angle = (1 - t) * (Math.PI / 2);
+    const px = (x3 + earR) + (xEar - (x3 + earR)) * Math.sin(angle);
+    const py = (y_lid_bot + earStemH) + (earH - earStemH) * Math.cos(angle);
+    botEarPoints.push({ x: px, y: py });
+  }
+  gb.addPolyline(botEarPoints, 'CUT');
+
+  gb.addArc({ x: x3 + earR, y: earBotY - earR }, earR, Math.PI * 0.5, Math.PI, 'CUT');
+  gb.addLine({ x: x3, y: earBotY - earR }, { x: x3, y: y_lid_bot }, 'CUT');
 
   // ----------------------------------------------------
   // 8. BLEED BOUNDARY
   // ----------------------------------------------------
   const bleed = p['bleed'] || 3;
-  const minX = x_front_flap - bleed;
+  const minX = x_front_wall - bleed;
   const maxX = x4 + bleed;
-  const minY = Math.min(y_top_tab, -dustFlapH) - bleed;
-  const maxY = Math.max(y_bot_tab, y1 + dustFlapH) + bleed;
+  const minY = Math.min(y_top_tab, -dustFlapH, -earH) - bleed;
+  const maxY = Math.max(y_bot_tab, y_base_bot + dustFlapH, y_base_bot + earH) + bleed;
   gb.addRect(minX, minY, maxX - minX, maxY - minY, 'BLEED');
 
   // ----------------------------------------------------
-  // 9. DRIVING DIMENSIONS (Matching exact callouts in user's image)
+  // 9. DRIVING DIMENSIONS (Exact match to the 3 callouts in user's image)
   // ----------------------------------------------------
-  // Base Horizontal Dimension (202 mm in image)
-  gb.addDimension({ x: x0, y: y1 * 0.65 }, { x: x1, y: y1 * 0.65 }, L, `${L} mm`, 0, 'horizontal', 'length');
-  // Base Vertical Dimension (315 mm in image)
-  gb.addDimension({ x: x0 + L * 0.60, y: y0 }, { x: x0 + L * 0.60, y: y1 }, W, `${W} mm`, 0, 'vertical', 'width');
-  // Depth Dimension across Rear Wall (62 mm in image)
-  gb.addDimension({ x: x1, y: y0 + 50 }, { x: x2, y: y0 + 50 }, D, `${D} mm`, 0, 'horizontal', 'height');
+  // Base Horizontal Dimension (220 mm in image)
+  gb.addDimension({ x: x0, y: y_base_bot * 0.68 }, { x: x1, y: y_base_bot * 0.68 }, L, `${L} mm`, 0, 'horizontal', 'length');
+  // Base Vertical Dimension (300 mm in image)
+  gb.addDimension({ x: x0 + L * 0.68, y: y_base_top }, { x: x0 + L * 0.68, y: y_base_bot }, W, `${W} mm`, 0, 'vertical', 'width');
+  // Depth Dimension across Rear Wall (80 mm in image)
+  gb.addDimension({ x: x1, y: y_base_top + D * 0.5 }, { x: x2, y: y_base_top + D * 0.5 }, D, `${D} mm`, 0, 'horizontal', 'height');
 }
 
 // 3. Straight Tuck End Box (STE)

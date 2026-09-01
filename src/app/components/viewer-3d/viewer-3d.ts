@@ -431,12 +431,12 @@ export class Viewer3D implements AfterViewInit, OnDestroy {
     gluePivot.rotation.y = angle;
   }
 
-  // 2. Roll End Tuck Top Mailer (RETT / FEFCO 0427)
+  // 2. Roll End Tuck Front Mailer (FEFCO 0427)
   private buildMailer3D(p: Record<string, number>, f: number, color: string): void {
-    const L = p['length'] || 260;
-    const W = p['width'] || 180;
-    const H = p['height'] || 70;
-    const tuck = p['tuckFlap'] || Math.max(35, Math.min(H * 0.85, 75));
+    const L = p['length'] || 220;
+    const W = p['width'] || 300;
+    const H = p['height'] || 80;
+    const tuck = p['tuckFlap'] || 80;
     const angle = (Math.PI / 2) * f;
 
     const root = new THREE.Group();

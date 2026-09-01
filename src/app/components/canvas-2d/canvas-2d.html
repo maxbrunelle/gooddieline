@@ -449,6 +449,13 @@
             <feGaussianBlur stdDeviation="2" result="blur" />
             <feComposite in="SourceGraphic" in2="blur" operator="over" />
           </filter>
+          <!-- Arrowhead markers for dimension lines -->
+          <marker id="dim-arrow-start" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+            <path d="M 0 1.5 L 10 5 L 0 8.5 z" fill="#0284c7" />
+          </marker>
+          <marker id="dim-arrow-end" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+            <path d="M 0 1.5 L 10 5 L 0 8.5 z" fill="#0284c7" />
+          </marker>
         </defs>
 
         <!-- 1. Panel Fill Base Layer -->
@@ -592,53 +599,40 @@
                   stroke-width="0.75"
                   stroke-dasharray="2, 2"
                 />
-                <!-- Main Dimension Line -->
+                <!-- Main Dimension Line with Arrowheads -->
                 <line
                   [attr.x1]="dim.p1.x + dim.offset"
                   [attr.y1]="dim.p1.y"
                   [attr.x2]="dim.p2.x + dim.offset"
                   [attr.y2]="dim.p2.y"
-                  [attr.stroke]="state.isDarkMode() ? '#a1a1aa' : '#64748b'"
-                  stroke-width="1"
-                  class="group-hover:stroke-[#3850a2] transition-colors"
-                />
-                <!-- End Arrow Ticks -->
-                <circle 
-                  [attr.cx]="dim.p1.x + dim.offset" 
-                  [attr.cy]="dim.p1.y" 
-                  r="2" 
-                  [attr.fill]="state.isDarkMode() ? '#a1a1aa' : '#64748b'" 
-                  class="group-hover:fill-[#3850a2]" 
-                />
-                <circle 
-                  [attr.cx]="dim.p2.x + dim.offset" 
-                  [attr.cy]="dim.p2.y" 
-                  r="2" 
-                  [attr.fill]="state.isDarkMode() ? '#a1a1aa' : '#64748b'" 
-                  class="group-hover:fill-[#3850a2]" 
+                  stroke="#0284c7"
+                  stroke-width="1.2"
+                  marker-start="url(#dim-arrow-start)"
+                  marker-end="url(#dim-arrow-end)"
+                  class="group-hover:stroke-[#2563eb] transition-colors"
                 />
                 
                 <!-- Value Label Badge -->
                 <rect
-                  [attr.x]="dim.p1.x + dim.offset - 40"
+                  [attr.x]="dim.p1.x + dim.offset - 35"
                   [attr.y]="((dim.p1.y + dim.p2.y) / 2) - 9"
-                  width="80"
+                  width="70"
                   height="18"
-                  rx="4"
+                  rx="3"
                   [attr.fill]="state.isDarkMode() ? '#18181b' : '#ffffff'"
-                  [attr.stroke]="state.isDarkMode() ? '#3f3f46' : '#cbd5e1'"
+                  [attr.stroke]="state.isDarkMode() ? '#3f3f46' : '#0284c7'"
                   stroke-width="0.8"
-                  class="group-hover:stroke-[#3850a2] transition-colors"
+                  class="group-hover:stroke-[#2563eb] transition-colors"
                 />
                 <text
                   [attr.x]="dim.p1.x + dim.offset"
-                  [attr.y]="((dim.p1.y + dim.p2.y) / 2) + 3"
+                  [attr.y]="((dim.p1.y + dim.p2.y) / 2) + 4"
                   text-anchor="middle"
-                  font-family="Fira Code"
-                  font-size="9"
+                  font-family="system-ui, -apple-system, sans-serif"
+                  font-size="10"
                   font-weight="600"
-                  [attr.fill]="state.isDarkMode() ? '#e4e4e7' : '#0f172a'"
-                  class="group-hover:fill-[#3850a2] select-none"
+                  fill="#0284c7"
+                  class="group-hover:fill-[#2563eb] select-none"
                 >
                   {{ state.formatUnit(dim.value) }}
                 </text>
@@ -663,53 +657,40 @@
                   stroke-width="0.75"
                   stroke-dasharray="2, 2"
                 />
-                <!-- Main Dimension Line -->
+                <!-- Main Dimension Line with Arrowheads -->
                 <line
                   [attr.x1]="dim.p1.x"
                   [attr.y1]="dim.p1.y + dim.offset"
                   [attr.x2]="dim.p2.x"
                   [attr.y2]="dim.p2.y + dim.offset"
-                  [attr.stroke]="state.isDarkMode() ? '#a1a1aa' : '#64748b'"
-                  stroke-width="1"
-                  class="group-hover:stroke-[#3850a2] transition-colors"
-                />
-                <!-- End Arrow Ticks -->
-                <circle 
-                  [attr.cx]="dim.p1.x" 
-                  [attr.cy]="dim.p1.y + dim.offset" 
-                  r="2" 
-                  [attr.fill]="state.isDarkMode() ? '#a1a1aa' : '#64748b'" 
-                  class="group-hover:fill-[#3850a2]" 
-                />
-                <circle 
-                  [attr.cx]="dim.p2.x" 
-                  [attr.cy]="dim.p2.y + dim.offset" 
-                  r="2" 
-                  [attr.fill]="state.isDarkMode() ? '#a1a1aa' : '#64748b'" 
-                  class="group-hover:fill-[#3850a2]" 
+                  stroke="#0284c7"
+                  stroke-width="1.2"
+                  marker-start="url(#dim-arrow-start)"
+                  marker-end="url(#dim-arrow-end)"
+                  class="group-hover:stroke-[#2563eb] transition-colors"
                 />
                 
                 <!-- Value Label Badge -->
                 <rect
-                  [attr.x]="((dim.p1.x + dim.p2.x) / 2) - 40"
+                  [attr.x]="((dim.p1.x + dim.p2.x) / 2) - 35"
                   [attr.y]="((dim.p1.y + dim.p2.y) / 2) + dim.offset - 9"
-                  width="80"
+                  width="70"
                   height="18"
-                  rx="4"
+                  rx="3"
                   [attr.fill]="state.isDarkMode() ? '#18181b' : '#ffffff'"
-                  [attr.stroke]="state.isDarkMode() ? '#3f3f46' : '#cbd5e1'"
+                  [attr.stroke]="state.isDarkMode() ? '#3f3f46' : '#0284c7'"
                   stroke-width="0.8"
-                  class="group-hover:stroke-[#3850a2] transition-colors"
+                  class="group-hover:stroke-[#2563eb] transition-colors"
                 />
                 <text
                   [attr.x]="(dim.p1.x + dim.p2.x) / 2"
-                  [attr.y]="((dim.p1.y + dim.p2.y) / 2) + dim.offset + 3"
+                  [attr.y]="((dim.p1.y + dim.p2.y) / 2) + dim.offset + 4"
                   text-anchor="middle"
-                  font-family="Fira Code"
-                  font-size="9"
+                  font-family="system-ui, -apple-system, sans-serif"
+                  font-size="10"
                   font-weight="600"
-                  [attr.fill]="state.isDarkMode() ? '#e4e4e7' : '#0f172a'"
-                  class="group-hover:fill-[#3850a2] select-none"
+                  fill="#0284c7"
+                  class="group-hover:fill-[#2563eb] select-none"
                 >
                   {{ state.formatUnit(dim.value) }}
                 </text>

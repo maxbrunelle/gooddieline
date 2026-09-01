@@ -20,17 +20,25 @@ export type WorkspaceTab = 'editor_2d' | 'viewer_3d' | 'nesting' | 'templates' |
 
 const DEFAULT_PROJECT: ProjectData = {
   id: 'proj_default_01',
-  name: 'Standard RSC Corrugated Shipping Carton',
-  customerName: 'AeroGoods Logistics',
-  jobNumber: 'JOB-2026-904',
-  sku: 'PKG-BX-300-200',
+  name: 'Roll End Tuck Front Mailer (FEFCO 0427)',
+  customerName: 'Custom Packaging Co.',
+  jobNumber: 'JOB-2026-0427',
+  sku: 'RETF-220-300-80',
   createdDate: new Date().toISOString().split('T')[0],
   modifiedDate: new Date().toISOString().split('T')[0],
-  notes: 'High yield Zünd cut layout on 48x96 in B-flute. Standard FEFCO 0201 Regular Slotted Carton with 25.4mm glue tab.',
-  templateId: 'rsc_carton',
-  params: { ...TEMPLATE_DEFINITIONS[0].defaultParams },
+  notes: 'FEFCO 0427 Roll-End Tuck-Front (RETF) Mailer box with double roll-over side walls, snap-locking base slots, and cherry lock curved front tuck ears.',
+  templateId: 'mailer_box',
+  params: {
+    length: 220,
+    width: 300,
+    height: 80,
+    tuckFlap: 80,
+    caliper: 2.5,
+    bleed: 3,
+    safety: 5
+  },
   dimensionMode: 'inside',
-  materialId: 'mat_bflute_30',
+  materialId: 'mat_eflute_15',
   sheetId: 'sheet_48x96',
   nestingConfig: {
     sheetWidth: 2438.4,

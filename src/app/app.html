@@ -1037,18 +1037,32 @@
               </p>
             </div>
           </div>
-          <button
-            (click)="showSettingsModal.set(false)"
-            class="p-1.5 rounded-lg transition-colors cursor-pointer"
-            [class.text-neutral-400]="state.isDarkMode()"
-            [class.hover:text-white]="state.isDarkMode()"
-            [class.hover:bg-neutral-800]="state.isDarkMode()"
-            [class.text-slate-500]="!state.isDarkMode()"
-            [class.hover:text-slate-900]="!state.isDarkMode()"
-            [class.hover:bg-slate-100]="!state.isDarkMode()"
-          >
-            <mat-icon class="text-base">close</mat-icon>
-          </button>
+          <div class="flex items-center gap-2">
+            <!-- Easter Egg Whiskey Bottle Button in Settings Header -->
+            <button
+              id="btn_easter_egg_whiskey"
+              type="button"
+              (click)="openEasterEgg()"
+              class="px-2.5 py-1.5 rounded-xl border border-amber-500/50 bg-gradient-to-r from-amber-500/20 via-yellow-500/15 to-amber-600/25 hover:from-amber-500/35 hover:to-amber-600/40 text-amber-300 hover:text-amber-200 transition-all active:scale-95 cursor-pointer flex items-center gap-1.5 shadow-md shadow-amber-500/20 animate-pulse"
+              title="MiLK's Reserve Blend 🥃 Click for celebration!"
+            >
+              <mat-icon class="text-lg text-amber-400">liquor</mat-icon>
+              <span class="text-xs font-bold tracking-wide">🥃</span>
+            </button>
+
+            <button
+              (click)="showSettingsModal.set(false)"
+              class="p-1.5 rounded-lg transition-colors cursor-pointer"
+              [class.text-neutral-400]="state.isDarkMode()"
+              [class.hover:text-white]="state.isDarkMode()"
+              [class.hover:bg-neutral-800]="state.isDarkMode()"
+              [class.text-slate-500]="!state.isDarkMode()"
+              [class.hover:text-slate-900]="!state.isDarkMode()"
+              [class.hover:bg-slate-100]="!state.isDarkMode()"
+            >
+              <mat-icon class="text-base">close</mat-icon>
+            </button>
+          </div>
         </div>
 
         <!-- Custom Brand Logo Section -->
@@ -1231,9 +1245,23 @@
 
         <!-- Modal Footer -->
         <div class="pt-4 border-t flex items-center justify-between" [class.border-neutral-800]="state.isDarkMode()" [class.border-slate-200]="!state.isDarkMode()">
-          <div class="flex items-center gap-1.5 text-[11px] font-mono" [class.text-neutral-400]="state.isDarkMode()" [class.text-slate-500]="!state.isDarkMode()">
-            <mat-icon class="text-xs text-emerald-400">check_circle</mat-icon>
-            <span>Saved to LocalStorage</span>
+          <div class="flex items-center gap-3">
+            <div class="flex items-center gap-1.5 text-[11px] font-mono" [class.text-neutral-400]="state.isDarkMode()" [class.text-slate-500]="!state.isDarkMode()">
+              <mat-icon class="text-xs text-emerald-400">check_circle</mat-icon>
+              <span>Saved to LocalStorage</span>
+            </div>
+
+            <!-- Easter Egg Whiskey Bottle Trigger in Footer -->
+            <button
+              id="btn_easter_egg_whiskey_footer"
+              type="button"
+              (click)="openEasterEgg()"
+              class="px-2.5 py-1 rounded-lg border border-amber-500/40 bg-amber-500/10 hover:bg-amber-500/25 text-amber-300 hover:text-amber-200 transition-all active:scale-95 cursor-pointer flex items-center gap-1.5 shadow-xs"
+              title="MiLK's Secret Reserve 🥃"
+            >
+              <mat-icon class="text-sm text-amber-400">liquor</mat-icon>
+              <span class="text-[11px] font-mono font-bold uppercase tracking-wider text-amber-300">Reserve 🥃</span>
+            </button>
           </div>
 
           <button
@@ -1242,6 +1270,87 @@
             class="px-5 py-2 bg-[#3850a2] hover:bg-[#4865c2] text-white font-bold text-xs rounded-lg shadow-md shadow-[#3850a2]/30 transition-all active:scale-95 cursor-pointer"
           >
             Save & Close
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- Easter Egg Celebration Modal with Fireworks -->
+  @if (showEasterEggModal()) {
+    <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md overflow-hidden animate-in fade-in duration-200">
+      <!-- Fullscreen Fireworks Interactive Canvas -->
+      <canvas 
+        #fireworksCanvas
+        class="absolute inset-0 w-full h-full cursor-crosshair z-10"
+      ></canvas>
+
+      <!-- Popup Center Card -->
+      <div class="relative z-20 w-full max-w-lg p-8 rounded-3xl border border-amber-500/50 bg-gradient-to-b from-neutral-950/95 via-purple-950/90 to-neutral-950/95 shadow-2xl shadow-purple-950/90 backdrop-blur-xl text-center space-y-6 animate-in zoom-in-95 duration-200">
+        <!-- Floating Close Button -->
+        <button
+          id="easter_egg_close_btn"
+          type="button"
+          (click)="closeEasterEgg()"
+          class="absolute top-4 right-4 p-2 rounded-xl text-neutral-400 hover:text-white hover:bg-white/10 transition-colors cursor-pointer"
+          title="Close Easter Egg"
+        >
+          <mat-icon class="text-lg">close</mat-icon>
+        </button>
+
+        <!-- Glowing Crown & Whiskey Bottle Icon Badges -->
+        <div class="flex items-center justify-center gap-3">
+          <div class="w-14 h-14 rounded-2xl bg-gradient-to-tr from-amber-500 to-amber-300 text-neutral-950 flex items-center justify-center shadow-lg shadow-amber-500/40 border border-amber-200">
+            <mat-icon class="text-3xl">liquor</mat-icon>
+          </div>
+          <div class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-purple-600 to-emerald-500 text-white flex items-center justify-center shadow-lg shadow-purple-500/40 border border-purple-300/40">
+            <mat-icon class="text-2xl">workspace_premium</mat-icon>
+          </div>
+        </div>
+
+        <!-- Required Text Line 1 & Line 2 -->
+        <div class="space-y-3">
+          <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-400/10 border border-amber-400/30 text-amber-300 text-[11px] font-mono font-bold uppercase tracking-widest">
+            <mat-icon class="text-xs text-amber-400">local_fire_department</mat-icon>
+            <span>Master Craftsman Edition</span>
+          </div>
+
+          <!-- Line 1: Made by the best Maxime "MiLK" Brunelle -->
+          <h1 class="text-xl sm:text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-amber-200 via-amber-400 to-yellow-100 tracking-tight drop-shadow-md">
+            Made by the best Maxime "MiLK" Brunelle
+          </h1>
+
+          <!-- Line 2: Crown Royal à la pomme dans nos veines ! -->
+          <p class="text-base sm:text-lg font-bold italic tracking-wide text-transparent bg-clip-text bg-gradient-to-r from-emerald-300 via-green-400 to-purple-300 drop-shadow-sm">
+            Crown Royal à la pomme dans nos veines !
+          </p>
+        </div>
+
+        <!-- Interactive Firework Note -->
+        <div class="p-3.5 rounded-2xl bg-neutral-900/80 border border-purple-500/30 text-xs text-neutral-300 flex items-center justify-center gap-2 font-mono">
+          <mat-icon class="text-emerald-400 text-base animate-pulse">sparkles</mat-icon>
+          <span>Click anywhere on screen to launch instant fireworks! 🎆</span>
+        </div>
+
+        <!-- Actions -->
+        <div class="flex items-center justify-center gap-3 pt-2">
+          <button
+            id="easter_egg_more_fireworks_btn"
+            type="button"
+            (click)="triggerManualSalvo()"
+            class="px-5 py-2.5 rounded-xl bg-gradient-to-r from-purple-600 to-emerald-600 hover:from-purple-500 hover:to-emerald-500 text-white font-bold text-xs shadow-lg shadow-purple-600/30 transition-all active:scale-95 cursor-pointer flex items-center gap-2"
+          >
+            <mat-icon class="text-base">celebration</mat-icon>
+            <span>More Fireworks! 🎆</span>
+          </button>
+
+          <button
+            id="easter_egg_sante_btn"
+            type="button"
+            (click)="closeEasterEgg()"
+            class="px-5 py-2.5 rounded-xl bg-neutral-800 hover:bg-neutral-700 text-white font-bold text-xs border border-neutral-700 transition-all active:scale-95 cursor-pointer"
+          >
+            Santé ! 🥃
           </button>
         </div>
       </div>

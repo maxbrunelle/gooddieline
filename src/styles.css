@@ -60,14 +60,14 @@
 
 /* Production line types */
 .line-cut {
-  stroke: #ef4444; /* Red cut line */
+  stroke: #2e3b82; /* Blueprint dark blue cut line */
   stroke-width: 1.5;
   stroke-linecap: round;
   stroke-linejoin: round;
 }
 
 .line-crease {
-  stroke: #eab308; /* Yellow crease/fold */
+  stroke: #e11d48; /* Red dashed fold/crease line */
   stroke-width: 1.2;
   stroke-dasharray: 4, 3;
 }
@@ -85,7 +85,7 @@
 }
 
 .line-dimension {
-  stroke: #a3a3a3;
+  stroke: #0284c7;
   stroke-width: 1;
 }
 
