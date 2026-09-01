@@ -153,6 +153,27 @@ export class GeometryBuilder {
       else if (line.type === 'PERF') perfLen += len;
     }
 
+    for (const arc of this.arcs) {
+      let diff = arc.endAngle - arc.startAngle;
+      while (diff < 0) diff += 2 * Math.PI;
+      const arcLen = arc.radius * diff;
+      if (arc.type === 'CUT') cutLen += arcLen;
+      else if (arc.type === 'CREASE') creaseLen += arcLen;
+      else if (arc.type === 'PERF') perfLen += arcLen;
+
+      // Sample arc points for bounding box
+      const samples = 8;
+      for (let i = 0; i <= samples; i++) {
+        const theta = arc.startAngle + (i / samples) * diff;
+        const ax = arc.center.x + arc.radius * Math.cos(theta);
+        const ay = arc.center.y + arc.radius * Math.sin(theta);
+        minX = Math.min(minX, ax);
+        minY = Math.min(minY, ay);
+        maxX = Math.max(maxX, ax);
+        maxY = Math.max(maxY, ay);
+      }
+    }
+
     if (!isFinite(minX)) {
       minX = 0; minY = 0; maxX = 100; maxY = 100;
     }

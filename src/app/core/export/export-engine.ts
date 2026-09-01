@@ -1,8 +1,59 @@
 import { jsPDF } from 'jspdf';
-import { DielineGeometry, LineSegment } from '../models/dieline.models';
+import { DielineGeometry, LineSegment, Point2D } from '../models/dieline.models';
 import { MaterialProfile } from '../models/material.models';
 import { ExportOptions, ProjectData } from '../models/project.models';
 import { NestingSolution, SheetPreset } from '../models/sheet.models';
+
+export interface CubicBezierSegment {
+  p0: Point2D;
+  cp1: Point2D;
+  cp2: Point2D;
+  p1: Point2D;
+}
+
+export function arcToCubicBeziers(
+  cx: number,
+  cy: number,
+  r: number,
+  startAngle: number,
+  endAngle: number
+): CubicBezierSegment[] {
+  let diff = endAngle - startAngle;
+  while (diff < 0) diff += 2 * Math.PI;
+  if (diff === 0) diff = 2 * Math.PI;
+
+  const numSegments = Math.max(1, Math.ceil(diff / (Math.PI / 2)));
+  const segAngle = diff / numSegments;
+  const beziers: CubicBezierSegment[] = [];
+
+  for (let i = 0; i < numSegments; i++) {
+    const a1 = startAngle + i * segAngle;
+    const a2 = a1 + segAngle;
+    const half = segAngle / 2;
+    const k = (4 / 3) * Math.tan(half / 2);
+
+    const cos1 = Math.cos(a1);
+    const sin1 = Math.sin(a1);
+    const cos2 = Math.cos(a2);
+    const sin2 = Math.sin(a2);
+
+    const p0 = { x: cx + r * cos1, y: cy + r * sin1 };
+    const p1 = { x: cx + r * cos2, y: cy + r * sin2 };
+
+    const cp1 = {
+      x: p0.x - k * r * sin1,
+      y: p0.y + k * r * cos1
+    };
+    const cp2 = {
+      x: p1.x + k * r * sin2,
+      y: p1.y - k * r * cos2
+    };
+
+    beziers.push({ p0, cp1, cp2, p1 });
+  }
+
+  return beziers;
+}
 
 export class ExportEngine {
   /**
@@ -161,6 +212,16 @@ export class ExportEngine {
         for (const l of geometry.lines.filter(l => l.type === 'CREASE')) {
           svg += `    <line x1="${l.p1.x}" y1="${l.p1.y}" x2="${l.p2.x}" y2="${l.p2.y}"/>\n`;
         }
+        for (const arc of geometry.arcs.filter(a => a.type === 'CREASE')) {
+          const x1 = (arc.center.x + arc.radius * Math.cos(arc.startAngle)).toFixed(3);
+          const y1 = (arc.center.y + arc.radius * Math.sin(arc.startAngle)).toFixed(3);
+          const x2 = (arc.center.x + arc.radius * Math.cos(arc.endAngle)).toFixed(3);
+          const y2 = (arc.center.y + arc.radius * Math.sin(arc.endAngle)).toFixed(3);
+          let diff = arc.endAngle - arc.startAngle;
+          while (diff < 0) diff += 2 * Math.PI;
+          const largeArc = diff > Math.PI ? 1 : 0;
+          svg += `    <path d="M ${x1} ${y1} A ${arc.radius.toFixed(3)} ${arc.radius.toFixed(3)} 0 ${largeArc} 1 ${x2} ${y2}"/>\n`;
+        }
         svg += `  </g>\n\n`;
       }
 
@@ -170,7 +231,7 @@ export class ExportEngine {
         for (const l of geometry.lines.filter(l => l.type === 'CUT' || l.type === 'PERF' || l.type === 'PARTIAL_CUT')) {
           svg += `    <line x1="${l.p1.x}" y1="${l.p1.y}" x2="${l.p2.x}" y2="${l.p2.y}"/>\n`;
         }
-        for (const arc of geometry.arcs.filter(a => a.type === 'CUT')) {
+        for (const arc of geometry.arcs.filter(a => a.type === 'CUT' || a.type === 'PERF' || a.type === 'PARTIAL_CUT')) {
           const x1 = (arc.center.x + arc.radius * Math.cos(arc.startAngle)).toFixed(3);
           const y1 = (arc.center.y + arc.radius * Math.sin(arc.startAngle)).toFixed(3);
           const x2 = (arc.center.x + arc.radius * Math.cos(arc.endAngle)).toFixed(3);
@@ -178,8 +239,7 @@ export class ExportEngine {
           let diff = arc.endAngle - arc.startAngle;
           while (diff < 0) diff += 2 * Math.PI;
           const largeArc = diff > Math.PI ? 1 : 0;
-          const sweep = arc.startAngle > arc.endAngle ? 0 : 1;
-          svg += `    <path d="M ${x1} ${y1} A ${arc.radius.toFixed(3)} ${arc.radius.toFixed(3)} 0 ${largeArc} ${sweep} ${x2} ${y2}"/>\n`;
+          svg += `    <path d="M ${x1} ${y1} A ${arc.radius.toFixed(3)} ${arc.radius.toFixed(3)} 0 ${largeArc} 1 ${x2} ${y2}"/>\n`;
         }
         svg += `  </g>\n\n`;
       }
@@ -238,6 +298,8 @@ export class ExportEngine {
     let maxY: number;
     const cutLines: { x1: number; y1: number; x2: number; y2: number }[] = [];
     const creaseLines: { x1: number; y1: number; x2: number; y2: number }[] = [];
+    const cutBeziers: CubicBezierSegment[] = [];
+    const creaseBeziers: CubicBezierSegment[] = [];
     let regMarks: { x: number; y: number }[] = [];
 
     if (isNesting && nestingSolution) {
@@ -247,7 +309,7 @@ export class ExportEngine {
       maxX = sheetPreset.width;
       maxY = sheetPreset.height;
 
-      // Extract nested cut and crease lines
+      // Extract nested cut and crease lines & arcs
       for (const item of sheet.items) {
         const rad = (item.rotation * Math.PI) / 180;
         const cos = Math.cos(rad);
@@ -268,6 +330,22 @@ export class ExportEngine {
             cutLines.push({ x1: rx1, y1: ry1, x2: rx2, y2: ry2 });
           } else if (line.type === 'CREASE') {
             creaseLines.push({ x1: rx1, y1: ry1, x2: rx2, y2: ry2 });
+          }
+        }
+
+        for (const arc of geometry.arcs) {
+          const lx = arc.center.x - geometry.bounds.minX;
+          const ly = arc.center.y - geometry.bounds.minY;
+          const rx = lx * cos - ly * sin + item.x;
+          const ry = lx * sin + ly * cos + item.y;
+          const rStart = arc.startAngle + rad;
+          const rEnd = arc.endAngle + rad;
+
+          const beziers = arcToCubicBeziers(rx, ry, arc.radius, rStart, rEnd);
+          if (arc.type === 'CUT' || arc.type === 'PERF' || arc.type === 'PARTIAL_CUT') {
+            cutBeziers.push(...beziers);
+          } else if (arc.type === 'CREASE') {
+            creaseBeziers.push(...beziers);
           }
         }
       }
@@ -294,6 +372,15 @@ export class ExportEngine {
           cutLines.push({ x1: line.p1.x, y1: line.p1.y, x2: line.p2.x, y2: line.p2.y });
         } else if (line.type === 'CREASE') {
           creaseLines.push({ x1: line.p1.x, y1: line.p1.y, x2: line.p2.x, y2: line.p2.y });
+        }
+      }
+
+      for (const arc of geometry.arcs) {
+        const beziers = arcToCubicBeziers(arc.center.x, arc.center.y, arc.radius, arc.startAngle, arc.endAngle);
+        if (arc.type === 'CUT' || arc.type === 'PERF' || arc.type === 'PARTIAL_CUT') {
+          cutBeziers.push(...beziers);
+        } else if (arc.type === 'CREASE') {
+          creaseBeziers.push(...beziers);
         }
       }
 
@@ -334,7 +421,7 @@ export class ExportEngine {
     const toPtX = (x: number): string => ((x - artMinX) * MM_TO_PT).toFixed(4);
     const toPtY = (y: number): string => ((artMaxY - y) * MM_TO_PT).toFixed(4);
 
-    let ai = `%!PS-Adobe-3.0\n`;
+    let ai = `%!PS-Adobe-3.0 EPSF-3.0\n`;
     ai += `%%Creator: Adobe Illustrator(R) 8.0 DielineForge ZCC Engine\n`;
     ai += `%%AI8_CreatorVersion: 8.0\n`;
     ai += `%%For: (Zund Cut Center - ${escapePs(project.name)})\n`;
@@ -343,11 +430,6 @@ export class ExportEngine {
     ai += `%%BoundingBox: 0 0 ${Math.ceil(Number(totalWidthPt))} ${Math.ceil(Number(totalHeightPt))}\n`;
     ai += `%%HiResBoundingBox: 0 0 ${totalWidthPt} ${totalHeightPt}\n`;
     ai += `%%DocumentProcessColors: Cyan Magenta Yellow Black\n`;
-    ai += `%%DocumentCustomColors: \n`;
-    ai += `%%CMYKCustomColor: \n`;
-    ai += `%%DocumentSuppliedResources: procset Adobe_level2_AI5 1.2 0\n`;
-    ai += `%%+ procset Adobe_typography_AI5 1.0 1\n`;
-    ai += `%%+ procset Adobe_Illustrator_AI5 1.3 0\n`;
     ai += `%AI5_FileFormat 3\n`;
     ai += `%%EndComments\n`;
     ai += `%%BeginProlog\n`;
@@ -368,7 +450,13 @@ export class ExportEngine {
       ai += `${toPtX(l.x2)} ${toPtY(l.y2)} l\n`;
       ai += `S\n`;
     }
+    for (const b of creaseBeziers) {
+      ai += `${toPtX(b.p0.x)} ${toPtY(b.p0.y)} m\n`;
+      ai += `${toPtX(b.cp1.x)} ${toPtY(b.cp1.y)} ${toPtX(b.cp2.x)} ${toPtY(b.cp2.y)} ${toPtX(b.p1.x)} ${toPtY(b.p1.y)} c\n`;
+      ai += `S\n`;
+    }
     ai += `LB\n`;
+    ai += `%AI5_EndLayer--\n`;
 
     // ----------------------------------------------------
     // LAYER 2: cut
@@ -383,7 +471,13 @@ export class ExportEngine {
       ai += `${toPtX(l.x2)} ${toPtY(l.y2)} l\n`;
       ai += `S\n`;
     }
+    for (const b of cutBeziers) {
+      ai += `${toPtX(b.p0.x)} ${toPtY(b.p0.y)} m\n`;
+      ai += `${toPtX(b.cp1.x)} ${toPtY(b.cp1.y)} ${toPtX(b.cp2.x)} ${toPtY(b.cp2.y)} ${toPtX(b.p1.x)} ${toPtY(b.p1.y)} c\n`;
+      ai += `S\n`;
+    }
     ai += `LB\n`;
+    ai += `%AI5_EndLayer--\n`;
 
     // ----------------------------------------------------
     // LAYER 3: reg (4 Registration Dots in the 4 corners of the box)
@@ -410,7 +504,9 @@ export class ExportEngine {
       ai += `f\n`; // Fill circle
     }
     ai += `LB\n`;
+    ai += `%AI5_EndLayer--\n`;
 
+    ai += `%%PageTrailer\n`;
     ai += `%%Trailer\n`;
     ai += `%%EOF\n`;
 
@@ -468,6 +564,37 @@ export class ExportEngine {
       dxf += `11\n${l.p2.x.toFixed(4)}\n`; // X2
       dxf += `21\n${(-l.p2.y).toFixed(4)}\n`; // Y2
       dxf += `31\n0.0\n`;
+    }
+
+    // Export Arc entities (discretized to fine line chords for universal cutter compatibility)
+    for (const arc of geometry.arcs) {
+      if (arc.type === 'CUT' && !options.layers.CUT) continue;
+      if (arc.type === 'CREASE' && !options.layers.CREASE) continue;
+      if (arc.type === 'PERF' && !options.layers.PERF) continue;
+
+      const layerName = arc.type === 'CUT' ? 'CUT' : (arc.type === 'CREASE' ? 'CREASE' : 'PERF');
+      let diff = arc.endAngle - arc.startAngle;
+      while (diff < 0) diff += 2 * Math.PI;
+      const steps = Math.max(12, Math.ceil(diff / (Math.PI / 16)));
+      const dTheta = diff / steps;
+
+      for (let i = 0; i < steps; i++) {
+        const th1 = arc.startAngle + i * dTheta;
+        const th2 = arc.startAngle + (i + 1) * dTheta;
+        const x1 = arc.center.x + arc.radius * Math.cos(th1);
+        const y1 = arc.center.y + arc.radius * Math.sin(th1);
+        const x2 = arc.center.x + arc.radius * Math.cos(th2);
+        const y2 = arc.center.y + arc.radius * Math.sin(th2);
+
+        dxf += '0\nLINE\n';
+        dxf += `8\n${layerName}\n`;
+        dxf += `10\n${x1.toFixed(4)}\n`;
+        dxf += `20\n${(-y1).toFixed(4)}\n`;
+        dxf += `30\n0.0\n`;
+        dxf += `11\n${x2.toFixed(4)}\n`;
+        dxf += `21\n${(-y2).toFixed(4)}\n`;
+        dxf += `31\n0.0\n`;
+      }
     }
 
     dxf += '0\nENDSEC\n';
@@ -568,6 +695,38 @@ export class ExportEngine {
             doc.line(rx1, ry1, rx2, ry2);
           }
         }
+
+        for (const arc of geometry.arcs) {
+          const lx = arc.center.x - geometry.bounds.minX;
+          const ly = arc.center.y - geometry.bounds.minY;
+          const rx = lx * cos - ly * sin + item.x;
+          const ry = lx * sin + ly * cos + item.y;
+          const rStart = arc.startAngle + rad;
+          const rEnd = arc.endAngle + rad;
+
+          let diff = rEnd - rStart;
+          while (diff < 0) diff += 2 * Math.PI;
+          const steps = Math.max(8, Math.ceil(diff / (Math.PI / 12)));
+          const dTheta = diff / steps;
+
+          if (arc.type === 'CUT') {
+            doc.setDrawColor(225, 29, 72);
+            doc.setLineWidth(0.3);
+          } else {
+            doc.setDrawColor(37, 99, 235);
+            doc.setLineWidth(0.25);
+          }
+
+          for (let i = 0; i < steps; i++) {
+            const th1 = rStart + i * dTheta;
+            const th2 = rStart + (i + 1) * dTheta;
+            const ax1 = canvasOffsetX + (rx + arc.radius * Math.cos(th1)) * scale;
+            const ay1 = canvasOffsetY + (ry + arc.radius * Math.sin(th1)) * scale;
+            const ax2 = canvasOffsetX + (rx + arc.radius * Math.cos(th2)) * scale;
+            const ay2 = canvasOffsetY + (ry + arc.radius * Math.sin(th2)) * scale;
+            doc.line(ax1, ay1, ax2, ay2);
+          }
+        }
       }
 
       // Summary Card Bottom Right
@@ -579,7 +738,7 @@ export class ExportEngine {
       doc.text(`Sheet Yield: ${sheet.itemCount} packages | Sheet Utilization: ${sheet.utilizationPercent}% | Waste: ${sheet.wastePercent}% | Sheets Required: ${nestingSolution.sheetsRequired} | Order Qty: ${nestingSolution.totalPiecesRequired}`, 20, 272);
 
     } else {
-      // Draw single dieline
+      // Draw single dieline lines
       for (const l of geometry.lines) {
         const x1 = canvasOffsetX + (l.p1.x - geometry.bounds.minX) * scale;
         const y1 = canvasOffsetY + (l.p1.y - geometry.bounds.minY) * scale;
@@ -594,6 +753,32 @@ export class ExportEngine {
           doc.setDrawColor(37, 99, 235);
           doc.setLineWidth(0.3);
           doc.line(x1, y1, x2, y2);
+        }
+      }
+
+      // Draw single dieline arcs
+      for (const arc of geometry.arcs) {
+        let diff = arc.endAngle - arc.startAngle;
+        while (diff < 0) diff += 2 * Math.PI;
+        const steps = Math.max(8, Math.ceil(diff / (Math.PI / 12)));
+        const dTheta = diff / steps;
+
+        if (arc.type === 'CUT') {
+          doc.setDrawColor(225, 29, 72);
+          doc.setLineWidth(0.4);
+        } else {
+          doc.setDrawColor(37, 99, 235);
+          doc.setLineWidth(0.3);
+        }
+
+        for (let i = 0; i < steps; i++) {
+          const th1 = arc.startAngle + i * dTheta;
+          const th2 = arc.startAngle + (i + 1) * dTheta;
+          const ax1 = canvasOffsetX + (arc.center.x + arc.radius * Math.cos(th1) - geometry.bounds.minX) * scale;
+          const ay1 = canvasOffsetY + (arc.center.y + arc.radius * Math.sin(th1) - geometry.bounds.minY) * scale;
+          const ax2 = canvasOffsetX + (arc.center.x + arc.radius * Math.cos(th2) - geometry.bounds.minX) * scale;
+          const ay2 = canvasOffsetY + (arc.center.y + arc.radius * Math.sin(th2) - geometry.bounds.minY) * scale;
+          doc.line(ax1, ay1, ax2, ay2);
         }
       }
 
