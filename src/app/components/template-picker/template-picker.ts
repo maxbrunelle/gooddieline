@@ -17,9 +17,9 @@ export class TemplatePicker {
   selectedCategory = signal<TemplateCategory | 'all'>('all');
 
   categories: { id: TemplateCategory | 'all'; label: string; icon: string }[] = [
-    { id: 'all', label: 'All Templates', icon: 'apps' },
-    { id: 'shipping', label: 'FEFCO 0201 (RSC)', icon: 'local_shipping' },
-    { id: 'mailer', label: 'FEFCO 0427 (Mailer)', icon: 'markunread_mailbox' }
+    { id: 'all', label: 'All Box Styles (3)', icon: 'apps' },
+    { id: 'shipping', label: 'Shipping (RSC)', icon: 'local_shipping' },
+    { id: 'mailer', label: 'Mailers', icon: 'markunread_mailbox' }
   ];
 
   isTemplateAvailable(id: string): boolean {

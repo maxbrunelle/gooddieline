@@ -238,35 +238,8 @@ export class Viewer3D implements AfterViewInit, OnDestroy {
       case 'mailer_box':
         this.buildMailer3D(p, foldFactor, matColor);
         break;
-      case 'straight_tuck_end':
-        this.buildTuckEnd3D(p, foldFactor, matColor, 'straight');
-        break;
-      case 'reverse_tuck_end':
-        this.buildTuckEnd3D(p, foldFactor, matColor, 'reverse');
-        break;
-      case 'auto_bottom_box':
-        this.buildAutoBottom3D(p, foldFactor, matColor);
-        break;
-      case 'snap_lock_123_bottom':
-        this.buildSnapLock3D(p, foldFactor, matColor);
-        break;
-      case 'roll_end_tray':
-        this.buildTray3D(p, foldFactor, matColor, true);
-        break;
-      case 'open_tray_4corner':
-        this.buildTray3D(p, foldFactor, matColor, false);
-        break;
-      case 'wraparound_sleeve':
-        this.buildSleeve3D(p, foldFactor, matColor);
-        break;
-      case 'pillow_box':
-        this.buildPillow3D(p, foldFactor, matColor);
-        break;
-      case 'lid_base_box':
-        this.buildLidBase3D(p, foldFactor, matColor);
-        break;
-      case 'folder_mailer':
-        this.buildFolderMailer3D(p, foldFactor, matColor);
+      case 'ugly_ass_mailer_box':
+        this.buildUglyMailer3D(p, foldFactor, matColor);
         break;
       default:
         this.buildRSC3D(p, foldFactor, matColor);
@@ -605,426 +578,100 @@ export class Viewer3D implements AfterViewInit, OnDestroy {
     rightRollPivot.rotation.z = angle * 2.0;
   }
 
-  // 3. Straight / Reverse Tuck End Box
-  private buildTuckEnd3D(p: Record<string, number>, f: number, color: string, type: 'straight' | 'reverse'): void {
-    const L = p['length'] || 120;
-    const W = p['width'] || 70;
-    const H = p['height'] || 180;
-    const G = p['glueFlap'] || 15;
-    const tuck = p['tuckFlap'] || 22;
-    const dust = p['dustFlap'] || 25;
-    const angle = (Math.PI / 2) * f;
-
-    const root = new THREE.Group();
-    root.position.set(0, (H / 2) * f, (W / 2) * f);
-    this.boxGroup.add(root);
-
-    // Panel 1 (Front: L × H)
-    const p1 = this.createPanel(L, H, color);
-    root.add(p1);
-
-    // Glue Tab
-    const gluePivot = new THREE.Group();
-    gluePivot.position.set(-L / 2, 0, 0);
-    root.add(gluePivot);
-    const glue = this.createPanel(G, H - 4, color);
-    glue.position.set(-G / 2, 0, 0);
-    gluePivot.add(glue);
-    gluePivot.rotation.y = -angle;
-
-    // Panel 2 (Side 1: W × H)
-    const p2Pivot = new THREE.Group();
-    p2Pivot.position.set(L / 2, 0, 0);
-    root.add(p2Pivot);
-    const p2 = this.createPanel(W, H, color);
-    p2.position.set(W / 2, 0, 0);
-    p2Pivot.add(p2);
-    p2Pivot.rotation.y = angle;
-
-    // Panel 2 Dust Flaps (Top & Bottom)
-    const p2DustTopPivot = new THREE.Group();
-    p2DustTopPivot.position.set(W / 2, H / 2, 0);
-    p2Pivot.add(p2DustTopPivot);
-    const p2DustTop = this.createPanel(W - 4, dust, color);
-    p2DustTop.position.set(0, dust / 2, 0);
-    p2DustTopPivot.add(p2DustTop);
-    p2DustTopPivot.rotation.x = -angle;
-
-    const p2DustBotPivot = new THREE.Group();
-    p2DustBotPivot.position.set(W / 2, -H / 2, 0);
-    p2Pivot.add(p2DustBotPivot);
-    const p2DustBot = this.createPanel(W - 4, dust, color);
-    p2DustBot.position.set(0, -dust / 2, 0);
-    p2DustBotPivot.add(p2DustBot);
-    p2DustBotPivot.rotation.x = angle;
-
-    // Panel 3 (Back: L × H)
-    const p3Pivot = new THREE.Group();
-    p3Pivot.position.set(W, 0, 0);
-    p2Pivot.add(p3Pivot);
-    const p3 = this.createPanel(L, H, color);
-    p3.position.set(L / 2, 0, 0);
-    p3Pivot.add(p3);
-    p3Pivot.rotation.y = angle;
-
-    // Panel 4 (Side 2: W × H)
-    const p4Pivot = new THREE.Group();
-    p4Pivot.position.set(L, 0, 0);
-    p3Pivot.add(p4Pivot);
-    const p4 = this.createPanel(W, H, color);
-    p4.position.set(W / 2, 0, 0);
-    p4Pivot.add(p4);
-    p4Pivot.rotation.y = angle;
-
-    // Panel 4 Dust Flaps (Top & Bottom)
-    const p4DustTopPivot = new THREE.Group();
-    p4DustTopPivot.position.set(W / 2, H / 2, 0);
-    p4Pivot.add(p4DustTopPivot);
-    const p4DustTop = this.createPanel(W - 4, dust, color);
-    p4DustTop.position.set(0, dust / 2, 0);
-    p4DustTopPivot.add(p4DustTop);
-    p4DustTopPivot.rotation.x = -angle;
-
-    const p4DustBotPivot = new THREE.Group();
-    p4DustBotPivot.position.set(W / 2, -H / 2, 0);
-    p4Pivot.add(p4DustBotPivot);
-    const p4DustBot = this.createPanel(W - 4, dust, color);
-    p4DustBot.position.set(0, -dust / 2, 0);
-    p4DustBotPivot.add(p4DustBot);
-    p4DustBotPivot.rotation.x = angle;
-
-    // Top Tuck Lid (hinges from Panel 1 Front)
-    const topLidPivot = new THREE.Group();
-    topLidPivot.position.set(0, H / 2, 0);
-    root.add(topLidPivot);
-    const topLid = this.createPanel(L, W, color);
-    topLid.position.set(0, W / 2, 0);
-    topLidPivot.add(topLid);
-    topLidPivot.rotation.x = -angle;
-
-    // Top Tuck-in Tab
-    const topTuckPivot = new THREE.Group();
-    topTuckPivot.position.set(0, W, 0);
-    topLidPivot.add(topTuckPivot);
-    const topTuck = this.createPanel(L - 6, tuck, color);
-    topTuck.position.set(0, tuck / 2, 0);
-    topTuckPivot.add(topTuck);
-    topTuckPivot.rotation.x = -angle * 0.95;
-
-    // Bottom Tuck Lid: Straight tuck hinges from Panel 1 (Front); Reverse tuck hinges from Panel 3 (Back)
-    if (type === 'straight') {
-      const botLidPivot = new THREE.Group();
-      botLidPivot.position.set(0, -H / 2, 0);
-      root.add(botLidPivot);
-      const botLid = this.createPanel(L, W, color);
-      botLid.position.set(0, -W / 2, 0);
-      botLidPivot.add(botLid);
-      botLidPivot.rotation.x = angle;
-
-      const botTuckPivot = new THREE.Group();
-      botTuckPivot.position.set(0, -W, 0);
-      botLidPivot.add(botTuckPivot);
-      const botTuck = this.createPanel(L - 6, tuck, color);
-      botTuck.position.set(0, -tuck / 2, 0);
-      botTuckPivot.add(botTuck);
-      botTuckPivot.rotation.x = angle * 0.95;
-    } else {
-      // Reverse Tuck: hinges from Panel 3 (Back)
-      const botLidPivot = new THREE.Group();
-      botLidPivot.position.set(L / 2, -H / 2, 0);
-      p3Pivot.add(botLidPivot);
-      const botLid = this.createPanel(L, W, color);
-      botLid.position.set(0, -W / 2, 0);
-      botLidPivot.add(botLid);
-      botLidPivot.rotation.x = angle;
-
-      const botTuckPivot = new THREE.Group();
-      botTuckPivot.position.set(0, -W, 0);
-      botLidPivot.add(botTuckPivot);
-      const botTuck = this.createPanel(L - 6, tuck, color);
-      botTuck.position.set(0, -tuck / 2, 0);
-      botTuckPivot.add(botTuck);
-      botTuckPivot.rotation.x = angle * 0.95;
-    }
-  }
-
-  // 4. Auto Bottom / Crash Lock Box (FEFCO 0215)
-  private buildAutoBottom3D(p: Record<string, number>, f: number, color: string): void {
-    // Builds 4-panel tube with folding crash lock floor
-    this.buildTuckEnd3D(p, f, color, 'reverse');
-  }
-
-  // 5. 1-2-3 Snap Lock Bottom Box
-  private buildSnapLock3D(p: Record<string, number>, f: number, color: string): void {
-    this.buildTuckEnd3D(p, f, color, 'straight');
-  }
-
-  // 6. Trays (Roll End & 4-Corner Glued)
-  private buildTray3D(p: Record<string, number>, f: number, color: string, rollover: boolean): void {
-    const L = p['length'] || 300;
-    const W = p['width'] || 200;
-    const H = p['height'] || 60;
+  // 3. Ugly Ass Mailer Box
+  private buildUglyMailer3D(p: Record<string, number>, f: number, color: string): void {
+    const L = p['length'] !== undefined ? p['length'] : 280;
+    const W = p['width'] !== undefined ? p['width'] : 200;
+    const H = p['height'] !== undefined ? p['height'] : 40;
+    const TF = p['topFlap'] !== undefined ? p['topFlap'] : (p['bottomFlap'] !== undefined ? p['bottomFlap'] : 152.4);
+    const BF = TF;
+    const LF = p['leftFlap'] !== undefined ? p['leftFlap'] : (p['rightFlap'] !== undefined ? p['rightFlap'] : W / 2);
+    const RF = LF;
     const angle = (Math.PI / 2) * f;
 
     const root = new THREE.Group();
     this.boxGroup.add(root);
 
-    // Base
-    const base = this.createPanel(L, W, color);
-    base.rotation.x = -Math.PI / 2;
-    root.add(base);
-
-    // Top Wall (L × H) - hinges at Z = -W/2
-    const topPivot = new THREE.Group();
-    topPivot.position.set(0, 0, -W / 2);
-    root.add(topPivot);
-    const topW = this.createPanel(L, H, color);
-    topW.position.set(0, H / 2, 0);
-    topPivot.add(topW);
-    topPivot.rotation.x = angle;
-
-    // Bottom Wall (L × H) - hinges at Z = W/2
-    const botPivot = new THREE.Group();
-    botPivot.position.set(0, 0, W / 2);
-    root.add(botPivot);
-    const botW = this.createPanel(L, H, color);
-    botW.position.set(0, H / 2, 0);
-    botPivot.add(botW);
-    botPivot.rotation.x = -angle;
-
-    // Left Wall (W × H) - hinges at X = -L/2
-    const leftPivot = new THREE.Group();
-    leftPivot.position.set(-L / 2, 0, 0);
-    root.add(leftPivot);
-    const leftW = this.createPanel(W, H, color);
-    leftW.rotation.y = Math.PI / 2;
-    leftW.position.set(0, H / 2, 0);
-    leftPivot.add(leftW);
-    leftPivot.rotation.z = -angle;
-
-    // Right Wall (W × H) - hinges at X = L/2
-    const rightPivot = new THREE.Group();
-    rightPivot.position.set(L / 2, 0, 0);
-    root.add(rightPivot);
-    const rightW = this.createPanel(W, H, color);
-    rightW.rotation.y = -Math.PI / 2;
-    rightW.position.set(0, H / 2, 0);
-    rightPivot.add(rightW);
-    rightPivot.rotation.z = angle;
-
-    if (rollover) {
-      // Top rollover
-      const topRoll = this.createPanel(L - 6, H - 2, color);
-      topRoll.position.set(0, (H - 2) / 2, 0);
-      const topRollPivot = new THREE.Group();
-      topRollPivot.position.set(0, H, 0);
-      topRollPivot.add(topRoll);
-      topRollPivot.rotation.x = angle * 2.0;
-      topPivot.add(topRollPivot);
-
-      // Bottom rollover
-      const botRoll = this.createPanel(L - 6, H - 2, color);
-      botRoll.position.set(0, (H - 2) / 2, 0);
-      const botRollPivot = new THREE.Group();
-      botRollPivot.position.set(0, H, 0);
-      botRollPivot.add(botRoll);
-      botRollPivot.rotation.x = -angle * 2.0;
-      botPivot.add(botRollPivot);
-    }
-  }
-
-  // 7. Wraparound Sleeve
-  private buildSleeve3D(p: Record<string, number>, f: number, color: string): void {
-    const L = p['length'] || 160;
-    const W = p['width'] || 110;
-    const H = p['height'] || 45;
-    const G = p['glueFlap'] || 18;
-    const angle = (Math.PI / 2) * f;
-
-    const root = new THREE.Group();
-    root.position.set(0, (H / 2) * f, 0);
-    this.boxGroup.add(root);
-
-    // Top Panel (L × W)
-    const p1 = this.createPanel(L, W, color);
-    p1.rotation.x = -Math.PI / 2;
-    root.add(p1);
-
-    // Glue Tab
-    const gluePivot = new THREE.Group();
-    gluePivot.position.set(-L / 2, 0, 0);
-    root.add(gluePivot);
-    const glue = this.createPanel(G, W, color);
-    glue.rotation.x = -Math.PI / 2;
-    glue.position.set(-G / 2, 0, 0);
-    gluePivot.add(glue);
-    gluePivot.rotation.z = angle;
-
-    // Side 1 (H × W)
-    const p2Pivot = new THREE.Group();
-    p2Pivot.position.set(L / 2, 0, 0);
-    root.add(p2Pivot);
-    const p2 = this.createPanel(H, W, color);
-    p2.rotation.x = -Math.PI / 2;
-    p2.position.set(H / 2, 0, 0);
-    p2Pivot.add(p2);
-    p2Pivot.rotation.z = -angle;
-
-    // Bottom Panel (L × W)
-    const p3Pivot = new THREE.Group();
-    p3Pivot.position.set(H, 0, 0);
-    p2Pivot.add(p3Pivot);
-    const p3 = this.createPanel(L, W, color);
-    p3.rotation.x = -Math.PI / 2;
-    p3.position.set(L / 2, 0, 0);
-    p3Pivot.add(p3);
-    p3Pivot.rotation.z = -angle;
-
-    // Side 2 (H × W)
-    const p4Pivot = new THREE.Group();
-    p4Pivot.position.set(L, 0, 0);
-    p3Pivot.add(p4Pivot);
-    const p4 = this.createPanel(H, W, color);
-    p4.rotation.x = -Math.PI / 2;
-    p4.position.set(H / 2, 0, 0);
-    p4Pivot.add(p4);
-    p4Pivot.rotation.z = -angle;
-  }
-
-  // 8. Pillow Box
-  private buildPillow3D(p: Record<string, number>, f: number, color: string): void {
-    const L = p['length'] || 180;
-    const W = p['width'] || 100;
-    const angle = (Math.PI / 2) * f;
-
-    const root = new THREE.Group();
-    this.boxGroup.add(root);
-
-    // Front arch
-    const front = this.createPanel(W, L, color);
-    front.position.set(-W / 4, 0, 0);
-    root.add(front);
-
-    // Back arch
-    const backPivot = new THREE.Group();
-    backPivot.position.set(W / 2, 0, 0);
-    root.add(backPivot);
-    const back = this.createPanel(W, L, color);
-    back.position.set(W / 2, 0, 0);
-    backPivot.add(back);
-    backPivot.rotation.y = -angle * 2.0;
-  }
-
-  // 9. Telescoping Lid + Base
-  private buildLidBase3D(p: Record<string, number>, f: number, color: string): void {
-    const L = p['length'] || 220;
-    const W = p['width'] || 150;
-    const H = p['height'] || 70;
-    const lidH = p['lidHeight'] || 35;
-    const angle = (Math.PI / 2) * f;
-
-    const root = new THREE.Group();
-    this.boxGroup.add(root);
-
-    // Base Tray
-    const baseGroup = new THREE.Group();
-    baseGroup.position.set(-L * 0.65, 0, 0);
-    root.add(baseGroup);
-    const base = this.createPanel(L, W, color);
-    base.rotation.x = -Math.PI / 2;
-    baseGroup.add(base);
-
-    // Base walls
-    const topW = this.createPanel(L, H, color);
-    topW.position.set(0, H / 2, 0);
-    const topPivot = new THREE.Group();
-    topPivot.position.set(0, 0, -W / 2);
-    topPivot.add(topW);
-    topPivot.rotation.x = angle;
-    baseGroup.add(topPivot);
-
-    const botW = this.createPanel(L, H, color);
-    botW.position.set(0, H / 2, 0);
-    const botPivot = new THREE.Group();
-    botPivot.position.set(0, 0, W / 2);
-    botPivot.add(botW);
-    botPivot.rotation.x = -angle;
-    baseGroup.add(botPivot);
-
-    // Lid Tray (offset to the right)
-    const lidGroup = new THREE.Group();
-    lidGroup.position.set(L * 0.65, 0, 0);
-    root.add(lidGroup);
-    const lid = this.createPanel(L + 6, W + 6, color);
-    lid.rotation.x = -Math.PI / 2;
-    lidGroup.add(lid);
-
-    const lidTopW = this.createPanel(L + 6, lidH, color);
-    lidTopW.position.set(0, lidH / 2, 0);
-    const lidTopPivot = new THREE.Group();
-    lidTopPivot.position.set(0, 0, -(W + 6) / 2);
-    lidTopPivot.add(lidTopW);
-    lidTopPivot.rotation.x = angle;
-    lidGroup.add(lidTopPivot);
-
-    const lidBotW = this.createPanel(L + 6, lidH, color);
-    lidBotW.position.set(0, lidH / 2, 0);
-    const lidBotPivot = new THREE.Group();
-    lidBotPivot.position.set(0, 0, (W + 6) / 2);
-    lidBotPivot.add(lidBotW);
-    lidBotPivot.rotation.x = -angle;
-    lidGroup.add(lidBotPivot);
-  }
-
-  // 10. Folder Mailer
-  private buildFolderMailer3D(p: Record<string, number>, f: number, color: string): void {
-    const L = p['length'] || 280;
-    const W = p['width'] || 200;
-    const H = p['height'] || 35;
-    const C = p['closureFlap'] || 50;
-    const angle = (Math.PI / 2) * f;
-
-    const root = new THREE.Group();
-    this.boxGroup.add(root);
-
-    // Bed
-    const bed = this.createPanel(L, W, color);
+    // Bed / Base panel
+    const bed = this.createPanel(W, L, color);
     bed.rotation.x = -Math.PI / 2;
     root.add(bed);
 
-    // Top flap
+    // Left Side Wall: pivots at x = -W/2 along Z axis
+    const leftPivot = new THREE.Group();
+    leftPivot.position.set(-W / 2, 0, 0);
+    root.add(leftPivot);
+    const leftW = this.createPanel(H, L, color);
+    leftW.position.set(-H / 2, 0, 0);
+    leftW.rotation.x = -Math.PI / 2;
+    leftPivot.add(leftW);
+    leftPivot.rotation.z = -angle;
+
+    // Left Outer Flap: pivots at outer edge of left wall
+    const leftFlapPivot = new THREE.Group();
+    leftFlapPivot.position.set(-H, 0, 0);
+    leftPivot.add(leftFlapPivot);
+    const leftP = this.createPanel(LF, L, color);
+    leftP.position.set(-LF / 2, 0, 0);
+    leftP.rotation.x = -Math.PI / 2;
+    leftFlapPivot.add(leftP);
+    leftFlapPivot.rotation.z = -angle;
+
+    // Right Side Wall: pivots at x = W/2 along Z axis
+    const rightPivot = new THREE.Group();
+    rightPivot.position.set(W / 2, 0, 0);
+    root.add(rightPivot);
+    const rightW = this.createPanel(H, L, color);
+    rightW.position.set(H / 2, 0, 0);
+    rightW.rotation.x = -Math.PI / 2;
+    rightPivot.add(rightW);
+    rightPivot.rotation.z = angle;
+
+    // Right Outer Flap: pivots at outer edge of right wall
+    const rightFlapPivot = new THREE.Group();
+    rightFlapPivot.position.set(H, 0, 0);
+    rightPivot.add(rightFlapPivot);
+    const rightP = this.createPanel(RF, L, color);
+    rightP.position.set(RF / 2, 0, 0);
+    rightP.rotation.x = -Math.PI / 2;
+    rightFlapPivot.add(rightP);
+    rightFlapPivot.rotation.z = angle;
+
+    // Top Wall: pivots at z = -L/2 along X axis
     const topPivot = new THREE.Group();
-    topPivot.position.set(0, 0, -W / 2);
+    topPivot.position.set(0, 0, -L / 2);
     root.add(topPivot);
-    const topW = this.createPanel(L, H, color);
+    const topW = this.createPanel(W, H, color);
     topW.position.set(0, H / 2, 0);
     topPivot.add(topW);
     topPivot.rotation.x = angle;
 
-    const topClosure = this.createPanel(L, C, color);
-    topClosure.position.set(0, C / 2, 0);
-    const topClosurePivot = new THREE.Group();
-    topClosurePivot.position.set(0, H, 0);
-    topClosurePivot.add(topClosure);
-    topClosurePivot.rotation.x = angle;
-    topPivot.add(topClosurePivot);
+    // Top Flap: pivots at top of wall (y = H)
+    const topFlapPivot = new THREE.Group();
+    topFlapPivot.position.set(0, H, 0);
+    topPivot.add(topFlapPivot);
+    const topFlapMesh = this.createPanel(W, TF, color);
+    topFlapMesh.position.set(0, TF / 2, 0);
+    topFlapPivot.add(topFlapMesh);
+    topFlapPivot.rotation.x = angle;
 
-    // Bottom flap
+    // Bottom Wall: pivots at z = L/2 along X axis
     const botPivot = new THREE.Group();
-    botPivot.position.set(0, 0, W / 2);
+    botPivot.position.set(0, 0, L / 2);
     root.add(botPivot);
-    const botW = this.createPanel(L, H, color);
+    const botW = this.createPanel(W, H, color);
     botW.position.set(0, H / 2, 0);
     botPivot.add(botW);
     botPivot.rotation.x = -angle;
 
-    const botWrap = this.createPanel(L, W + C, color);
-    botWrap.position.set(0, (W + C) / 2, 0);
-    const botWrapPivot = new THREE.Group();
-    botWrapPivot.position.set(0, H, 0);
-    botWrapPivot.add(botWrap);
-    botWrapPivot.rotation.x = -angle;
-    botPivot.add(botWrapPivot);
+    // Bottom Flap: pivots at bottom of wall (y = H)
+    const botFlapPivot = new THREE.Group();
+    botFlapPivot.position.set(0, H, 0);
+    botPivot.add(botFlapPivot);
+    const botFlapMesh = this.createPanel(W, BF, color);
+    botFlapMesh.position.set(0, BF / 2, 0);
+    botFlapPivot.add(botFlapMesh);
+    botFlapPivot.rotation.x = -angle;
   }
 
   private animate = (): void => {

@@ -2,7 +2,6 @@
   "name": "dielineforge",
   "version": "1.0.0",
   "description": "Parametric Packaging Dieline Generator & Zünd Nesting Production CAD Software",
-  "main": "electron.js",
   "scripts": {
     "ng": "ng",
     "start": "ng serve --port=3000 --host=0.0.0.0 --allowed-hosts=true",
@@ -11,36 +10,7 @@
     "postbuild": "node -e \"const fs=require('fs'),path=require('path');const dirs=['dist/app/browser','dist/browser','dist/dielineforge/browser'];dirs.forEach(d=>{const csr=path.join(d,'index.csr.html'),idx=path.join(d,'index.html');if(fs.existsSync(csr)){fs.copyFileSync(csr,idx);console.log('Synchronized client entrypoint to '+idx);}});\"",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
-    "lint": "ng lint",
-    "electron": "electron .",
-    "electron:start": "npm run build && electron .",
-    "electron:build": "npm run build && electron-builder",
-    "electron:build:win": "npm run build && electron-builder --win",
-    "electron:build:mac": "npm run build && electron-builder --mac",
-    "electron:build:linux": "npm run build && electron-builder --linux"
-  },
-  "build": {
-    "appId": "com.dielineforge.app",
-    "productName": "DielineForge",
-    "copyright": "Copyright © 2026",
-    "directories": {
-      "output": "release"
-    },
-    "files": [
-      "dist/**/*",
-      "electron.js"
-    ],
-    "win": {
-      "target": [
-        "nsis",
-        "portable"
-      ]
-    },
-    "nsis": {
-      "oneClick": false,
-      "allowToChangeInstallationDirectory": true
-    },
-    "forceCodeSigning": false
+    "lint": "ng lint"
   },
   "private": true,
   "dependencies": {
@@ -71,8 +41,6 @@
     "@types/node": "^20.17.19",
     "@types/three": "^0.185.4",
     "angular-eslint": "21.1.0",
-    "electron": "^34.2.0",
-    "electron-builder": "^25.1.8",
     "eslint": "^9.39.1",
     "jsdom": "^27.0.0",
     "postcss": "^8.5.3",

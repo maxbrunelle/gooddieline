@@ -46,55 +46,51 @@
       </button>
 
       <!-- Main Studio Navigation Tabs -->
-      <nav class="flex items-center gap-1 p-0.5 rounded-lg border" [class.bg-neutral-950/60]="state.isDarkMode()" [class.border-neutral-800]="state.isDarkMode()" [class.bg-slate-50]="!state.isDarkMode()" [class.border-slate-200]="!state.isDarkMode()">
+      <nav class="flex items-center gap-1 p-1 rounded-xl border shadow-xs" [class.bg-neutral-950/80]="state.isDarkMode()" [class.border-neutral-800]="state.isDarkMode()" [class.bg-slate-100/90]="!state.isDarkMode()" [class.border-slate-200]="!state.isDarkMode()">
+        <!-- 1. 2D CAD Editor -->
         <button
           id="nav_editor_2d"
           (click)="setTab('editor_2d')"
           [class.bg-[#3850a2]]="state.activeTab() === 'editor_2d'"
           [class.text-white]="state.activeTab() === 'editor_2d'"
-          [class.font-semibold]="state.activeTab() === 'editor_2d'"
+          [class.shadow-xs]="state.activeTab() === 'editor_2d'"
           [class.text-neutral-400]="state.activeTab() !== 'editor_2d' && state.isDarkMode()"
+          [class.hover:text-neutral-200]="state.activeTab() !== 'editor_2d' && state.isDarkMode()"
           [class.text-slate-600]="state.activeTab() !== 'editor_2d' && !state.isDarkMode()"
-          class="flex items-center gap-1.5 px-3 py-1 rounded-md text-xs font-medium transition-all cursor-pointer"
+          [class.hover:text-slate-900]="state.activeTab() !== 'editor_2d' && !state.isDarkMode()"
+          class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer"
+          title="2D Parametric Dieline CAD Editor (Shortcut: 1)"
         >
           <mat-icon class="text-sm">grid_view</mat-icon>
           <span>2D Editor</span>
+          <kbd class="hidden md:inline text-[9px] font-mono px-1 py-0.2 rounded opacity-60" [class.bg-white/20]="state.activeTab() === 'editor_2d'" [class.bg-neutral-800]="state.activeTab() !== 'editor_2d'">1</kbd>
         </button>
 
+        <!-- 2. Template Catalog -->
         <button
           id="nav_templates"
           (click)="setTab('templates')"
           [class.bg-[#3850a2]]="state.activeTab() === 'templates'"
           [class.text-white]="state.activeTab() === 'templates'"
-          [class.font-semibold]="state.activeTab() === 'templates'"
+          [class.shadow-xs]="state.activeTab() === 'templates'"
           [class.text-neutral-400]="state.activeTab() !== 'templates' && state.isDarkMode()"
+          [class.hover:text-neutral-200]="state.activeTab() !== 'templates' && state.isDarkMode()"
           [class.text-slate-600]="state.activeTab() !== 'templates' && !state.isDarkMode()"
-          class="flex items-center gap-1.5 px-3 py-1 rounded-md text-xs font-medium transition-all cursor-pointer"
+          [class.hover:text-slate-900]="state.activeTab() !== 'templates' && !state.isDarkMode()"
+          class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer"
+          title="Standard Packaging Catalog: FEFCO & ECMA (Shortcut: 2)"
         >
           <mat-icon class="text-sm">category</mat-icon>
           <span>Templates</span>
-        </button>
-
-        <button
-          id="nav_materials"
-          (click)="setTab('materials')"
-          [class.bg-[#3850a2]]="state.activeTab() === 'materials'"
-          [class.text-white]="state.activeTab() === 'materials'"
-          [class.font-semibold]="state.activeTab() === 'materials'"
-          [class.text-neutral-400]="state.activeTab() !== 'materials' && state.isDarkMode()"
-          [class.text-slate-600]="state.activeTab() !== 'materials' && !state.isDarkMode()"
-          class="flex items-center gap-1.5 px-3 py-1 rounded-md text-xs font-medium transition-all cursor-pointer"
-        >
-          <mat-icon class="text-sm">layers</mat-icon>
-          <span>Materials</span>
+          <span class="text-[9px] font-mono px-1.5 py-0.2 rounded-full font-bold" [class.bg-white/25]="state.activeTab() === 'templates'" [class.bg-[#3850a2]/20]="state.activeTab() !== 'templates' && !state.isDarkMode()" [class.text-[#3850a2]]="state.activeTab() !== 'templates' && !state.isDarkMode()" [class.bg-neutral-800]="state.activeTab() !== 'templates' && state.isDarkMode()" [class.text-[#7995f5]]="state.activeTab() !== 'templates' && state.isDarkMode()">12</span>
         </button>
       </nav>
     </div>
 
     <!-- Quick Action Utility Bar -->
     <div class="flex items-center gap-2">
-      <!-- Undo / Redo -->
-      <div class="flex items-center rounded-lg border p-0.5" [class.bg-neutral-950/60]="state.isDarkMode()" [class.border-neutral-800]="state.isDarkMode()" [class.bg-slate-50]="!state.isDarkMode()" [class.border-slate-200]="!state.isDarkMode()">
+      <!-- Undo / Redo Controls -->
+      <div class="flex items-center rounded-xl border p-0.5 shadow-2xs" [class.bg-neutral-950/60]="state.isDarkMode()" [class.border-neutral-800]="state.isDarkMode()" [class.bg-slate-50]="!state.isDarkMode()" [class.border-slate-200]="!state.isDarkMode()">
         <button
           id="btn_undo"
           (click)="state.undo()"
@@ -103,10 +99,10 @@
           [class.hover:text-white]="state.isDarkMode()"
           [class.text-slate-500]="!state.isDarkMode()"
           [class.hover:text-slate-900]="!state.isDarkMode()"
-          class="p-1 rounded transition-colors disabled:opacity-25 cursor-pointer"
+          class="p-1.5 rounded-lg transition-colors disabled:opacity-25 cursor-pointer"
           title="Undo (Ctrl+Z)"
         >
-          <mat-icon class="text-base">undo</mat-icon>
+          <mat-icon class="text-sm">undo</mat-icon>
         </button>
 
         <button
@@ -117,24 +113,48 @@
           [class.hover:text-white]="state.isDarkMode()"
           [class.text-slate-500]="!state.isDarkMode()"
           [class.hover:text-slate-900]="!state.isDarkMode()"
-          class="p-1 rounded transition-colors disabled:opacity-25 cursor-pointer"
+          class="p-1.5 rounded-lg transition-colors disabled:opacity-25 cursor-pointer"
           title="Redo (Ctrl+Y)"
         >
-          <mat-icon class="text-base">redo</mat-icon>
+          <mat-icon class="text-sm">redo</mat-icon>
         </button>
       </div>
+
+      <!-- Saved Projects Library Button -->
+      <button
+        id="btn_projects_library"
+        (click)="showProjectsModal.set(true)"
+        class="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-xl border shadow-2xs transition-colors cursor-pointer"
+        [class.bg-neutral-900]="state.isDarkMode()"
+        [class.hover:bg-neutral-800]="state.isDarkMode()"
+        [class.text-neutral-200]="state.isDarkMode()"
+        [class.border-neutral-800]="state.isDarkMode()"
+        [class.bg-white]="!state.isDarkMode()"
+        [class.hover:bg-slate-50]="!state.isDarkMode()"
+        [class.text-slate-700]="!state.isDarkMode()"
+        [class.border-slate-200]="!state.isDarkMode()"
+        title="Open Saved Projects in LocalStorage"
+      >
+        <mat-icon class="text-sm text-[#7995f5]" [class.text-[#3850a2]]="!state.isDarkMode()">folder_open</mat-icon>
+        <span class="hidden sm:inline">Projects</span>
+        @if (state.savedProjects().length > 0) {
+          <span class="text-[10px] font-mono px-1.5 py-0.2 rounded-full font-bold bg-amber-500/20 text-amber-500">
+            {{ state.savedProjects().length }}
+          </span>
+        }
+      </button>
 
       <!-- Light / Dark Mode Toggle Button -->
       <button
         id="btn_toggle_theme"
         (click)="state.toggleDarkMode()"
-        class="flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-medium rounded-lg border transition-colors cursor-pointer"
+        class="flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-medium rounded-xl border shadow-2xs transition-colors cursor-pointer"
         [class.bg-neutral-900]="state.isDarkMode()"
         [class.hover:bg-neutral-800]="state.isDarkMode()"
         [class.text-neutral-300]="state.isDarkMode()"
         [class.border-neutral-800]="state.isDarkMode()"
         [class.bg-white]="!state.isDarkMode()"
-        [class.hover:bg-slate-100]="!state.isDarkMode()"
+        [class.hover:bg-slate-50]="!state.isDarkMode()"
         [class.text-slate-700]="!state.isDarkMode()"
         [class.border-slate-200]="!state.isDarkMode()"
         [title]="state.isDarkMode() ? 'Switch to Light Mode' : 'Switch to Dark Mode'"
@@ -142,33 +162,51 @@
         <mat-icon class="text-sm scale-90" [class.text-amber-400]="state.isDarkMode()" [class.text-[#3850a2]]="!state.isDarkMode()">
           {{ state.isDarkMode() ? 'light_mode' : 'dark_mode' }}
         </mat-icon>
-        <span class="hidden sm:inline">{{ state.isDarkMode() ? 'Light' : 'Dark' }}</span>
+        <span class="hidden md:inline">{{ state.isDarkMode() ? 'Light' : 'Dark' }}</span>
+      </button>
+
+      <!-- Keyboard Shortcuts Helper -->
+      <button
+        id="btn_keyboard_shortcuts"
+        (click)="showShortcutsModal.set(true)"
+        class="p-2 text-xs rounded-xl border shadow-2xs transition-colors cursor-pointer"
+        [class.bg-neutral-900]="state.isDarkMode()"
+        [class.hover:bg-neutral-800]="state.isDarkMode()"
+        [class.text-neutral-400]="state.isDarkMode()"
+        [class.border-neutral-800]="state.isDarkMode()"
+        [class.bg-white]="!state.isDarkMode()"
+        [class.hover:bg-slate-50]="!state.isDarkMode()"
+        [class.text-slate-600]="!state.isDarkMode()"
+        [class.border-slate-200]="!state.isDarkMode()"
+        title="Keyboard Shortcuts (?)"
+      >
+        <mat-icon class="text-sm">keyboard</mat-icon>
       </button>
 
       <!-- Settings & Logo Customization Button -->
       <button
         id="btn_settings"
         (click)="showSettingsModal.set(true)"
-        class="flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-medium rounded-lg border transition-colors cursor-pointer"
+        class="flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-medium rounded-xl border shadow-2xs transition-colors cursor-pointer"
         [class.bg-neutral-900]="state.isDarkMode()"
         [class.hover:bg-neutral-800]="state.isDarkMode()"
         [class.text-neutral-300]="state.isDarkMode()"
         [class.border-neutral-800]="state.isDarkMode()"
         [class.bg-white]="!state.isDarkMode()"
-        [class.hover:bg-slate-100]="!state.isDarkMode()"
+        [class.hover:bg-slate-50]="!state.isDarkMode()"
         [class.text-slate-700]="!state.isDarkMode()"
         [class.border-slate-200]="!state.isDarkMode()"
-        title="Settings & Logo Configuration"
+        title="Settings & Brand Logo Customization"
       >
         <mat-icon class="text-sm scale-90 text-[#7995f5]" [class.text-[#3850a2]]="!state.isDarkMode()">settings</mat-icon>
-        <span class="hidden sm:inline">Settings</span>
+        <span class="hidden md:inline">Settings</span>
       </button>
 
       <!-- Export Production Suite Trigger -->
       <button
         id="btn_export_suite"
         (click)="showExportModal.set(true)"
-        class="flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-bold text-white bg-[#3850a2] hover:bg-[#4865c2] rounded-lg shadow-sm shadow-[#3850a2]/30 transition-all active:scale-95 cursor-pointer"
+        class="flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-bold text-white bg-[#3850a2] hover:bg-[#4865c2] rounded-xl shadow-sm shadow-[#3850a2]/30 transition-all active:scale-95 cursor-pointer"
       >
         <mat-icon class="text-sm font-bold">file_download</mat-icon>
         <span>Export</span>
@@ -183,6 +221,9 @@
       @switch (state.activeTab()) {
         @case ('editor_2d') {
           <app-canvas-2d class="w-full h-full" />
+        }
+        @case ('viewer_3d') {
+          <app-viewer-3d class="w-full h-full" />
         }
         @case ('nesting') {
           <app-nesting-view class="w-full h-full" />
@@ -374,6 +415,26 @@
           </div>
         </div>
 
+        @if (state.activeTemplateId() === 'ugly_ass_mailer_box') {
+          <div 
+            class="p-2.5 rounded-lg text-[11px] leading-relaxed border space-y-1"
+            [class.bg-[#3850a2]/10]="state.isDarkMode()"
+            [class.border-[#3850a2]/30]="state.isDarkMode()"
+            [class.text-neutral-200]="state.isDarkMode()"
+            [class.bg-[#3850a2]/5]="!state.isDarkMode()"
+            [class.border-[#3850a2]/20]="!state.isDarkMode()"
+            [class.text-slate-800]="!state.isDarkMode()"
+          >
+            <div class="font-bold flex items-center gap-1.5 text-xs" [class.text-[#7995f5]]="state.isDarkMode()" [class.text-[#3850a2]]="!state.isDarkMode()">
+              <mat-icon class="text-xs">auto_mode</mat-icon>
+              <span>Auto-Adapted Dimensions</span>
+            </div>
+            <p [class.text-neutral-400]="state.isDarkMode()" [class.text-slate-600]="!state.isDarkMode()">
+              Enter closed dimensions (L, W, H). Left & Right flaps are locked together and auto-adapt to <span class="font-semibold font-mono">W / 2</span>. Top & Bottom flaps are locked together and default to <span class="font-semibold font-mono">6"</span> (152.4 mm).
+            </p>
+          </div>
+        }
+
         @for (param of state.activeTemplate().paramsList; track param.key) {
           @let curValMm = state.project().params[param.key] !== undefined ? state.project().params[param.key] : param.value;
           @let curDisplayVal = state.toCurrentUnit(curValMm);
@@ -486,6 +547,17 @@
             </span>
             <span class="font-bold" [class.text-neutral-100]="state.isDarkMode()" [class.text-slate-900]="!state.isDarkMode()">
               {{ state.formatUnit(metrics.outsideL) }} × {{ state.formatUnit(metrics.outsideW) }} × {{ state.formatUnit(metrics.outsideH) }}
+            </span>
+          </div>
+
+          <!-- Open Flat Blank Dimensions -->
+          <div class="flex items-center justify-between text-xs">
+            <span class="flex items-center gap-1" [class.text-neutral-400]="state.isDarkMode()" [class.text-slate-500]="!state.isDarkMode()">
+              <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+              <span>Open Flat Blank:</span>
+            </span>
+            <span class="font-bold text-emerald-600 dark:text-emerald-400">
+              {{ state.formatUnit(state.geometry().bounds.width) }} × {{ state.formatUnit(state.geometry().bounds.height) }}
             </span>
           </div>
 
@@ -1351,6 +1423,103 @@
             class="px-5 py-2.5 rounded-xl bg-neutral-800 hover:bg-neutral-700 text-white font-bold text-xs border border-neutral-700 transition-all active:scale-95 cursor-pointer"
           >
             Santé ! 🥃
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- Keyboard Shortcuts Reference Modal -->
+  @if (showShortcutsModal()) {
+    <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/75 backdrop-blur-xs p-4 animate-in fade-in duration-150">
+      <div 
+        class="border rounded-2xl w-full max-w-lg shadow-2xl p-6 space-y-5"
+        [class.bg-neutral-900]="state.isDarkMode()"
+        [class.border-neutral-800]="state.isDarkMode()"
+        [class.text-neutral-100]="state.isDarkMode()"
+        [class.bg-white]="!state.isDarkMode()"
+        [class.border-slate-200]="!state.isDarkMode()"
+        [class.text-slate-900]="!state.isDarkMode()"
+      >
+        <div class="flex items-center justify-between pb-3 border-b" [class.border-neutral-800]="state.isDarkMode()" [class.border-slate-200]="!state.isDarkMode()">
+          <div class="flex items-center gap-2.5">
+            <div class="w-9 h-9 rounded-xl bg-[#3850a2]/15 border border-[#3850a2]/30 flex items-center justify-center text-[#7995f5]" [class.text-[#3850a2]]="!state.isDarkMode()">
+              <mat-icon class="text-lg">keyboard</mat-icon>
+            </div>
+            <div>
+              <h2 class="text-sm font-bold">Keyboard Shortcuts</h2>
+              <p class="text-[11px] text-neutral-400" [class.text-slate-500]="!state.isDarkMode()">Quick access hotkeys for high-speed packaging workflow</p>
+            </div>
+          </div>
+          <button (click)="showShortcutsModal.set(false)" class="p-1.5 rounded-lg text-neutral-400 hover:text-white hover:bg-neutral-800 cursor-pointer transition-colors" [class.hover:bg-slate-100]="!state.isDarkMode()" [class.hover:text-slate-900]="!state.isDarkMode()">
+            <mat-icon class="text-base">close</mat-icon>
+          </button>
+        </div>
+
+        <div class="space-y-4 text-xs">
+          <div>
+            <span class="text-[10px] font-bold uppercase tracking-wider text-[#7995f5]" [class.text-[#3850a2]]="!state.isDarkMode()">Workspace Switcher</span>
+            <div class="grid grid-cols-2 gap-2 mt-2 font-mono">
+              <div class="flex items-center justify-between p-2 rounded-lg border" [class.bg-neutral-950/60]="state.isDarkMode()" [class.border-neutral-800]="state.isDarkMode()" [class.bg-slate-50]="!state.isDarkMode()" [class.border-slate-200]="!state.isDarkMode()">
+                <span class="font-sans text-[11px]">2D CAD Editor</span>
+                <kbd class="px-2 py-0.5 rounded bg-[#3850a2] text-white text-[11px] font-bold">1</kbd>
+              </div>
+              <div class="flex items-center justify-between p-2 rounded-lg border" [class.bg-neutral-950/60]="state.isDarkMode()" [class.border-neutral-800]="state.isDarkMode()" [class.bg-slate-50]="!state.isDarkMode()" [class.border-slate-200]="!state.isDarkMode()">
+                <span class="font-sans text-[11px]">3D Fold Studio</span>
+                <kbd class="px-2 py-0.5 rounded bg-[#3850a2] text-white text-[11px] font-bold">2</kbd>
+              </div>
+              <div class="flex items-center justify-between p-2 rounded-lg border" [class.bg-neutral-950/60]="state.isDarkMode()" [class.border-neutral-800]="state.isDarkMode()" [class.bg-slate-50]="!state.isDarkMode()" [class.border-slate-200]="!state.isDarkMode()">
+                <span class="font-sans text-[11px]">Nesting & CAM</span>
+                <kbd class="px-2 py-0.5 rounded bg-[#3850a2] text-white text-[11px] font-bold">3</kbd>
+              </div>
+              <div class="flex items-center justify-between p-2 rounded-lg border" [class.bg-neutral-950/60]="state.isDarkMode()" [class.border-neutral-800]="state.isDarkMode()" [class.bg-slate-50]="!state.isDarkMode()" [class.border-slate-200]="!state.isDarkMode()">
+                <span class="font-sans text-[11px]">Templates Library</span>
+                <kbd class="px-2 py-0.5 rounded bg-[#3850a2] text-white text-[11px] font-bold">4</kbd>
+              </div>
+              <div class="flex items-center justify-between p-2 rounded-lg border" [class.bg-neutral-950/60]="state.isDarkMode()" [class.border-neutral-800]="state.isDarkMode()" [class.bg-slate-50]="!state.isDarkMode()" [class.border-slate-200]="!state.isDarkMode()">
+                <span class="font-sans text-[11px]">Materials</span>
+                <kbd class="px-2 py-0.5 rounded bg-[#3850a2] text-white text-[11px] font-bold">5</kbd>
+              </div>
+              <div class="flex items-center justify-between p-2 rounded-lg border" [class.bg-neutral-950/60]="state.isDarkMode()" [class.border-neutral-800]="state.isDarkMode()" [class.bg-slate-50]="!state.isDarkMode()" [class.border-slate-200]="!state.isDarkMode()">
+                <span class="font-sans text-[11px]">Job Specification</span>
+                <kbd class="px-2 py-0.5 rounded bg-[#3850a2] text-white text-[11px] font-bold">6</kbd>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <span class="text-[10px] font-bold uppercase tracking-wider text-[#7995f5]" [class.text-[#3850a2]]="!state.isDarkMode()">Actions & Navigation</span>
+            <div class="space-y-1.5 mt-2 font-mono">
+              <div class="flex items-center justify-between p-2 rounded-lg border" [class.bg-neutral-950/60]="state.isDarkMode()" [class.border-neutral-800]="state.isDarkMode()" [class.bg-slate-50]="!state.isDarkMode()" [class.border-slate-200]="!state.isDarkMode()">
+                <span class="font-sans text-[11px]">Undo parameter edit</span>
+                <kbd class="px-2 py-0.5 rounded border text-[11px]" [class.bg-neutral-800]="state.isDarkMode()" [class.border-neutral-700]="state.isDarkMode()" [class.bg-white]="!state.isDarkMode()" [class.border-slate-200]="!state.isDarkMode()">Ctrl + Z</kbd>
+              </div>
+              <div class="flex items-center justify-between p-2 rounded-lg border" [class.bg-neutral-950/60]="state.isDarkMode()" [class.border-neutral-800]="state.isDarkMode()" [class.bg-slate-50]="!state.isDarkMode()" [class.border-slate-200]="!state.isDarkMode()">
+                <span class="font-sans text-[11px]">Redo parameter edit</span>
+                <kbd class="px-2 py-0.5 rounded border text-[11px]" [class.bg-neutral-800]="state.isDarkMode()" [class.border-neutral-700]="state.isDarkMode()" [class.bg-white]="!state.isDarkMode()" [class.border-slate-200]="!state.isDarkMode()">Ctrl + Y / Shift + Ctrl + Z</kbd>
+              </div>
+              <div class="flex items-center justify-between p-2 rounded-lg border" [class.bg-neutral-950/60]="state.isDarkMode()" [class.border-neutral-800]="state.isDarkMode()" [class.bg-slate-50]="!state.isDarkMode()" [class.border-slate-200]="!state.isDarkMode()">
+                <span class="font-sans text-[11px]">Open Export Production Suite</span>
+                <kbd class="px-2 py-0.5 rounded border text-[11px]" [class.bg-neutral-800]="state.isDarkMode()" [class.border-neutral-700]="state.isDarkMode()" [class.bg-white]="!state.isDarkMode()" [class.border-slate-200]="!state.isDarkMode()">Ctrl + E</kbd>
+              </div>
+              <div class="flex items-center justify-between p-2 rounded-lg border" [class.bg-neutral-950/60]="state.isDarkMode()" [class.border-neutral-800]="state.isDarkMode()" [class.bg-slate-50]="!state.isDarkMode()" [class.border-slate-200]="!state.isDarkMode()">
+                <span class="font-sans text-[11px]">Pan Canvas (in 2D Editor)</span>
+                <kbd class="px-2 py-0.5 rounded border text-[11px]" [class.bg-neutral-800]="state.isDarkMode()" [class.border-neutral-700]="state.isDarkMode()" [class.bg-white]="!state.isDarkMode()" [class.border-slate-200]="!state.isDarkMode()">Space + Drag / Right-Click Drag</kbd>
+              </div>
+              <div class="flex items-center justify-between p-2 rounded-lg border" [class.bg-neutral-950/60]="state.isDarkMode()" [class.border-neutral-800]="state.isDarkMode()" [class.bg-slate-50]="!state.isDarkMode()" [class.border-slate-200]="!state.isDarkMode()">
+                <span class="font-sans text-[11px]">Zoom In / Out</span>
+                <kbd class="px-2 py-0.5 rounded border text-[11px]" [class.bg-neutral-800]="state.isDarkMode()" [class.border-neutral-700]="state.isDarkMode()" [class.bg-white]="!state.isDarkMode()" [class.border-slate-200]="!state.isDarkMode()">Mouse Wheel</kbd>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="pt-3 border-t flex justify-end" [class.border-neutral-800]="state.isDarkMode()" [class.border-slate-200]="!state.isDarkMode()">
+          <button
+            (click)="showShortcutsModal.set(false)"
+            class="px-4 py-2 bg-[#3850a2] hover:bg-[#4865c2] text-white font-bold text-xs rounded-xl transition-colors cursor-pointer"
+          >
+            Got It
           </button>
         </div>
       </div>

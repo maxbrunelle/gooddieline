@@ -277,16 +277,14 @@ export class DielineStateService {
     const mode = this.dimensionMode();
     const mat = this.activeMaterial();
     const t = mat ? mat.thickness : (params['caliper'] || 2.5);
-    const templateId = this.activeTemplateId();
     
     const rawL = params['length'] !== undefined ? params['length'] : 300;
     const rawW = params['width'] !== undefined ? params['width'] : 200;
     const rawH = params['height'] !== undefined ? params['height'] : 150;
 
-    const heightFactor = (templateId === 'roll_end_tray' || templateId === 'open_tray_4corner') ? 2 : 4;
     const deltaL = 2 * t;
     const deltaW = 2 * t;
-    const deltaH = heightFactor * t;
+    const deltaH = 4 * t;
 
     let insideL: number;
     let insideW: number;
@@ -375,19 +373,17 @@ export class DielineStateService {
       const params = { ...this.project().params };
       const mat = this.activeMaterial();
       const t = mat ? mat.thickness : (params['caliper'] || 2.5);
-      const templateId = this.activeTemplateId();
-      const heightFactor = (templateId === 'roll_end_tray' || templateId === 'open_tray_4corner') ? 2 : 4;
 
       if (mode === 'outside') {
         // Converting from Inside input to Outside input (add clearances)
         if (params['length'] !== undefined) params['length'] = Number((params['length'] + 2 * t).toFixed(1));
         if (params['width'] !== undefined) params['width'] = Number((params['width'] + 2 * t).toFixed(1));
-        if (params['height'] !== undefined) params['height'] = Number((params['height'] + heightFactor * t).toFixed(1));
+        if (params['height'] !== undefined) params['height'] = Number((params['height'] + 4 * t).toFixed(1));
       } else {
         // Converting from Outside input to Inside input (deduct clearances)
         if (params['length'] !== undefined) params['length'] = Math.max(10, Number((params['length'] - 2 * t).toFixed(1)));
         if (params['width'] !== undefined) params['width'] = Math.max(10, Number((params['width'] - 2 * t).toFixed(1)));
-        if (params['height'] !== undefined) params['height'] = Math.max(10, Number((params['height'] - heightFactor * t).toFixed(1)));
+        if (params['height'] !== undefined) params['height'] = Math.max(10, Number((params['height'] - 4 * t).toFixed(1)));
       }
 
       this.project.update(p => ({
@@ -427,14 +423,36 @@ export class DielineStateService {
   }
 
   updateParam(key: string, value: number): void {
-    this.project.update(p => ({
-      ...p,
-      params: {
+    const numVal = Number(value);
+    const templateId = this.activeTemplateId();
+
+    this.project.update(p => {
+      const updatedParams = {
         ...p.params,
-        [key]: Number(value)
-      },
-      modifiedDate: new Date().toISOString().split('T')[0]
-    }));
+        [key]: numVal
+      };
+
+      // For Ugly Ass Mailer Box: automatically adapt flaps and open dimensions to closed dimensions
+      if (templateId === 'ugly_ass_mailer_box') {
+        if (key === 'width') {
+          const halfWidth = Number((numVal / 2).toFixed(2));
+          updatedParams['leftFlap'] = halfWidth;
+          updatedParams['rightFlap'] = halfWidth;
+        } else if (key === 'leftFlap' || key === 'rightFlap') {
+          updatedParams['leftFlap'] = numVal;
+          updatedParams['rightFlap'] = numVal;
+        } else if (key === 'topFlap' || key === 'bottomFlap') {
+          updatedParams['topFlap'] = numVal;
+          updatedParams['bottomFlap'] = numVal;
+        }
+      }
+
+      return {
+        ...p,
+        params: updatedParams,
+        modifiedDate: new Date().toISOString().split('T')[0]
+      };
+    });
     this.manualItemsOverride.set(null);
     this.pushHistoryState(`Update ${key}: ${value}`);
     this.recalculateNesting();

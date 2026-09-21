@@ -1,10 +1,11 @@
-import { ChangeDetectionStrategy, Component, ElementRef, inject, signal, viewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, ElementRef, HostListener, inject, signal, viewChild } from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
 import { Canvas2D } from './components/canvas-2d/canvas-2d';
 import { MaterialManager } from './components/material-manager/material-manager';
 import { NestingView } from './components/nesting-view/nesting-view';
 import { ReportsView } from './components/reports-view/reports-view';
 import { TemplatePicker } from './components/template-picker/template-picker';
+import { Viewer3D } from './components/viewer-3d/viewer-3d';
 import { DielineStateService, WorkspaceTab } from './core/services/dieline-state.service';
 
 interface Particle {
@@ -33,6 +34,7 @@ interface Rocket {
   imports: [
     MatIconModule,
     Canvas2D,
+    Viewer3D,
     NestingView,
     TemplatePicker,
     MaterialManager,
@@ -49,10 +51,88 @@ export class App {
   showProjectsModal = signal<boolean>(false);
   showSettingsModal = signal<boolean>(false);
   showEasterEggModal = signal<boolean>(false);
+  showShortcutsModal = signal<boolean>(false);
   saveSnapshotName = signal<string>('');
   notificationMessage = signal<string | null>(null);
   logoUploadError = signal<string | null>(null);
   isDraggingLogo = signal<boolean>(false);
+
+  @HostListener('window:keydown', ['$event'])
+  handleGlobalShortcuts(event: KeyboardEvent): void {
+    // Ignore when user is editing in an input or textarea
+    const target = event.target as HTMLElement;
+    if (target && (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable)) {
+      return;
+    }
+
+    const key = event.key;
+    const isCtrlOrMeta = event.ctrlKey || event.metaKey;
+
+    if (isCtrlOrMeta) {
+      if (key === 'z' || key === 'Z') {
+        event.preventDefault();
+        if (event.shiftKey) {
+          this.state.redo();
+          this.triggerToast('Redo applied');
+        } else {
+          this.state.undo();
+          this.triggerToast('Undo applied');
+        }
+        return;
+      }
+      if (key === 'y' || key === 'Y') {
+        event.preventDefault();
+        this.state.redo();
+        this.triggerToast('Redo applied');
+        return;
+      }
+      if (key === 'e' || key === 'E') {
+        event.preventDefault();
+        this.showExportModal.update(v => !v);
+        return;
+      }
+      if (key === 's' || key === 'S') {
+        event.preventDefault();
+        this.saveCurrentToLibrary();
+        return;
+      }
+    }
+
+    // Number keys for switching workspace tabs
+    switch (key) {
+      case '1':
+        this.setTab('editor_2d');
+        break;
+      case '2':
+        this.setTab('viewer_3d');
+        break;
+      case '3':
+        this.setTab('nesting');
+        break;
+      case '4':
+        this.setTab('templates');
+        break;
+      case '5':
+        this.setTab('materials');
+        break;
+      case '6':
+        this.setTab('reports');
+        break;
+      case '?':
+        this.showShortcutsModal.update(v => !v);
+        break;
+      case 'Escape':
+        this.showProjectModal.set(false);
+        this.showExportModal.set(false);
+        this.showProjectsModal.set(false);
+        this.showSettingsModal.set(false);
+        this.showShortcutsModal.set(false);
+        if (this.showEasterEggModal()) {
+          this.closeEasterEgg();
+        }
+        break;
+    }
+  }
 
   private fireworksCanvas = viewChild<ElementRef<HTMLCanvasElement>>('fireworksCanvas');
   private animationFrameId: number | null = null;

@@ -91,12 +91,7 @@ export interface TemplateParam {
 
 export type TemplateCategory = 
   | 'shipping'
-  | 'mailer'
-  | 'folding_carton'
-  | 'tray'
-  | 'sleeve'
-  | 'novelty'
-  | 'display';
+  | 'mailer';
 
 export interface TemplateDefinition {
   id: string;
