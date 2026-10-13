@@ -38,6 +38,21 @@ function findIndexHtml() {
   return path.join(__dirname, 'dist', 'app', 'browser', 'index.html');
 }
 
+function getAppIcon() {
+  const candidates = [
+    path.join(__dirname, 'assets/icon.ico'),
+    path.join(__dirname, 'assets/icon.png'),
+    path.join(__dirname, 'public/favicon.ico'),
+    path.join(__dirname, 'icon.ico'),
+    path.join(__dirname, 'icon.png')
+  ];
+
+  for (const p of candidates) {
+    if (fs.existsSync(p)) return p;
+  }
+  return undefined;
+}
+
 function createWindow() {
   const win = new BrowserWindow({
     width: 1440,
@@ -45,6 +60,7 @@ function createWindow() {
     minWidth: 1024,
     minHeight: 700,
     title: 'DielineForge — Packaging CAD & Zünd Nesting',
+    icon: getAppIcon(),
     backgroundColor: '#0a0a0a',
     autoHideMenuBar: true,
     show: false,

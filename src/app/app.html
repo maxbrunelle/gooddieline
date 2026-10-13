@@ -37,6 +37,13 @@
           </div>
         } @else {
           <div class="flex items-center justify-center gap-2 px-3 py-1.5 rounded-xl bg-[#3850a2]/15 border border-[#3850a2]/30 shadow-xs">
+            <img 
+              src="assets/icon.png" 
+              (error)="$any($event.target).style.display='none'"
+              alt="CAD Icon" 
+              class="w-5 h-5 object-contain rounded"
+              referrerpolicy="no-referrer"
+            />
             <mat-icon class="text-xl text-[#3850a2]" [class.text-[#7995f5]]="state.isDarkMode()">architecture</mat-icon>
             <span class="text-sm font-black tracking-wider" [class.text-neutral-100]="state.isDarkMode()" [class.text-slate-900]="!state.isDarkMode()">
               {{ state.brandName() }}
@@ -1247,6 +1254,25 @@
               <span>{{ logoUploadError() }}</span>
             </p>
           }
+
+          <!-- Desktop App & Windows Icon Location Info -->
+          <div 
+            class="p-3 rounded-xl border text-xs flex items-start gap-2.5 transition-colors"
+            [class.bg-neutral-950/80]="state.isDarkMode()"
+            [class.border-neutral-800]="state.isDarkMode()"
+            [class.bg-slate-50]="!state.isDarkMode()"
+            [class.border-slate-200]="!state.isDarkMode()"
+          >
+            <mat-icon class="text-base text-[#7995f5] shrink-0 mt-0.5" [class.text-[#3850a2]]="!state.isDarkMode()">folder_open</mat-icon>
+            <div class="space-y-1 text-[11px]" [class.text-neutral-300]="state.isDarkMode()" [class.text-slate-600]="!state.isDarkMode()">
+              <span class="font-bold block" [class.text-neutral-100]="state.isDarkMode()" [class.text-slate-800]="!state.isDarkMode()">
+                Windows App & Title Bar Icon Folder:
+              </span>
+              <p class="leading-relaxed">
+                Place your custom <code class="px-1 py-0.5 rounded font-mono font-bold bg-[#3850a2]/20 text-[#7995f5]">icon.ico</code> or <code class="px-1 py-0.5 rounded font-mono font-bold bg-[#3850a2]/20 text-[#7995f5]">icon.png</code> into the project's <strong class="font-mono text-emerald-400 font-bold">assets/</strong> folder. The Windows installer, taskbar, desktop shortcut, and window title bar automatically use it.
+              </p>
+            </div>
+          </div>
         </div>
 
         <!-- Studio / Brand Name Section -->

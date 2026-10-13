@@ -2,12 +2,16 @@
   "name": "dielineforge",
   "version": "1.0.0",
   "description": "Parametric Packaging Dieline Generator & Zünd Nesting Production CAD Software",
+  "main": "electron/main.js",
   "scripts": {
     "ng": "ng",
     "start": "ng serve --port=3000 --host=0.0.0.0 --allowed-hosts=true",
     "dev": "ng serve --port=3000 --host=0.0.0.0 --allowed-hosts=true",
     "build": "ng build",
     "postbuild": "node -e \"const fs=require('fs'),path=require('path');const dirs=['dist/app/browser','dist/browser','dist/dielineforge/browser'];dirs.forEach(d=>{const csr=path.join(d,'index.csr.html'),idx=path.join(d,'index.html');if(fs.existsSync(csr)){fs.copyFileSync(csr,idx);console.log('Synchronized client entrypoint to '+idx);}});\"",
+    "electron:dev": "electron .",
+    "electron:build:win": "ng build --base-href ./ && electron-builder --win",
+    "electron:dist": "electron-builder --win nsis portable",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
     "lint": "ng lint"
@@ -47,5 +51,44 @@
     "tailwindcss": "^4.1.12",
     "typescript": "~5.9.2",
     "typescript-eslint": "8.47.0"
+  },
+  "build": {
+    "appId": "com.dielineforge.cad",
+    "productName": "DielineForge CAD",
+    "copyright": "Copyright © 2026",
+    "directories": {
+      "output": "dist-electron"
+    },
+    "files": [
+      "dist/**/*",
+      "electron/**/*",
+      "electron.js",
+      "assets/**/*",
+      "public/**/*",
+      "package.json"
+    ],
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": ["x64"]
+        },
+        {
+          "target": "portable",
+          "arch": ["x64"]
+        }
+      ],
+      "icon": "assets/icon.ico"
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "DielineForge CAD",
+      "installerIcon": "assets/icon.ico",
+      "uninstallerIcon": "assets/icon.ico"
+    }
   }
 }

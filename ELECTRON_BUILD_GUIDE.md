@@ -1,29 +1,64 @@
-# DielineForge CAD - Windows Desktop Packaging Guide
+# DielineForge CAD - Windows Desktop Packaging & Custom Icon Guide
 
-This guide explains how to package DielineForge into a standalone Windows installer (`.exe`) and portable executable.
-
----
-
-### Step 1: Export and Extract
-1. Export / download the project ZIP from the **Settings / Export** menu (or clone from GitHub).
-2. Extract the zip folder on your Windows computer.
+This guide explains how to package DielineForge into a standalone Windows installer (`.exe`) and portable executable using the included **`build-windows-installer.bat`** script, and how to upload your custom brand icon.
 
 ---
 
-### Step 2: Install Dependencies on Windows
-Open PowerShell or Command Prompt inside the extracted project folder (`gooddieline-main`):
+## 🎨 Where to Upload Your Custom Icon
 
-```bash
-npm install --legacy-peer-deps
+To display your custom icon in the **Windows Title Bar**, the **Taskbar**, the **Desktop Shortcut**, the **Installer Wizard**, and **on the app itself**, place your icon files into this directory:
+
+```
+📁 assets/
+   ├── icon.ico   <-- (Windows setup installer, .exe file icon, taskbar & window title bar)
+   ├── icon.png   <-- (In-app top navigation header & high-DPI display)
+   └── logo.png   <-- (Optional: wide horizontal brand logo)
 ```
 
+### File Specifications:
+1. **`assets/icon.ico`** (Required for Windows Executable):
+   - **Format:** Windows Icon (`.ico`)
+   - **Recommended size:** Multi-resolution (256x256, 128x128, 64x64, 48x48, 32x32, 16x16)
+   - **Free online converter:** If you have a PNG, convert it at [cloudconvert.com/png-to-ico](https://cloudconvert.com/png-to-ico) or [convertio.co/png-ico](https://convertio.co/png-ico/) and save as `assets/icon.ico`.
+
+2. **`assets/icon.png`** (For App Title Bar & Header):
+   - **Format:** PNG with transparent background (`.png`)
+   - **Recommended size:** 512x512 px or 256x256 px
+   - **Where it appears:** Rendered directly in the CAD header next to your studio brand name.
+
+3. **In-App Logo Customization (Live)**:
+   - You can also upload a logo dynamically at any time inside the running app by clicking **Settings (gear icon) -> Brand Logo** to drag-and-drop your image directly.
+
 ---
 
-### Step 3: Build & Package Windows Executables
+## 🚀 How to Build the Windows Installer with `.bat`
 
-Run the packaging script (this compiles the Angular app with relative paths and builds the Windows executables):
+### Method 1: One-Click Build Script (Easiest)
+1. Download or extract the project on your Windows PC.
+2. Ensure you have **Node.js** installed ([nodejs.org](https://nodejs.org/)).
+3. Simply **double-click** the file:
+   ```cmd
+   build-windows-installer.bat
+   ```
+   *(or `build-installer.bat`)*
+
+The script will automatically:
+- Verify your Node.js and npm environment
+- Detect your custom `assets/icon.ico` and `assets/icon.png`
+- Check and install required packaging tools (`electron`, `electron-builder`)
+- Compile the Angular CAD application with relative paths
+- Build both the Windows **NSIS Setup Installer** and the **Portable Standalone Executable**
+- Give you an option to immediately open the output folder or test the app!
+
+---
+
+### Method 2: Command Line (PowerShell or CMD)
 
 ```bash
+# 1. Install dependencies
+npm install --legacy-peer-deps
+
+# 2. Build the Angular app and package Windows executables
 npm run electron:build:win
 ```
 
@@ -34,43 +69,26 @@ npm run electron:dev
 
 ---
 
-### Fixing `Cannot create symbolic link : A required privilege is not held by the client`
+## 📦 Output Location
 
-This error occurs when Windows non-admin terminals extract macOS/Linux symlinks inside the default code-signing tool cache (`winCodeSign`). 
+Once the script completes, find your executables in the **`dist-electron/`** folder:
+- **`dist-electron/DielineForge CAD Setup 1.0.0.exe`**
+  - Full Windows installation wizard with Desktop & Start Menu shortcuts with your custom icon.
+- **`dist-electron/DielineForge CAD 1.0.0.exe`**
+  - Portable standalone executable that runs immediately without installation.
 
-Here are the **2 quick ways to fix it**:
+---
 
-#### Option A: Run PowerShell / Terminal as Administrator (Fastest)
-1. Close your current PowerShell/Command Prompt.
-2. Search for **PowerShell** in the Windows Start menu, right-click, and choose **Run as administrator**.
-3. Navigate back to your project directory:
-   ```bash
-   cd "C:\Users\brune\Documents\gooddieline-main"
-   ```
-4. Run:
-   ```bash
-   npm run electron:build:win
-   ```
+## 🛠️ Troubleshooting: `Cannot create symbolic link: A required privilege is not held`
 
-#### Option B: Enable Windows Developer Mode
+This is a known Windows security restriction when extracting symlinks inside the default `winCodeSign` cache.
+
+### Fix A: Enable Windows Developer Mode (Recommended - Permanent Fix)
 1. Open Windows **Settings** (`Win + I`).
-2. Go to **System** > **For developers** (or search **Developer settings**).
+2. Go to **System** > **For developers** (or search "Developer settings").
 3. Toggle **Developer Mode** to **ON**.
-4. This grants non-admin users permission to create symlinks without needing elevated administrator prompts.
-5. Re-run `npm run electron:build:win`.
+4. Re-run `build-windows-installer.bat`.
 
----
-
-### Step 4: Output Location
-Once the build completes, find your executables in the **`dist-electron/`** folder:
-- **`DielineForge Setup 1.0.0.exe`** (Installer)
-- **`DielineForge 1.0.0.exe`** (Portable standalone executable, runs immediately)
-
----
-
-### Troubleshooting: `ERR_FILE_NOT_FOUND`
-If you encounter `ERR_FILE_NOT_FOUND` when launching the packaged `.exe`, it means the Angular client was not built prior to running electron-builder. Always use:
-```bash
-npm run electron:build:win
-```
-(which automatically runs `ng build --base-href ./` before running `electron-builder`).
+### Fix B: Run as Administrator
+1. Right-click **`build-windows-installer.bat`**.
+2. Select **Run as administrator**.

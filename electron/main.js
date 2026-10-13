@@ -121,13 +121,37 @@ function resolveIndexPath() {
   return path.join(appPath, 'dist/app/browser/index.html');
 }
 
+function getAppIcon() {
+  const candidates = [
+    path.join(app.getAppPath(), 'assets/icon.ico'),
+    path.join(app.getAppPath(), 'assets/icon.png'),
+    path.join(app.getAppPath(), 'public/favicon.ico'),
+    path.join(__dirname, '../assets/icon.ico'),
+    path.join(__dirname, '../assets/icon.png'),
+    path.join(__dirname, '../public/favicon.ico'),
+    path.join(__dirname, 'icon.ico'),
+    path.join(__dirname, 'icon.png'),
+    path.join(process.cwd(), 'assets/icon.ico'),
+    path.join(process.cwd(), 'assets/icon.png')
+  ];
+
+  for (const p of candidates) {
+    if (fs.existsSync(p)) {
+      return p;
+    }
+  }
+  return undefined;
+}
+
 function createWindow() {
+  const appIcon = getAppIcon();
   mainWindow = new BrowserWindow({
     width: 1440,
     height: 920,
     minWidth: 1024,
     minHeight: 700,
     title: 'DielineForge CAD - Parametric Packaging & Zünd Production',
+    icon: appIcon,
     backgroundColor: '#0a0a0a',
     show: false, // Show gracefully once content is ready
     webPreferences: {
